@@ -4,11 +4,12 @@ import {
   nextStep,
   daysUntilNext,
   evidenceProgress,
+  hasEscalatedPastFirstStep,
   isOverdueForEscalation,
   buildDraft,
 } from './engine';
 import { LADDERS } from './ladders';
-import { Case } from './types';
+import { Case, IssueType } from './types';
 
 function createMockCase(overrides: Partial<Case> = {}): Case {
   return {
@@ -174,89 +175,120 @@ describe('Case Escalation Engine', () => {
   });
 
   describe('buildDraft', () => {
-    const testStep = LADDERS.refund.steps[0];
+    const issueTypes: IssueType[] = ['refund', 'fraud', 'bank', 'insurance'];
 
-    it('handles every field empty with sensible fallbacks and no undefined or empty brackets', () => {
-      const emptyCase: Case = {
-        id: 'empty-1',
-        issueType: 'refund',
-        company: '',
-        amount: '',
-        reference: '',
-        incidentDate: '',
-        note: '',
-        createdAt: new Date().toISOString(),
-        evidence: {},
-      };
+    issueTypes.forEach((issueType) => {
+      it(`draft for ${issueType} contains request sentence, does not contain how text, no undefined, and no Details section when note is empty`, () => {
+        const ladder = LADDERS[issueType];
+        const step = ladder.steps[0];
+        const emptyNoteCase = createMockCase({
+          issueType,
+          company: 'Test Company',
+          amount: '500',
+          reference: 'REF-001',
+          incidentDate: '1 Nov 2026',
+          note: '',
+          userName: '',
+        });
 
-      const draft = buildDraft(emptyCase, testStep);
+        const draft = buildDraft(emptyNoteCase, step);
 
-      expect(draft).not.toContain('undefined');
-      expect(draft).not.toContain('null');
-      expect(draft).not.toContain('[]');
-      expect(draft).not.toContain('()');
-      expect(draft).toContain('To: Seller grievance officer');
-      expect(draft).toContain('the concerned company');
-      expect(draft).toContain('Reference details to be provided');
+        // Asserts request sentence is present
+        expect(draft).toContain(step.request);
+        // Asserts guidance "how" text is NOT in the draft
+        expect(draft).not.toContain(step.how);
+        // Asserts no undefined, null, or brackets
+        expect(draft).not.toContain('undefined');
+        expect(draft).not.toContain('null');
+        expect(draft).not.toContain('[]');
+        expect(draft).not.toContain('Aggrieved Consumer');
+        // Asserts no Details section when note is empty
+        expect(draft).not.toContain('Details:');
+        // Asserts ends with "Thank you." when no user name is provided
+        expect(draft).toMatch(/Thank you\.$/);
+      });
     });
 
-    it('correctly includes every field when all are filled', () => {
+    it('includes Details: section and user note when note is provided', () => {
+      const step = LADDERS.refund.steps[0];
       const filledCase = createMockCase({
-        company: 'Amazon India',
-        amount: '4500',
-        reference: 'AMZ-998877',
-        incidentDate: '12 Nov 2026',
-        note: 'Damaged phone delivered, replacement refused.',
+        note: 'Package arrived torn and empty.',
+        userName: 'Asha Sharma',
       });
+      const draft = buildDraft(filledCase, step);
 
-      const draft = buildDraft(filledCase, testStep);
-
-      expect(draft).toContain('To: Seller grievance officer');
-      expect(draft).toContain('Amazon India');
-      expect(draft).toContain('₹4500');
-      expect(draft).toContain('AMZ-998877');
-      expect(draft).toContain('12 Nov 2026');
-      expect(draft).toContain('Damaged phone delivered, replacement refused.');
+      expect(draft).toContain('Details:');
+      expect(draft).toContain('Package arrived torn and empty.');
+      expect(draft).toContain('Yours sincerely,');
+      expect(draft).toContain('Asha Sharma');
     });
   });
 
-  describe('Calendar day boundaries across midnight in local time', () => {
+  describe('daysElapsed with Math.round and local time calculations', () => {
     it('accurately counts 1 day elapsed for case created at 11:59pm checked after midnight', () => {
-      // Case created Nov 10, 2026 at 23:59:00 local time
       const created = new Date(2026, 10, 10, 23, 59, 0);
       const caseItem = createMockCase({
         createdAt: created.toISOString(),
       });
 
-      // Checked same night at 23:59:30 local time -> 0 days
       const sameNight = new Date(2026, 10, 10, 23, 59, 30);
       expect(daysElapsed(caseItem, sameNight)).toBe(0);
 
-      // Checked 2 minutes later on Nov 11, 2026 at 00:01:00 local time -> 1 day
       const afterMidnight = new Date(2026, 10, 11, 0, 1, 0);
       expect(daysElapsed(caseItem, afterMidnight)).toBe(1);
     });
+
+    it('simulates time differences with non-midnight offsets across days', () => {
+      // Case created on Nov 1 at 22:30 local time
+      const created = new Date(2026, 10, 1, 22, 30, 0);
+      const caseItem = createMockCase({
+        createdAt: created.toISOString(),
+      });
+
+      // Now on Nov 3 at 06:15 local time (clock diff is ~31.75 hours, but calendar days = 2)
+      const now = new Date(2026, 10, 3, 6, 15, 0);
+      expect(daysElapsed(caseItem, now)).toBe(2);
+    });
   });
 
-  describe('isOverdueForEscalation', () => {
+  describe('hasEscalatedPastFirstStep (and alias isOverdueForEscalation)', () => {
     const baseDate = new Date(2026, 10, 1, 10, 0, 0);
 
-    it('returns false on day 0 when within initial company resolution window', () => {
+    it('returns false for refund on day 0 and day 6', () => {
       const c = createMockCase({
         issueType: 'refund',
         createdAt: baseDate.toISOString(),
       });
-      const now = new Date(2026, 10, 3, 10, 0, 0); // 2 days later
-      expect(isOverdueForEscalation(c, now)).toBe(false);
+      expect(hasEscalatedPastFirstStep(c, new Date(2026, 10, 1, 10, 0, 0))).toBe(false);
+      expect(hasEscalatedPastFirstStep(c, new Date(2026, 10, 7, 10, 0, 0))).toBe(false);
     });
 
-    it('returns true when deadline passes without resolution', () => {
+    it('returns true for refund on day 7 (escalation milestone reached)', () => {
       const c = createMockCase({
         issueType: 'refund',
         createdAt: baseDate.toISOString(),
       });
-      const now = new Date(2026, 10, 9, 10, 0, 0); // 8 days later (past day 7)
-      expect(isOverdueForEscalation(c, now)).toBe(true);
+      expect(hasEscalatedPastFirstStep(c, new Date(2026, 10, 8, 10, 0, 0))).toBe(true);
+      expect(isOverdueForEscalation(c, new Date(2026, 10, 8, 10, 0, 0))).toBe(true);
+    });
+
+    it('returns false for fraud on day 0 AND day 1 (portal filing is NOT overdue)', () => {
+      const c = createMockCase({
+        issueType: 'fraud',
+        createdAt: baseDate.toISOString(),
+      });
+      // Day 0: Helpline
+      expect(hasEscalatedPastFirstStep(c, new Date(2026, 10, 1, 12, 0, 0))).toBe(false);
+      // Day 1: Cybercrime portal filing - must NOT be flagged as overdue
+      expect(hasEscalatedPastFirstStep(c, new Date(2026, 10, 2, 12, 0, 0))).toBe(false);
+    });
+
+    it('returns true for fraud on day 30 (escalates past initial portal stage to RBI)', () => {
+      const c = createMockCase({
+        issueType: 'fraud',
+        createdAt: baseDate.toISOString(),
+      });
+      expect(hasEscalatedPastFirstStep(c, new Date(2026, 11, 1, 10, 0, 0))).toBe(true);
     });
 
     it('returns false when case has already been resolved', () => {
@@ -265,8 +297,7 @@ describe('Case Escalation Engine', () => {
         createdAt: baseDate.toISOString(),
         resolvedAt: '2026-11-05T12:00:00.000Z',
       });
-      const now = new Date(2026, 10, 15, 10, 0, 0); // 14 days later
-      expect(isOverdueForEscalation(c, now)).toBe(false);
+      expect(hasEscalatedPastFirstStep(c, new Date(2026, 10, 15, 10, 0, 0))).toBe(false);
     });
   });
 

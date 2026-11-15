@@ -51,7 +51,7 @@ export const Button: React.FC<ButtonProps> = ({
     opacity: disabled ? 0.5 : 1,
   };
 
-  const textColor = colors.ink;
+  const textColor = isPrimary ? colors.onAction : colors.ink;
 
   return (
     <Pressable

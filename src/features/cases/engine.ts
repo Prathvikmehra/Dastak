@@ -3,7 +3,8 @@ import { LADDERS } from './ladders';
 
 /**
  * Calculates the number of calendar days elapsed between case creation and `now`
- * using calendar days in local time.
+ * using calendar days in local time. Uses Math.round to avoid off-by-one errors across
+ * daylight saving or slight midnight clock drift.
  */
 export function daysElapsed(caseItem: Case, now: Date): number {
   const created = new Date(caseItem.createdAt);
@@ -16,7 +17,7 @@ export function daysElapsed(caseItem: Case, now: Date): number {
   const nowLocalMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
   const diffMs = nowLocalMidnight - startLocalMidnight;
-  return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+  return Math.max(0, Math.round(diffMs / (1000 * 60 * 60 * 24)));
 }
 
 /**
@@ -78,65 +79,102 @@ export function evidenceProgress(caseItem: Case): { done: number; total: number 
 }
 
 /**
- * Returns whether a case is overdue for escalation.
- * A case is overdue if it has passed its initial company resolution deadline (dayOffset > 0)
- * and has not yet been resolved.
+ * Returns whether a case has escalated past its initial filing stage.
+ * For fraud, day 1 is the initial cybercrime portal filing step, so day 1 is NOT overdue.
+ * Fraud escalates to RBI complaint portal after day 30.
+ * For other issues (refund, bank, insurance), it is true when current step dayOffset > 0.
+ * Returns false if the case has already been resolved.
  */
-export function isOverdueForEscalation(caseItem: Case, now: Date): boolean {
+export function hasEscalatedPastFirstStep(caseItem: Case, now: Date): boolean {
   if (caseItem.resolvedAt) {
     return false;
+  }
+  const elapsed = daysElapsed(caseItem, now);
+  if (caseItem.issueType === 'fraud') {
+    return elapsed >= 30;
   }
   const current = currentStep(caseItem, now);
   return current.dayOffset > 0;
 }
 
+// Backward-compatible alias
+export const isOverdueForEscalation = hasEscalatedPastFirstStep;
+
 /**
- * Generates a clean, plain-text complaint draft with sensible fallbacks when fields are empty.
- * Never outputs "undefined", "null", or empty brackets.
+ * Generates an honest, factual plain-text complaint draft.
+ * - Only states facts the user supplied.
+ * - Uses step.request (never step.how).
+ * - If note is empty, omits the "Details" section entirely.
+ * - If user has no name on file, ends with "Thank you." and no placeholder signature.
+ * - Never prints "undefined", "null", empty brackets, or "Aggrieved Consumer".
  */
 export function buildDraft(caseItem: Case, step: LadderStep): string {
-  const company =
-    caseItem.company && caseItem.company.trim() ? caseItem.company.trim() : 'the concerned company';
+  const parts: string[] = [];
 
+  parts.push(`To: ${step.who}`);
+
+  const company = caseItem.company && caseItem.company.trim() ? caseItem.company.trim() : '';
+  if (company) {
+    parts.push(`Subject: Formal grievance regarding issue with ${company}`);
+  } else {
+    parts.push('Subject: Formal grievance');
+  }
+
+  parts.push('');
+  parts.push('Respected Sir/Madam,');
+  parts.push('');
+
+  const sentences: string[] = [];
   const rawAmount = caseItem.amount ? caseItem.amount.trim().replace(/^₹/, '') : '';
-  const amountText = rawAmount ? `of ₹${rawAmount}` : 'in dispute';
-
-  const refText =
-    caseItem.reference && caseItem.reference.trim()
-      ? caseItem.reference.trim()
-      : 'Reference details to be provided';
-
   const incidentDate =
-    caseItem.incidentDate && caseItem.incidentDate.trim()
-      ? caseItem.incidentDate.trim()
-      : 'recently';
+    caseItem.incidentDate && caseItem.incidentDate.trim() ? caseItem.incidentDate.trim() : '';
 
-  const userNote =
-    caseItem.note && caseItem.note.trim()
-      ? caseItem.note.trim()
-      : 'I have not received the rightful refund or resolution despite multiple requests.';
+  if (company && rawAmount) {
+    sentences.push(
+      `I am submitting this grievance regarding my transaction with ${company} for an amount of ₹${rawAmount}.`
+    );
+  } else if (company) {
+    sentences.push(`I am submitting this grievance regarding my transaction with ${company}.`);
+  } else if (rawAmount) {
+    sentences.push(
+      `I am submitting this grievance regarding a transaction for an amount of ₹${rawAmount}.`
+    );
+  } else {
+    sentences.push('I am submitting this formal grievance for your consideration.');
+  }
 
-  const lines: string[] = [
-    `To: ${step.who}`,
-    `Subject: Formal grievance regarding issue with ${company}`,
-    '',
-    'Respected Sir/Madam,',
-    '',
-    `I am submitting this grievance regarding an issue with ${company} involving an amount ${amountText}. The incident occurred on or around ${incidentDate}.`,
-    '',
-    `Reference ID / Account: ${refText}`,
-    '',
-    'Details of the problem:',
-    userNote,
-    '',
-    'Requested action:',
-    step.how,
-    '',
-    'I request your prompt intervention to resolve this matter.',
-    '',
-    'Yours sincerely,',
-    'Aggrieved Consumer / Account Holder',
-  ];
+  if (incidentDate) {
+    sentences.push(`The incident occurred on ${incidentDate}.`);
+  }
 
-  return lines.join('\n');
+  parts.push(sentences.join(' '));
+
+  const reference =
+    caseItem.reference && caseItem.reference.trim() ? caseItem.reference.trim() : '';
+  if (reference) {
+    parts.push('');
+    parts.push(`Reference / Account ID: ${reference}`);
+  }
+
+  const note = caseItem.note && caseItem.note.trim() ? caseItem.note.trim() : '';
+  if (note) {
+    parts.push('');
+    parts.push('Details:');
+    parts.push(note);
+  }
+
+  parts.push('');
+  parts.push('Requested action:');
+  parts.push(step.request);
+
+  parts.push('');
+  const userName = caseItem.userName && caseItem.userName.trim() ? caseItem.userName.trim() : '';
+  if (userName) {
+    parts.push('Yours sincerely,');
+    parts.push(userName);
+  } else {
+    parts.push('Thank you.');
+  }
+
+  return parts.join('\n');
 }

@@ -70,7 +70,7 @@ export default function CaseDetailScreen() {
           onPress={() => {
             // Placeholder action - shares letter
           }}
-          icon={<Ionicons name="download-outline" size={20} color={colors.ink} />}
+          icon={<Ionicons name="download-outline" size={20} color={colors.onAction} />}
           style={styles.primaryAction}
         />
 

@@ -10,6 +10,7 @@ export interface Case {
   note: string;
   createdAt: string; // ISO string
   evidence: Record<string, boolean>;
+  userName?: string;
   resolvedAt?: string;
   recoveredAmount?: number;
 }
@@ -19,6 +20,7 @@ export interface LadderStep {
   dayOffset: number;
   who: string;
   how: string;
+  request: string;
   link?: string;
   phone?: string;
 }

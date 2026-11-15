@@ -4,10 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
 
+export function getTabBarBottomPadding(bottomInset: number): number {
+  return Math.max(bottomInset, 8);
+}
+
 export default function TabsLayout() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const bottomInset = Math.max(insets.bottom, 8);
+  const bottomInset = getTabBarBottomPadding(insets.bottom);
 
   return (
     <Tabs

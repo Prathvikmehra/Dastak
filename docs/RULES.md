@@ -75,13 +75,13 @@ dastak/
 - **Ink (Text)**: `#14233B`
 - **Muted (Secondary text)**: `#5B6B82`
 - **Primary**: `#1E4D8F`
-- **Action**: `#E8890C` (Used **only** for the single main button per screen; label and icon use `colors.ink`)
+- **Action**: `#E8890C` (Used **only** for the single main button per screen in both themes)
+- **OnAction**: `#14233B` (Dark ink text and icon on action button, 6.01:1 contrast in both light and dark themes)
 - **Success**: `#1C8255` (Adjusted minimally from `#1F8A5B` to achieve 4.80:1 contrast on surface `#FFFFFF`)
 - **Danger**: `#C0392B`
 - **Dark Mode Adjusted Tokens** (for WCAG 2.1 AA 4.5:1 ratio):
   - Primary: `#5D8DD1` (4.70:1 on dark surface `#152238`)
   - Danger: `#EC5A4A` (4.65:1 on dark surface `#152238`)
-  - Action: `#A25000` (5.20:1 with dark ink `#F1F5F9`)
   - Success: `#2ECC71` (7.58:1 on dark surface `#152238`)
 - **Card radius**: `12dp`
 - **Button radius**: `8dp`

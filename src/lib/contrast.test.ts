@@ -11,7 +11,7 @@ describe('WCAG 2.1 Contrast Ratios (at least 4.5:1)', () => {
     { name: 'ink on surface', textKey: 'ink', bgKey: 'surface' },
     { name: 'muted on background', textKey: 'muted', bgKey: 'background' },
     { name: 'muted on surface', textKey: 'muted', bgKey: 'surface' },
-    { name: 'ink on action', textKey: 'ink', bgKey: 'action' },
+    { name: 'onAction on action', textKey: 'onAction', bgKey: 'action' },
     { name: 'primary on surface', textKey: 'primary', bgKey: 'surface' },
     { name: 'success on surface', textKey: 'success', bgKey: 'surface' },
     { name: 'danger on surface', textKey: 'danger', bgKey: 'surface' },

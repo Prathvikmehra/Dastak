@@ -5,6 +5,7 @@ export interface ColorTokens {
   muted: string;
   primary: string;
   action: string;
+  onAction: string;
   success: string;
   danger: string;
   border: string;
@@ -19,6 +20,7 @@ export const lightColors: ColorTokens = {
   muted: '#5B6B82',
   primary: '#1E4D8F',
   action: '#E8890C', // Used only for the one main button per screen
+  onAction: '#14233B', // Dark ink text/icon on action button (6.01:1 contrast)
   success: '#1C8255', // Minimally adjusted from #1F8A5B for WCAG 2.1 AA (4.80:1 on #FFFFFF)
   danger: '#C0392B',
   border: '#E2E8F0',
@@ -32,7 +34,8 @@ export const darkColors: ColorTokens = {
   ink: '#F1F5F9',
   muted: '#94A3B8',
   primary: '#5D8DD1', // Minimally adjusted from #4C7EC4 for WCAG 2.1 AA (4.70:1 on #152238)
-  action: '#A25000', // Minimally adjusted from #E8890C for WCAG 2.1 AA (5.20:1 with #F1F5F9 ink)
+  action: '#E8890C', // Restored to #E8890C
+  onAction: '#14233B', // Dark ink on action button (6.01:1 contrast)
   success: '#2ECC71',
   danger: '#EC5A4A', // Minimally adjusted from #E74C3C for WCAG 2.1 AA (4.65:1 on #152238)
   border: '#233554',

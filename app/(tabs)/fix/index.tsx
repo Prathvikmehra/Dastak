@@ -50,7 +50,7 @@ export default function FixHomeScreen() {
         <Button
           label="Start a case"
           onPress={handleStartCase}
-          icon={<Ionicons name="arrow-forward" size={20} color={colors.ink} />}
+          icon={<Ionicons name="arrow-forward" size={20} color={colors.onAction} />}
         />
       </Card>
 
