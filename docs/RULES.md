@@ -1,0 +1,109 @@
+# Dastak Engineering and Design Rules
+
+These rules are mandatory for all contributors, human and AI agents working on Dastak. Every future task must begin by reviewing this document.
+
+---
+
+## 1. Product Mission & Context
+
+Dastak is a React Native (Expo) app built for everyday Indian citizens. It helps ordinary people:
+
+1. **Fix problems**: Get refunds, report UPI payment fraud, resolve bank account errors, and contest rejected insurance claims.
+2. **Find money**: Recover forgotten bank deposits, unclaimed insurance, and pension/provident funds, and reduce monthly medicine bills with equivalent generic alternatives.
+
+---
+
+## 2. Core Technical Stack
+
+- **Framework**: React Native with Expo SDK (latest stable).
+- **Language**: TypeScript with `strict: true`.
+- **Router**: Expo Router (file-based routing with typed routes).
+- **Styling**: Native StyleSheet backed by central theme tokens.
+- **Icons**: Single icon family only (`Ionicons` from `@expo/vector-icons`). No emoji as icons.
+
+---
+
+## 3. Strict Folder Structure
+
+```
+dastak/
+├── app/                          # Expo Router routes & stack/tab layouts only
+│   ├── (tabs)/
+│   │   ├── _layout.tsx           # Exactly two tabs: "Fix" and "Find"
+│   │   ├── fix/                  # Fix flow stack (index, new-case, case-detail, my-cases)
+│   │   └── find/                 # Find flow stack (index, money-radar, medicine-saver)
+│   ├── _layout.tsx               # Root stack provider and modal routes
+│   └── help.tsx                  # Settings, language, and help modal
+├── src/
+│   ├── components/               # Core design system components
+│   │   ├── Screen.tsx            # Safe area container
+│   │   ├── Text.tsx              # 4 sizes only (title, subtitle, body, caption)
+│   │   ├── Button.tsx            # primary (action token) and quiet variants
+│   │   ├── Card.tsx              # 12dp radius surface card
+│   │   ├── Field.tsx             # 48dp min touch target text input
+│   │   ├── EmptyState.tsx        # Standard empty state layout
+│   │   └── HeaderActions.tsx     # Header icon buttons
+│   ├── theme/                    # Tokens, colors, typography, spacing, radius
+│   ├── features/                 # Domain logic and features
+│   │   ├── cases/                # Problem resolution & complaint cases
+│   │   ├── money/                # Unclaimed money radar
+│   │   └── medicine/             # Jan Aushadhi & generic medicine saver
+│   └── lib/                      # Pure utilities (formatters, date, rupee)
+└── docs/                         # Architecture, rules, and specifications
+    └── RULES.md
+```
+
+---
+
+## 4. Navigation Rules
+
+1. **Exactly Two Bottom Tabs**:
+   - **Fix**: Stack with Home (`What happened?` box + 4 issue doors), `NewCase`, `CaseDetail`, `MyCases`.
+   - **Find**: Stack with Home (`Money radar` + `Medicine saver` cards), `MoneyRadar`, `MedicineSaver`.
+   - **Nothing else on the tab bar**.
+2. **Header Utilities**:
+   - Settings, language selection, and help live behind a single small icon (`help-circle-outline`) in the header.
+3. **Back Traps are Forbidden**:
+   - The user must never be trapped on any screen. Back buttons, back titles, hardware back buttons, and swipe-to-back must always work predictably.
+
+---
+
+## 5. Design System Tokens
+
+- **Background**: `#F7F9FC`
+- **Surface / Card**: `#FFFFFF`
+- **Ink (Text)**: `#14233B`
+- **Muted (Secondary text)**: `#5B6B82`
+- **Primary**: `#1E4D8F`
+- **Action**: `#E8890C` (Used **only** for the single main button per screen)
+- **Success**: `#1F8A5B`
+- **Danger**: `#C0392B`
+- **Card radius**: `12dp`
+- **Button radius**: `8dp`
+- **Touch target**: Minimum `48dp` on all interactive elements (buttons, inputs, cards, pills).
+- **Typography**: Exactly 4 sizes across the entire app:
+  1. `title`: 24sp (bold)
+  2. `subtitle`: 18sp (semibold)
+  3. `body`: 16sp (regular) — Body text is **always 16sp or larger**.
+  4. `caption`: 14sp (medium)
+- **Primary Action Rule**: Exactly **one** primary action button per screen. Secondary or auxiliary actions must use the `quiet` variant.
+- **Theme**: Light theme by default, with dark mode support.
+
+---
+
+## 6. Copy and Language Style
+
+- **Audience**: Plain words a first-time smartphone user understands.
+- **Sentence-case**: Use sentence-case for all titles, buttons, headings, and labels.
+- **No All-Caps**: Never use all-caps text (`SUBMIT` -> `Submit case`).
+- **No Jargon**: Avoid technical jargon (say "Money cut from bank" instead of "Debit transaction initiated").
+- **No Emoji Icons**: Do not use emojis as user interface icons; use `Ionicons` consistently.
+
+---
+
+## 7. Privacy & Engineering Policies
+
+- **Ask Before Adding Dependencies**: Do not install any library or package without explicit user permission.
+- **Strict Privacy ("Local-First")**: No user data leaves the device unless the user explicitly taps to share or export it. Drafts, case IDs, and search terms remain on the user's phone.
+- **Type Safety**: TypeScript strict mode must pass with zero errors (`npx tsc --noEmit`).
+- **Health Checks**: `npx expo-doctor` must always pass with zero failures.
