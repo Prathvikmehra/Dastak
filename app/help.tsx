@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Pressable, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Notifications from 'expo-notifications';
 import { Screen, Text, Card, Button } from '../src/components';
 import { useTheme } from '../src/theme/ThemeContext';
+import { useCases } from '../src/features/cases/store';
+import { defaultReminders } from '../src/features/cases/reminders';
 
 const LANGUAGES = [
   { id: 'en', label: 'English', native: 'English' },
@@ -17,10 +20,79 @@ const LANGUAGES = [
 export default function HelpScreen() {
   const router = useRouter();
   const { colors, mode, setMode, radius } = useTheme();
+  const { hadCorruptedData, openCases } = useCases();
   const [selectedLang, setSelectedLang] = useState('en');
+  const [remindersEnabled, setRemindersEnabled] = useState(false);
+
+  useEffect(() => {
+    Notifications.getPermissionsAsync()
+      .then((perm) => {
+        setRemindersEnabled(perm.status === 'granted');
+      })
+      .catch(() => {
+        setRemindersEnabled(false);
+      });
+  }, []);
+
+  const handleToggleReminders = async (val: boolean) => {
+    if (val) {
+      try {
+        const { status } = await Notifications.requestPermissionsAsync();
+        const granted = status === 'granted';
+        setRemindersEnabled(granted);
+        if (granted) {
+          for (const c of openCases) {
+            await defaultReminders.schedule(c);
+          }
+        }
+      } catch {
+        setRemindersEnabled(false);
+      }
+    } else {
+      setRemindersEnabled(false);
+      for (const c of openCases) {
+        await defaultReminders.cancel(c.id);
+      }
+    }
+  };
 
   return (
     <Screen scrollable>
+      {/* Calm notice if corrupted data was recovered and backed up */}
+      {hadCorruptedData ? (
+        <Card
+          style={[
+            styles.sectionCard,
+            { borderColor: colors.danger, backgroundColor: colors.dangerSurface },
+          ]}
+        >
+          <Text size="body" color="danger">
+            We could not read your saved cases. A backup was kept.
+          </Text>
+        </Card>
+      ) : null}
+
+      {/* Escalation Reminders Toggle */}
+      <Card style={styles.sectionCard}>
+        <View style={styles.remindersHeaderRow}>
+          <View style={styles.remindersTextContainer}>
+            <Text size="subtitle" color="ink" style={styles.sectionHeading}>
+              Escalation reminders
+            </Text>
+            <Text size="body" color="muted">
+              Remind you at 9:00 AM on the day your case moves to the next step.
+            </Text>
+          </View>
+          <Switch
+            value={remindersEnabled}
+            onValueChange={handleToggleReminders}
+            trackColor={{ false: colors.border, true: colors.primary }}
+            thumbColor={colors.surface}
+            accessibilityLabel="Toggle escalation reminders"
+          />
+        </View>
+      </Card>
+
       {/* Language Selector */}
       <Card style={styles.sectionCard}>
         <Text size="subtitle" color="ink" style={styles.sectionHeading}>
@@ -143,34 +215,8 @@ export default function HelpScreen() {
         </Text>
       </Card>
 
-      {/* Help & FAQs */}
-      <Card style={styles.sectionCard}>
-        <Text size="subtitle" color="ink" style={styles.sectionHeading}>
-          Frequently asked questions
-        </Text>
-
-        <View style={styles.faqItem}>
-          <Text size="body" color="ink" style={styles.faqQuestion}>
-            How much does Dastak charge?
-          </Text>
-          <Text size="body" color="muted">
-            Dastak is completely free. We do not ask for card details or fees.
-          </Text>
-        </View>
-
-        <View style={styles.faqItem}>
-          <Text size="body" color="ink" style={styles.faqQuestion}>
-            Can bank officials see my drafts?
-          </Text>
-          <Text size="body" color="muted">
-            Only when you share or send the generated letter to your bank branch or nodal desk.
-          </Text>
-        </View>
-      </Card>
-
       {/* Close button that never traps the user */}
       <View style={styles.closeContainer}>
-        {/* The single primary action on this screen */}
         <Button label="Back to app" onPress={() => router.back()} />
       </View>
     </Screen>
@@ -186,6 +232,15 @@ const styles = StyleSheet.create({
   },
   sectionSubtitle: {
     marginBottom: 14,
+  },
+  remindersHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  remindersTextContainer: {
+    flex: 1,
   },
   languageGrid: {
     gap: 8,
@@ -223,13 +278,6 @@ const styles = StyleSheet.create({
   },
   privacyDescription: {
     lineHeight: 22,
-  },
-  faqItem: {
-    marginBottom: 14,
-  },
-  faqQuestion: {
-    fontWeight: '600',
-    marginBottom: 2,
   },
   closeContainer: {
     marginBottom: 32,

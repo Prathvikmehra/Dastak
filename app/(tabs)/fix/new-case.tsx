@@ -6,6 +6,8 @@ import { IssueType } from '../../../src/features/cases/types';
 import { useCases } from '../../../src/features/cases/store';
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
 import { copy } from '../../../src/copy/en';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NOTIFICATION_ASKED_KEY } from '../../notification-prompt';
 import {
   IssueSelector,
   FraudTimingSelector,
@@ -66,10 +68,18 @@ export default function NewCaseScreen() {
         fraudWhen: issueType === 'fraud' ? fraudWhen : undefined,
       });
 
-      router.replace({
-        pathname: '/fix/case-detail',
-        params: { id: created.id },
-      });
+      const asked = await AsyncStorage.getItem(NOTIFICATION_ASKED_KEY);
+      if (!asked) {
+        router.replace({
+          pathname: '/notification-prompt' as any,
+          params: { id: created.id },
+        });
+      } else {
+        router.replace({
+          pathname: '/fix/case-detail',
+          params: { id: created.id },
+        });
+      }
     } catch {
       setError('Could not save case. Please try again.');
       setIsSubmitting(false);

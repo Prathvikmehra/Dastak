@@ -111,6 +111,8 @@ dastak/
 
 - **Ask Before Adding Dependencies**: Do not install any library or package without explicit user permission.
 - **Strict Privacy ("Local-First")**: No user data leaves the device unless the user explicitly taps to share or export it. Drafts, case IDs, and search terms remain on the user's phone.
+- **Data Stays on the Device**: All cases are persisted locally as a single versioned JSON document (`dastak_cases_v1`) via `KeyValueStorage` (`@react-native-async-storage/async-storage`). If saved data is corrupt, the app never crashes or wipes silently; it archives the raw string to a backup key and calmly notifies the user.
+- **Local Escalation Reminders**: Future ladder milestones are planned via pure function `planReminders` firing at 9:00 AM local time on that step's day. Local notifications are managed with `expo-notifications`. Permission is requested with a one-screen explanation only after the first case is saved, never nags if declined, and can be toggled in Settings.
 - **Type Safety**: TypeScript strict mode must pass with zero errors (`npx tsc --noEmit`).
 - **Health Checks**: `npx expo-doctor` must always pass with zero failures.
 

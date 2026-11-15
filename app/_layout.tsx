@@ -31,6 +31,13 @@ function RootLayoutContent() {
           title: 'Settings and help',
         }}
       />
+      <Stack.Screen
+        name="notification-prompt"
+        options={{
+          presentation: 'modal',
+          title: 'Reminders',
+        }}
+      />
     </Stack>
   );
 }

@@ -16,6 +16,25 @@ export interface Case {
   recoveredAmount?: number;
 }
 
+export interface CaseInput {
+  issueType: IssueType;
+  company?: string;
+  amount?: string;
+  reference?: string;
+  incidentDate?: string;
+  note?: string;
+  userName?: string;
+  fraudWhen?: 'hour' | 'today' | 'yesterday' | 'earlier';
+}
+
+export interface CaseStore {
+  list(): Promise<Case[]>;
+  get(id: string): Promise<Case | null>;
+  create(input: CaseInput, now?: Date): Promise<Case>;
+  update(id: string, updates: Partial<Omit<Case, 'id' | 'createdAt'>>): Promise<Case>;
+  resolve(id: string, recoveredAmount?: number, now?: Date): Promise<Case>;
+}
+
 export interface LadderStep {
   id: string;
   dayOffset: number;

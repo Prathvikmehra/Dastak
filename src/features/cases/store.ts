@@ -1,108 +1,22 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Case, IssueType } from './types';
+import { Case, CaseInput, CaseStore } from './types';
+import { PersistentCaseStore } from './storage';
+import { Reminders, defaultReminders } from './reminders';
 
-export interface CaseInput {
-  issueType: IssueType;
-  company?: string;
-  amount?: string;
-  reference?: string;
-  incidentDate?: string;
-  note?: string;
-  userName?: string;
-  fraudWhen?: 'hour' | 'today' | 'yesterday' | 'earlier';
-}
+export { CaseInput, CaseStore } from './types';
+export { InMemoryCaseStore } from './storage-inmemory';
 
-export interface CaseStore {
-  list(): Promise<Case[]>;
-  get(id: string): Promise<Case | null>;
-  create(input: CaseInput): Promise<Case>;
-  update(id: string, updates: Partial<Omit<Case, 'id' | 'createdAt'>>): Promise<Case>;
-  resolve(id: string, recoveredAmount?: number): Promise<Case>;
-}
-
-/**
- * In-memory implementation of CaseStore.
- * Storage-agnostic; will be swapped with SQLite in future steps.
- */
-export class InMemoryCaseStore implements CaseStore {
-  private cases: Map<string, Case> = new Map();
-
-  constructor(initialCases: Case[] = []) {
-    for (const c of initialCases) {
-      this.cases.set(c.id, c);
-    }
-  }
-
-  async list(): Promise<Case[]> {
-    return Array.from(this.cases.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-  }
-
-  async get(id: string): Promise<Case | null> {
-    return this.cases.get(id) || null;
-  }
-
-  async create(input: CaseInput): Promise<Case> {
-    const id = `case_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const newCase: Case = {
-      id,
-      issueType: input.issueType,
-      company: input.company?.trim() || '',
-      amount: input.amount?.trim() || '',
-      reference: input.reference?.trim() || '',
-      incidentDate: input.incidentDate?.trim() || '',
-      note: input.note?.trim() || '',
-      userName: input.userName?.trim() || '',
-      fraudWhen: input.fraudWhen,
-      createdAt: new Date().toISOString(),
-      evidence: {},
-    };
-    this.cases.set(id, newCase);
-    return newCase;
-  }
-
-  async update(id: string, updates: Partial<Omit<Case, 'id' | 'createdAt'>>): Promise<Case> {
-    const existing = this.cases.get(id);
-    if (!existing) {
-      throw new Error(`Case with id ${id} not found`);
-    }
-    const updated: Case = {
-      ...existing,
-      ...updates,
-      evidence: updates.evidence
-        ? { ...existing.evidence, ...updates.evidence }
-        : existing.evidence,
-    };
-    this.cases.set(id, updated);
-    return updated;
-  }
-
-  async resolve(id: string, recoveredAmount?: number): Promise<Case> {
-    const existing = this.cases.get(id);
-    if (!existing) {
-      throw new Error(`Case with id ${id} not found`);
-    }
-    const updated: Case = {
-      ...existing,
-      resolvedAt: new Date().toISOString(),
-      recoveredAmount: recoveredAmount !== undefined ? recoveredAmount : undefined,
-    };
-    this.cases.set(id, updated);
-    return updated;
-  }
-}
-
-// Global default in-memory store singleton for app session
-export const defaultCaseStore = new InMemoryCaseStore();
+// Global default persistent store singleton for app session
+export const defaultCaseStore = new PersistentCaseStore();
 
 export interface CasesContextValue {
   cases: Case[];
   loading: boolean;
+  hadCorruptedData: boolean;
   getCase: (id: string) => Case | undefined;
-  createCase: (input: CaseInput) => Promise<Case>;
+  createCase: (input: CaseInput, now?: Date) => Promise<Case>;
   updateCase: (id: string, updates: Partial<Omit<Case, 'id' | 'createdAt'>>) => Promise<Case>;
-  resolveCase: (id: string, recoveredAmount?: number) => Promise<Case>;
+  resolveCase: (id: string, recoveredAmount?: number, now?: Date) => Promise<Case>;
   refresh: () => Promise<void>;
   totalRecovered: number;
   openCases: Case[];
@@ -113,12 +27,18 @@ const CasesContext = createContext<CasesContextValue | null>(null);
 
 export interface CasesProviderProps {
   store?: CaseStore;
+  reminders?: Reminders;
   children: React.ReactNode;
 }
 
-export function CasesProvider({ store = defaultCaseStore, children }: CasesProviderProps) {
+export function CasesProvider({
+  store = defaultCaseStore,
+  reminders = defaultReminders,
+  children,
+}: CasesProviderProps) {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const hadCorruptedData = store instanceof PersistentCaseStore ? store.hadCorruptedData : false;
 
   const refresh = useCallback(async () => {
     const list = await store.list();
@@ -147,30 +67,33 @@ export function CasesProvider({ store = defaultCaseStore, children }: CasesProvi
   );
 
   const createCase = useCallback(
-    async (input: CaseInput) => {
-      const created = await store.create(input);
+    async (input: CaseInput, now: Date = new Date()) => {
+      const created = await store.create(input, now);
+      await reminders.schedule(created, now);
       await refresh();
       return created;
     },
-    [store, refresh]
+    [store, reminders, refresh]
   );
 
   const updateCase = useCallback(
     async (id: string, updates: Partial<Omit<Case, 'id' | 'createdAt'>>) => {
       const updated = await store.update(id, updates);
+      await reminders.schedule(updated);
       await refresh();
       return updated;
     },
-    [store, refresh]
+    [store, reminders, refresh]
   );
 
   const resolveCase = useCallback(
-    async (id: string, recoveredAmount?: number) => {
-      const resolved = await store.resolve(id, recoveredAmount);
+    async (id: string, recoveredAmount?: number, now: Date = new Date()) => {
+      const resolved = await store.resolve(id, recoveredAmount, now);
+      await reminders.cancel(id);
       await refresh();
       return resolved;
     },
-    [store, refresh]
+    [store, reminders, refresh]
   );
 
   const openCases = cases.filter((c) => !c.resolvedAt);
@@ -180,6 +103,7 @@ export function CasesProvider({ store = defaultCaseStore, children }: CasesProvi
   const value: CasesContextValue = {
     cases,
     loading,
+    hadCorruptedData,
     getCase,
     createCase,
     updateCase,
