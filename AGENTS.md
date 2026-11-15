@@ -4,7 +4,7 @@ Welcome to the Dastak codebase. Before writing or modifying any code, you must r
 
 ## Primary Rulebook
 
-Read [docs/RULES.md](file:///c:/Users/PRATHVIK/OneDrive/Desktop/react-native-project/docs/RULES.md) before starting any task.
+Read [docs/RULES.md](file:///c:/Users/PRATHVIK/OneDrive/Desktop/Dastak/docs/RULES.md) before starting any task.
 
 ### Core Tenets:
 

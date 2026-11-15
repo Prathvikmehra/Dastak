@@ -112,3 +112,11 @@ dastak/
 - **Strict Privacy ("Local-First")**: No user data leaves the device unless the user explicitly taps to share or export it. Drafts, case IDs, and search terms remain on the user's phone.
 - **Type Safety**: TypeScript strict mode must pass with zero errors (`npx tsc --noEmit`).
 - **Health Checks**: `npx expo-doctor` must always pass with zero failures.
+
+---
+
+## 8. Case Engine
+
+- **Pure Functions Only**: All escalation calculation, timeline progression, and draft generation logic in `src/features/cases/engine.ts` must be pure functions with zero side-effects.
+- **Injected Clock**: Never call `Date.now()`, `new Date()`, or hidden system clocks inside engine functions. All time calculations accept an explicit `now: Date` parameter to guarantee deterministic testing across timezones and midnight boundaries.
+- **No Network Dependency**: Escalation ladders and draft builders run completely offline on-device with zero network requests. Contacts are sourced strictly from vetted local data.
