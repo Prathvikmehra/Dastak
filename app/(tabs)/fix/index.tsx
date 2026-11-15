@@ -4,21 +4,88 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Screen, Text, Card, Field, Button } from '../../../src/components';
 import { useTheme } from '../../../src/theme/ThemeContext';
-import { ISSUE_DOORS, CaseIssueType } from '../../../src/features/cases/types';
+import { useCases } from '../../../src/features/cases/store';
+import { IssueType } from '../../../src/features/cases/types';
+import {
+  currentStep,
+  daysUntilNext,
+  hasEscalatedPastFirstStep,
+} from '../../../src/features/cases/engine';
+import { formatRupees } from '../../../src/lib/formatters';
+import { copy } from '../../../src/copy/en';
+
+interface DoorItem {
+  id: IssueType;
+  title: string;
+  description: string;
+  iconName: keyof typeof Ionicons.glyphMap;
+}
+
+const DOORS: DoorItem[] = [
+  {
+    id: 'refund',
+    title: copy.fixHome.doors.refund.title,
+    description: copy.fixHome.doors.refund.subtitle,
+    iconName: 'cart-outline',
+  },
+  {
+    id: 'fraud',
+    title: copy.fixHome.doors.fraud.title,
+    description: copy.fixHome.doors.fraud.subtitle,
+    iconName: 'alert-circle-outline',
+  },
+  {
+    id: 'bank',
+    title: copy.fixHome.doors.bank.title,
+    description: copy.fixHome.doors.bank.subtitle,
+    iconName: 'business-outline',
+  },
+  {
+    id: 'insurance',
+    title: copy.fixHome.doors.insurance.title,
+    description: copy.fixHome.doors.insurance.subtitle,
+    iconName: 'shield-outline',
+  },
+];
 
 export default function FixHomeScreen() {
   const router = useRouter();
   const { colors, radius } = useTheme();
+  const { openCases, totalRecovered } = useCases();
   const [description, setDescription] = useState('');
+
+  const now = new Date();
+
+  // Find most urgent next step among open cases
+  let urgentNextText = '';
+  if (openCases.length > 0) {
+    let minDays = Infinity;
+    for (const c of openCases) {
+      const isOverdue = hasEscalatedPastFirstStep(c, now);
+      const step = currentStep(c, now);
+      const remaining = daysUntilNext(c, now);
+
+      if (isOverdue) {
+        urgentNextText = `Action needed: ${step.who}`;
+        break;
+      } else if (remaining !== null && remaining < minDays) {
+        minDays = remaining;
+        urgentNextText =
+          remaining === 0 ? `Today: ${step.who}` : `Next: ${step.who} in ${remaining}d`;
+      } else if (!urgentNextText) {
+        urgentNextText = `Next: ${step.who}`;
+      }
+    }
+  }
 
   const handleStartCase = () => {
     router.push({
       pathname: '/fix/new-case',
-      params: { initialDesc: description },
+      params: { note: description },
     });
   };
 
-  const handleSelectDoor = (doorId: CaseIssueType) => {
+  const handleSelectDoor = (doorId: IssueType) => {
     router.push({
       pathname: '/fix/new-case',
       params: { issueType: doorId },
@@ -27,13 +94,72 @@ export default function FixHomeScreen() {
 
   return (
     <Screen scrollable>
+      {/* Recovered Banner if any money has been recovered */}
+      {totalRecovered > 0 ? (
+        <View
+          style={[
+            styles.recoveredBanner,
+            {
+              backgroundColor: colors.surfaceAlt,
+              borderColor: colors.success,
+              borderRadius: radius.card,
+            },
+          ]}
+        >
+          <Ionicons name="sparkles" size={20} color={colors.success} />
+          <Text size="subtitle" color="success" style={styles.recoveredText}>
+            {copy.fixHome.recoveredBanner(formatRupees(totalRecovered))}
+          </Text>
+        </View>
+      ) : null}
+
+      {/* Open Cases Summary Card (when open cases exist) */}
+      {openCases.length > 0 ? (
+        <Card style={styles.summaryCard}>
+          <View style={styles.summaryHeaderRow}>
+            <View style={styles.summaryBadge}>
+              <Ionicons name="time" size={18} color={colors.primary} />
+              <Text size="subtitle" color="ink" style={styles.summaryTitle}>
+                {copy.fixHome.summaryTitle(openCases.length)}
+              </Text>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="View my cases"
+              onPress={() => router.push('/fix/my-cases')}
+              style={styles.quietLink}
+            >
+              <Text size="body" color="primary" style={styles.linkText}>
+                {copy.fixHome.viewMyCases}
+              </Text>
+            </Pressable>
+          </View>
+
+          {urgentNextText ? (
+            <View style={styles.urgentRow}>
+              <Ionicons name="arrow-forward-circle" size={16} color={colors.primary} />
+              <Text size="body" color="muted" numberOfLines={1} style={styles.urgentText}>
+                {urgentNextText}
+              </Text>
+            </View>
+          ) : null}
+
+          <Button
+            label={copy.fixHome.viewMyCases}
+            variant="quiet"
+            onPress={() => router.push('/fix/my-cases')}
+            style={styles.summaryButton}
+          />
+        </Card>
+      ) : null}
+
       {/* What happened? input box */}
       <Card style={styles.promptCard}>
         <Text size="subtitle" color="ink" style={styles.cardHeader}>
-          What happened?
+          {copy.fixHome.title}
         </Text>
         <Text size="body" color="muted" style={styles.cardSubtitle}>
-          Tell us about the issue in simple words. We will help you write the official complaint.
+          {copy.fixHome.subtitle}
         </Text>
 
         <Field
@@ -66,13 +192,13 @@ export default function FixHomeScreen() {
           style={styles.quietLink}
         >
           <Text size="body" color="primary" style={styles.linkText}>
-            My cases
+            {copy.myCases.title}
           </Text>
         </Pressable>
       </View>
 
       <View style={styles.doorsList}>
-        {ISSUE_DOORS.map((door) => (
+        {DOORS.map((door) => (
           <Card
             key={door.id}
             onPress={() => handleSelectDoor(door.id)}
@@ -111,6 +237,46 @@ export default function FixHomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  recoveredBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 14,
+    borderWidth: 1.5,
+    marginBottom: 16,
+  },
+  recoveredText: {
+    fontWeight: '700',
+  },
+  summaryCard: {
+    marginBottom: 16,
+  },
+  summaryHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  summaryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  summaryTitle: {
+    fontWeight: '600',
+  },
+  urgentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 12,
+  },
+  urgentText: {
+    flex: 1,
+  },
+  summaryButton: {
+    marginTop: 4,
+  },
   promptCard: {
     marginBottom: 24,
   },

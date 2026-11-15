@@ -1,6 +1,7 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
+import { CasesProvider } from '../src/features/cases/store';
 
 function RootLayoutContent() {
   const { colors } = useTheme();
@@ -37,7 +38,9 @@ function RootLayoutContent() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <RootLayoutContent />
+      <CasesProvider>
+        <RootLayoutContent />
+      </CasesProvider>
     </ThemeProvider>
   );
 }

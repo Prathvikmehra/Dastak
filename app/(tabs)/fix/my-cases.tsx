@@ -1,118 +1,227 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Screen, Text, Card, EmptyState, Button } from '../../../src/components';
 import { useTheme } from '../../../src/theme/ThemeContext';
-import { CaseItem } from '../../../src/features/cases/types';
-
-const INITIAL_CASES: CaseItem[] = [];
+import { useCases } from '../../../src/features/cases/store';
+import { Case } from '../../../src/features/cases/types';
+import { LADDERS } from '../../../src/features/cases/ladders';
+import {
+  daysElapsed,
+  currentStep,
+  nextStep,
+  daysUntilNext,
+  hasEscalatedPastFirstStep,
+} from '../../../src/features/cases/engine';
+import { formatRupees, parseAmount } from '../../../src/lib/formatters';
+import { copy } from '../../../src/copy/en';
 
 export default function MyCasesScreen() {
   const router = useRouter();
   const { colors, radius } = useTheme();
-  const [cases, setCases] = useState<CaseItem[]>(INITIAL_CASES);
+  const { openCases, resolvedCases, cases } = useCases();
 
-  const handleCreateNew = () => {
-    router.push('/fix/new-case');
-  };
-
-  const handleOpenDetail = (item: CaseItem) => {
+  const handleOpenDetail = (caseItem: Case) => {
     router.push({
       pathname: '/fix/case-detail',
-      params: {
-        id: item.id,
-        title: item.title,
-        amount: item.amount || '0',
-        status: item.status,
-      },
+      params: { id: caseItem.id },
     });
   };
 
+  const handleStartNew = () => {
+    router.push('/fix/new-case');
+  };
+
+  const now = new Date();
+
   return (
     <Screen scrollable>
+      <View style={styles.header}>
+        <Text size="title" color="ink" style={styles.title}>
+          {copy.myCases.title}
+        </Text>
+        <Text size="body" color="muted">
+          {copy.myCases.subtitle}
+        </Text>
+      </View>
+
       {cases.length === 0 ? (
         <View style={styles.emptyContainer}>
           <EmptyState
             iconName="folder-open-outline"
-            title="No cases yet"
-            description="When you start a complaint for UPI fraud, refunds, or bank disputes, your progress will be tracked here."
-            actionLabel="Start a case"
-            onAction={handleCreateNew}
+            title={copy.myCases.emptyTitle}
+            description={copy.myCases.emptySubtitle}
+            actionLabel={copy.myCases.startCaseButton}
+            onAction={handleStartNew}
           />
-
-          <View style={styles.demoNotice}>
-            <Button
-              label="Preview with a sample case"
-              variant="quiet"
-              onPress={() => {
-                setCases([
-                  {
-                    id: 'CAS-1042',
-                    issueType: 'upi_fraud',
-                    title: 'UPI payment stuck between banks',
-                    description: 'Money deducted from ICICI but merchant did not receive',
-                    amount: '2,500',
-                    status: 'in_progress',
-                    createdAt: '2026-11-15',
-                    updatedAt: '2026-11-15',
-                    nextStep: 'Awaiting bank nodal officer response',
-                  },
-                ]);
-              }}
-            />
-          </View>
         </View>
       ) : (
-        <View style={styles.listContainer}>
-          <View style={styles.headerRow}>
-            <Text size="subtitle" color="ink">
-              Your active complaints ({cases.length})
-            </Text>
-            {/* Single primary action on screen */}
-            <Button label="New case" onPress={handleCreateNew} />
+        <View style={styles.content}>
+          {/* In Progress Section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeaderRow}>
+              <Text size="subtitle" color="ink">
+                {copy.myCases.inProgressSection} ({openCases.length})
+              </Text>
+              {/* Primary action button */}
+              <Button label={copy.myCases.startCaseButton} onPress={handleStartNew} />
+            </View>
+
+            {openCases.length === 0 ? (
+              <Card style={styles.emptySectionCard}>
+                <Text size="body" color="muted">
+                  No active cases in progress.
+                </Text>
+              </Card>
+            ) : (
+              openCases.map((c) => {
+                const ladder = LADDERS[c.issueType];
+                const elapsed = daysElapsed(c, now);
+                const step = currentStep(c, now);
+                const next = nextStep(c, now);
+                const remaining = daysUntilNext(c, now);
+                const isOverdue = hasEscalatedPastFirstStep(c, now);
+
+                const parsed = parseAmount(c.amount);
+                const amountText = parsed !== null ? formatRupees(parsed) : c.amount;
+
+                let nextStepText = '';
+                if (isOverdue) {
+                  nextStepText = copy.myCases.overdueStep(step.who);
+                } else if (next && remaining !== null) {
+                  nextStepText = copy.myCases.nextStep(next.who, remaining);
+                } else {
+                  nextStepText = `Active: ${step.who}`;
+                }
+
+                return (
+                  <Card
+                    key={c.id}
+                    onPress={() => handleOpenDetail(c)}
+                    style={styles.caseCard}
+                    accessibilityLabel={`Case for ${c.company || 'unknown'}, ${amountText}`}
+                  >
+                    <View style={styles.cardHeaderRow}>
+                      <View
+                        style={[
+                          styles.issueChip,
+                          {
+                            backgroundColor: colors.surfaceAlt,
+                            borderRadius: radius.button,
+                          },
+                        ]}
+                      >
+                        <Text size="caption" color="primary" style={styles.chipText}>
+                          {ladder.title}
+                        </Text>
+                      </View>
+                      <Text size="caption" color="muted">
+                        {copy.myCases.daysOpen(elapsed)}
+                      </Text>
+                    </View>
+
+                    <Text size="subtitle" color="ink" style={styles.cardCompany}>
+                      {c.company || 'Grievance Case'}
+                    </Text>
+
+                    {amountText ? (
+                      <Text size="body" color="action" style={styles.cardAmount}>
+                        {amountText}
+                      </Text>
+                    ) : null}
+
+                    <View style={styles.nextStepRow}>
+                      <Ionicons
+                        name={isOverdue ? 'alert-circle' : 'arrow-forward-circle'}
+                        size={16}
+                        color={isOverdue ? colors.danger : colors.primary}
+                      />
+                      <Text
+                        size="caption"
+                        color={isOverdue ? 'danger' : 'muted'}
+                        style={styles.nextStepText}
+                        numberOfLines={1}
+                      >
+                        {nextStepText}
+                      </Text>
+                    </View>
+                  </Card>
+                );
+              })
+            )}
           </View>
 
-          {cases.map((c) => (
-            <Card
-              key={c.id}
-              onPress={() => handleOpenDetail(c)}
-              style={styles.caseCard}
-              accessibilityLabel={`Case ${c.id}: ${c.title}`}
-            >
-              <View style={styles.cardHeader}>
-                <View
-                  style={[
-                    styles.badge,
-                    {
-                      backgroundColor: colors.surfaceAlt,
-                      borderRadius: radius.button,
-                    },
-                  ]}
-                >
-                  <Text size="caption" color="primary" style={styles.badgeText}>
-                    In progress
-                  </Text>
-                </View>
-                <Text size="caption" color="muted">
-                  {c.id}
-                </Text>
-              </View>
-
-              <Text size="subtitle" color="ink" style={styles.titleText}>
-                {c.title}
+          {/* Resolved Section */}
+          {resolvedCases.length > 0 ? (
+            <View style={styles.section}>
+              <Text size="subtitle" color="ink" style={styles.resolvedSectionHeader}>
+                {copy.myCases.resolvedSection} ({resolvedCases.length})
               </Text>
 
-              {c.amount ? (
-                <Text size="body" color="action" style={styles.amountText}>
-                  ₹{c.amount}
-                </Text>
-              ) : null}
+              {resolvedCases.map((c) => {
+                const ladder = LADDERS[c.issueType];
+                const parsed = parseAmount(c.amount);
+                const originalAmount = parsed !== null ? formatRupees(parsed) : c.amount;
+                const recoveredAmount =
+                  c.recoveredAmount !== undefined ? formatRupees(c.recoveredAmount) : undefined;
 
-              <Text size="body" color="muted" numberOfLines={2}>
-                Next: {c.nextStep}
-              </Text>
-            </Card>
-          ))}
+                return (
+                  <Card
+                    key={c.id}
+                    onPress={() => handleOpenDetail(c)}
+                    style={styles.caseCard}
+                    accessibilityLabel={`Resolved case for ${c.company}`}
+                  >
+                    <View style={styles.cardHeaderRow}>
+                      <View
+                        style={[
+                          styles.issueChip,
+                          {
+                            backgroundColor: colors.surfaceAlt,
+                            borderRadius: radius.button,
+                          },
+                        ]}
+                      >
+                        <Text size="caption" color="muted" style={styles.chipText}>
+                          {ladder.title}
+                        </Text>
+                      </View>
+                      <View
+                        style={[
+                          styles.resolvedBadge,
+                          {
+                            backgroundColor: colors.surfaceAlt,
+                            borderColor: colors.success,
+                            borderRadius: radius.button,
+                          },
+                        ]}
+                      >
+                        <Ionicons name="checkmark-circle" size={14} color={colors.success} />
+                        <Text size="caption" color="success" style={styles.resolvedBadgeText}>
+                          {copy.myCases.resolvedBadge}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <Text size="subtitle" color="ink" style={styles.cardCompany}>
+                      {c.company || 'Grievance Case'}
+                    </Text>
+
+                    {recoveredAmount ? (
+                      <Text size="body" color="success" style={styles.cardAmount}>
+                        {copy.myCases.recoveredBadge(recoveredAmount)}
+                      </Text>
+                    ) : originalAmount ? (
+                      <Text size="body" color="muted" style={styles.cardAmount}>
+                        {originalAmount}
+                      </Text>
+                    ) : null}
+                  </Card>
+                );
+              })}
+            </View>
+          ) : null}
         </View>
       )}
     </Screen>
@@ -120,45 +229,76 @@ export default function MyCasesScreen() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    marginBottom: 16,
+  },
+  title: {
+    marginBottom: 6,
+  },
   emptyContainer: {
-    paddingTop: 40,
-    alignItems: 'center',
+    paddingTop: 36,
   },
-  demoNotice: {
-    marginTop: 20,
-    width: '100%',
-    maxWidth: 280,
-  },
-  listContainer: {
+  content: {
     paddingBottom: 24,
   },
-  headerRow: {
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
+  },
+  emptySectionCard: {
+    padding: 16,
+    alignItems: 'center',
   },
   caseCard: {
     marginBottom: 12,
   },
-  cardHeader: {
+  cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
-  badge: {
+  issueChip: {
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 3,
   },
-  badgeText: {
+  chipText: {
     fontWeight: '600',
   },
-  titleText: {
+  cardCompany: {
     marginBottom: 4,
+    fontWeight: '600',
   },
-  amountText: {
+  cardAmount: {
     fontWeight: '700',
-    marginBottom: 6,
+    marginBottom: 8,
+  },
+  nextStepRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
+  nextStepText: {
+    flex: 1,
+  },
+  resolvedSectionHeader: {
+    marginBottom: 12,
+  },
+  resolvedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderWidth: 1,
+  },
+  resolvedBadgeText: {
+    fontWeight: '600',
   },
 });
