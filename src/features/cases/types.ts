@@ -8,6 +8,7 @@ export interface Case {
   reference: string;
   incidentDate: string;
   note: string;
+  fraudWhen?: 'hour' | 'today' | 'yesterday' | 'earlier';
   createdAt: string; // ISO string
   evidence: Record<string, boolean>;
   userName?: string;

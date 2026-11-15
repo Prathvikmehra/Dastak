@@ -9,6 +9,7 @@ export interface CaseInput {
   incidentDate?: string;
   note?: string;
   userName?: string;
+  fraudWhen?: 'hour' | 'today' | 'yesterday' | 'earlier';
 }
 
 export interface CaseStore {
@@ -53,6 +54,7 @@ export class InMemoryCaseStore implements CaseStore {
       incidentDate: input.incidentDate?.trim() || '',
       note: input.note?.trim() || '',
       userName: input.userName?.trim() || '',
+      fraudWhen: input.fraudWhen,
       createdAt: new Date().toISOString(),
       evidence: {},
     };

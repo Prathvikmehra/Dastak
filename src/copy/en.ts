@@ -57,13 +57,46 @@ export const copy = {
     notePlaceholder: 'Tell us what happened in your own words',
     saveButton: 'Save case',
     issueRequired: 'Please select an issue type to continue.',
+    fieldLabels: {
+      refund: {
+        company: 'Seller or app',
+        companyPlaceholder: 'e.g. Flipkart, Amazon, Swiggy',
+        reference: 'Order ID',
+        referencePlaceholder: 'e.g. OD123456789',
+      },
+      fraud: {
+        company: 'Who took the money? Name, number or UPI ID, if you know',
+        companyPlaceholder: 'e.g. 9876543210 or user@upi',
+        reference: 'Transaction ID',
+        referencePlaceholder: 'e.g. 12-digit UTR number',
+      },
+      bank: {
+        company: 'Bank name',
+        companyPlaceholder: 'e.g. State Bank of India, HDFC Bank',
+        reference: 'Account or card, last 4 digits, or complaint number',
+        referencePlaceholder: 'e.g. Card ending 1234, or Ref No.',
+      },
+      insurance: {
+        company: 'Insurance company',
+        companyPlaceholder: 'e.g. Star Health, LIC, ICICI Lombard',
+        reference: 'Policy or claim number',
+        referencePlaceholder: 'e.g. POL-98765432 or Claim ID',
+      },
+    },
+    fraudTiming: {
+      label: 'When did it happen?',
+      hour: 'In the last hour',
+      today: 'Earlier today',
+      yesterday: 'Yesterday',
+      earlier: 'More than 2 days ago',
+    },
   },
   caseDetail: {
     dayCount: (days: number) => `Day ${days} of your case`,
     fraudUrgent: {
       bannerTitle: 'Call 1930 now',
-      bannerBody:
-        'Reporting financial fraud within 24 hours gives police the best chance to freeze the money.',
+      bannerBodyRecent: 'Call 1930 now. The first hours matter most.',
+      bannerBodyEarlier: 'Report today. The sooner the better.',
       callButton: 'Call 1930',
     },
     doThisNow: {
@@ -72,6 +105,10 @@ export const copy = {
       websiteButton: 'Open official website',
       shareDraftButton: 'Share complaint draft',
       draftCopiedNotice: 'Draft ready to share',
+    },
+    callScript: {
+      title: 'What to say on the call',
+      subtitle: 'Read these plain lines directly to the helpline officer:',
     },
     evidence: {
       title: 'Evidence checklist',

@@ -1,6 +1,8 @@
 import { Case, LadderStep } from './types';
 import { LADDERS } from './ladders';
 
+export { buildDraft, buildCallScript } from './drafts';
+
 /**
  * Calculates the number of calendar days elapsed between case creation and `now`
  * using calendar days in local time. Uses Math.round to avoid off-by-one errors across
@@ -18,6 +20,27 @@ export function daysElapsed(caseItem: Case, now: Date): number {
 
   const diffMs = nowLocalMidnight - startLocalMidnight;
   return Math.max(0, Math.round(diffMs / (1000 * 60 * 60 * 24)));
+}
+
+/**
+ * Calculates the number of real hours elapsed between case creation and `now`
+ * using exact timestamps.
+ */
+export function hoursSince(caseItem: Case, now: Date): number {
+  const createdMs = new Date(caseItem.createdAt).getTime();
+  const nowMs = now.getTime();
+  return Math.max(0, (nowMs - createdMs) / (1000 * 60 * 60));
+}
+
+/**
+ * Returns true only for unresolved fraud cases under 24 real hours old.
+ */
+export function isFraudUrgent(caseItem: Case, now: Date): boolean {
+  if (caseItem.issueType !== 'fraud' || caseItem.resolvedAt) {
+    return false;
+  }
+  const hours = hoursSince(caseItem, now);
+  return hours >= 0 && hours < 24;
 }
 
 /**
@@ -99,82 +122,3 @@ export function hasEscalatedPastFirstStep(caseItem: Case, now: Date): boolean {
 
 // Backward-compatible alias
 export const isOverdueForEscalation = hasEscalatedPastFirstStep;
-
-/**
- * Generates an honest, factual plain-text complaint draft.
- * - Only states facts the user supplied.
- * - Uses step.request (never step.how).
- * - If note is empty, omits the "Details" section entirely.
- * - If user has no name on file, ends with "Thank you." and no placeholder signature.
- * - Never prints "undefined", "null", empty brackets, or "Aggrieved Consumer".
- */
-export function buildDraft(caseItem: Case, step: LadderStep): string {
-  const parts: string[] = [];
-
-  parts.push(`To: ${step.who}`);
-
-  const company = caseItem.company && caseItem.company.trim() ? caseItem.company.trim() : '';
-  if (company) {
-    parts.push(`Subject: Formal grievance regarding issue with ${company}`);
-  } else {
-    parts.push('Subject: Formal grievance');
-  }
-
-  parts.push('');
-  parts.push('Respected Sir/Madam,');
-  parts.push('');
-
-  const sentences: string[] = [];
-  const rawAmount = caseItem.amount ? caseItem.amount.trim().replace(/^₹/, '') : '';
-  const incidentDate =
-    caseItem.incidentDate && caseItem.incidentDate.trim() ? caseItem.incidentDate.trim() : '';
-
-  if (company && rawAmount) {
-    sentences.push(
-      `I am submitting this grievance regarding my transaction with ${company} for an amount of ₹${rawAmount}.`
-    );
-  } else if (company) {
-    sentences.push(`I am submitting this grievance regarding my transaction with ${company}.`);
-  } else if (rawAmount) {
-    sentences.push(
-      `I am submitting this grievance regarding a transaction for an amount of ₹${rawAmount}.`
-    );
-  } else {
-    sentences.push('I am submitting this formal grievance for your consideration.');
-  }
-
-  if (incidentDate) {
-    sentences.push(`The incident occurred on ${incidentDate}.`);
-  }
-
-  parts.push(sentences.join(' '));
-
-  const reference =
-    caseItem.reference && caseItem.reference.trim() ? caseItem.reference.trim() : '';
-  if (reference) {
-    parts.push('');
-    parts.push(`Reference / Account ID: ${reference}`);
-  }
-
-  const note = caseItem.note && caseItem.note.trim() ? caseItem.note.trim() : '';
-  if (note) {
-    parts.push('');
-    parts.push('Details:');
-    parts.push(note);
-  }
-
-  parts.push('');
-  parts.push('Requested action:');
-  parts.push(step.request);
-
-  parts.push('');
-  const userName = caseItem.userName && caseItem.userName.trim() ? caseItem.userName.trim() : '';
-  if (userName) {
-    parts.push('Yours sincerely,');
-    parts.push(userName);
-  } else {
-    parts.push('Thank you.');
-  }
-
-  return parts.join('\n');
-}

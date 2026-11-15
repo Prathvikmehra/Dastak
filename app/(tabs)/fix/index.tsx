@@ -13,6 +13,7 @@ import {
 } from '../../../src/features/cases/engine';
 import { formatRupees } from '../../../src/lib/formatters';
 import { copy } from '../../../src/copy/en';
+import { OpenCasesSummary } from '../../../src/features/cases/components/OpenCasesSummary';
 
 interface DoorItem {
   id: IssueType;
@@ -56,7 +57,6 @@ export default function FixHomeScreen() {
 
   const now = new Date();
 
-  // Find most urgent next step among open cases
   let urgentNextText = '';
   if (openCases.length > 0) {
     let minDays = Infinity;
@@ -94,7 +94,6 @@ export default function FixHomeScreen() {
 
   return (
     <Screen scrollable>
-      {/* Recovered Banner if any money has been recovered */}
       {totalRecovered > 0 ? (
         <View
           style={[
@@ -113,47 +112,14 @@ export default function FixHomeScreen() {
         </View>
       ) : null}
 
-      {/* Open Cases Summary Card (when open cases exist) */}
       {openCases.length > 0 ? (
-        <Card style={styles.summaryCard}>
-          <View style={styles.summaryHeaderRow}>
-            <View style={styles.summaryBadge}>
-              <Ionicons name="time" size={18} color={colors.primary} />
-              <Text size="subtitle" color="ink" style={styles.summaryTitle}>
-                {copy.fixHome.summaryTitle(openCases.length)}
-              </Text>
-            </View>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="View my cases"
-              onPress={() => router.push('/fix/my-cases')}
-              style={styles.quietLink}
-            >
-              <Text size="body" color="primary" style={styles.linkText}>
-                {copy.fixHome.viewMyCases}
-              </Text>
-            </Pressable>
-          </View>
-
-          {urgentNextText ? (
-            <View style={styles.urgentRow}>
-              <Ionicons name="arrow-forward-circle" size={16} color={colors.primary} />
-              <Text size="body" color="muted" numberOfLines={1} style={styles.urgentText}>
-                {urgentNextText}
-              </Text>
-            </View>
-          ) : null}
-
-          <Button
-            label={copy.fixHome.viewMyCases}
-            variant="quiet"
-            onPress={() => router.push('/fix/my-cases')}
-            style={styles.summaryButton}
-          />
-        </Card>
+        <OpenCasesSummary
+          count={openCases.length}
+          urgentText={urgentNextText}
+          onViewCases={() => router.push('/fix/my-cases')}
+        />
       ) : null}
 
-      {/* What happened? input box */}
       <Card style={styles.promptCard}>
         <Text size="subtitle" color="ink" style={styles.cardHeader}>
           {copy.fixHome.title}
@@ -172,7 +138,6 @@ export default function FixHomeScreen() {
           inputStyle={styles.multilineInput}
         />
 
-        {/* The single primary action on this screen */}
         <Button
           label="Start a case"
           onPress={handleStartCase}
@@ -180,14 +145,13 @@ export default function FixHomeScreen() {
         />
       </Card>
 
-      {/* 4 Issue Doors */}
       <View style={styles.sectionHeaderRow}>
         <Text size="subtitle" color="ink">
           Common problems
         </Text>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="View my cases"
+          accessibilityLabel={copy.myCases.title}
           onPress={() => router.push('/fix/my-cases')}
           style={styles.quietLink}
         >
@@ -247,35 +211,6 @@ const styles = StyleSheet.create({
   },
   recoveredText: {
     fontWeight: '700',
-  },
-  summaryCard: {
-    marginBottom: 16,
-  },
-  summaryHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  summaryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  summaryTitle: {
-    fontWeight: '600',
-  },
-  urgentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 12,
-  },
-  urgentText: {
-    flex: 1,
-  },
-  summaryButton: {
-    marginTop: 4,
   },
   promptCard: {
     marginBottom: 24,
