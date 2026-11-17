@@ -1,16 +1,40 @@
-export type UnclaimedCategory = 'bank_deposit' | 'insurance_policy' | 'provident_fund';
+export type Relationship = 'Parent' | 'Spouse' | 'Someone who has passed away' | 'Other';
 
-export interface UnclaimedAsset {
+export interface Person {
   id: string;
-  source: string;
-  category: UnclaimedCategory;
-  holderName: string;
-  estimatedAmount: number;
-  status: 'found' | 'in_claim';
+  name: string;
+  relationship?: Relationship;
+  isDefault?: boolean;
 }
 
-export interface MoneyRadarCardInfo {
+export type MoneyPlaceStatus =
+  'not_checked' | 'checked_nothing' | 'found_money' | 'claim_started' | 'money_received';
+
+export interface PlaceRecord {
+  placeId: string;
+  status: MoneyPlaceStatus;
+  amount?: string;
+  note?: string;
+  updatedAt: string;
+}
+
+export interface MoneyPlace {
+  id: string;
   title: string;
-  description: string;
-  iconName: 'search-outline';
+  subtitle: string;
+  portalName: string;
+  source: string | null;
+  verifiedOn: null;
+  covers: string;
+  keepReady: string[];
+  howToSearch: string[];
+  howToClaim: string[];
+}
+
+export interface MoneySummary {
+  checked: number;
+  total: number;
+  found: number;
+  claimed: number;
+  received: number;
 }

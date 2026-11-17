@@ -149,4 +149,18 @@ export const copy = {
     resolvedBadge: 'Resolved',
     recoveredBadge: (amount: string) => `Recovered ${amount}`,
   },
+  moneyRadar: {
+    title: 'Money radar',
+    subtitle:
+      'Search national records for deposits, matured policies, and pensions that were forgotten or left unclaimed.',
+    framingNotice:
+      'UDGAM covers participating banks only; it does not cover post office savings, PF, or insurance. We do not promise any recovered money.',
+    deceasedNotice:
+      'Claiming usually needs a death certificate and proof that you are the nominee or legal heir; check each place’s rules.',
+    checkedCount: (checked: number, total: number) => `Checked ${checked} of ${total} places`,
+    foundSoFar: (amount: string) => `Found so far: ${amount}`,
+    receivedSoFar: (amount: string) => `Received: ${amount}`,
+    saveUpdate: 'Save update',
+    remindIn7Days: 'Remind me in 7 days to check again',
+  },
 };

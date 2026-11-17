@@ -43,6 +43,13 @@ export default function FindStackLayout() {
           headerBackTitle: 'Back',
         }}
       />
+      <Stack.Screen
+        name="place-detail"
+        options={{
+          title: 'Claim guide',
+          headerBackTitle: 'Back',
+        }}
+      />
     </Stack>
   );
 }

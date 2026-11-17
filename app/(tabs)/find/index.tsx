@@ -4,10 +4,13 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Screen, Text, Card } from '../../../src/components';
 import { useTheme } from '../../../src/theme/ThemeContext';
+import { useMoney } from '../../../src/features/money/store';
+import { formatRupees } from '../../../src/lib/formatters';
 
 export default function FindHomeScreen() {
   const router = useRouter();
   const { colors, radius } = useTheme();
+  const { summary } = useMoney();
 
   return (
     <Screen scrollable>
@@ -16,7 +19,7 @@ export default function FindHomeScreen() {
           Find money you are owed or can save
         </Text>
         <Text size="body" color="muted">
-          Choose a tool below to check forgotten deposits or reduce monthly pharmacy expenses.
+          Check forgotten deposits or find lower-cost medicines.
         </Text>
       </View>
 
@@ -45,9 +48,65 @@ export default function FindHomeScreen() {
           <Text size="subtitle" color="ink" style={styles.cardTitle}>
             Money radar
           </Text>
+
           <Text size="body" color="muted" style={styles.cardDescription}>
             Search old bank accounts, inactive fixed deposits, unclaimed life insurance, and
             forgotten provident fund money.
+          </Text>
+
+          {/* Progress and recovery tracker */}
+          <View style={styles.statusRow}>
+            <View
+              style={[
+                styles.statusBadge,
+                {
+                  backgroundColor: colors.surfaceAlt,
+                  borderRadius: radius.button,
+                },
+              ]}
+            >
+              <Text size="caption" color="primary" style={{ fontWeight: '600' }}>
+                Checked {summary.checked} of {summary.total} places
+              </Text>
+            </View>
+
+            {summary.found > 0 && (
+              <View
+                style={[
+                  styles.statusBadge,
+                  {
+                    backgroundColor: colors.surfaceAlt,
+                    borderRadius: radius.button,
+                  },
+                ]}
+              >
+                <Text size="caption" color="primary" style={{ fontWeight: '600' }}>
+                  Found so far {formatRupees(summary.found)}
+                </Text>
+              </View>
+            )}
+
+            {summary.received > 0 && (
+              <View
+                style={[
+                  styles.statusBadge,
+                  {
+                    backgroundColor: colors.surfaceAlt,
+                    borderRadius: radius.button,
+                  },
+                ]}
+              >
+                <Text size="caption" color="success" style={{ fontWeight: '600' }}>
+                  Received {formatRupees(summary.received)}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Plain truthful framing */}
+          <Text size="caption" color="muted" style={styles.disclaimerText}>
+            Note: RBI UDGAM covers participating banks only. It does not search post office savings,
+            EPF, or insurance.
           </Text>
         </Card>
 
@@ -116,5 +175,20 @@ const styles = StyleSheet.create({
   },
   cardDescription: {
     lineHeight: 22,
+    marginBottom: 12,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 10,
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  disclaimerText: {
+    lineHeight: 18,
+    marginTop: 4,
   },
 });

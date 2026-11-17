@@ -74,6 +74,12 @@ export function planReminders(caseItem: Case, now: Date): PlannedReminder[] {
 
 export interface Reminders {
   schedule(caseItem: Case, now?: Date): Promise<ScheduleResult>;
+  scheduleFollowUp(
+    id: string,
+    title: string,
+    body: string,
+    fireAt: Date
+  ): Promise<{ scheduled: boolean; reason?: string }>;
   cancel(caseId: string): Promise<void>;
   cancelAll(): Promise<void>;
 }
@@ -192,6 +198,44 @@ export class RemindersService implements Reminders {
       failed,
       permission: perm,
     };
+  }
+
+  async scheduleFollowUp(
+    id: string,
+    title: string,
+    body: string,
+    fireAt: Date
+  ): Promise<{ scheduled: boolean; reason?: string }> {
+    const prefs = await this.preferencesStore.get();
+    if (!prefs.remindersEnabled) {
+      return { scheduled: false, reason: 'Reminders are disabled in Settings' };
+    }
+    const perm = await this.port.getPermission();
+    if (perm !== 'granted') {
+      return { scheduled: false, reason: 'Notification permission is not granted' };
+    }
+
+    await this.port.ensureChannel('dastak_reminders', 'Case Escalation Reminders');
+    const identifier = `dastak_followup_${id}`;
+    try {
+      await this.port.scheduleNotification({
+        identifier,
+        content: {
+          title,
+          body,
+          data: { followUpId: id },
+        },
+        trigger: {
+          type: 'date',
+          date: fireAt,
+          channelId: 'dastak_reminders',
+        },
+      });
+      return { scheduled: true };
+    } catch (err) {
+      logger.error(`Failed to schedule follow-up reminder ${identifier}`, err);
+      return { scheduled: false, reason: 'Scheduling failed' };
+    }
   }
 
   async cancel(caseId: string): Promise<void> {
