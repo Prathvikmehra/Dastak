@@ -3,6 +3,7 @@ import { View, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme/ThemeContext';
+import { copy } from '../copy/en';
 
 export const HeaderActions: React.FC = () => {
   const router = useRouter();
@@ -12,7 +13,7 @@ export const HeaderActions: React.FC = () => {
     <View style={styles.container}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Settings and help"
+        accessibilityLabel={copy.header.helpAccessibility}
         onPress={() => router.push('/settings-and-help')}
         style={({ pressed }) => [
           styles.iconButton,
@@ -28,7 +29,7 @@ export const HeaderActions: React.FC = () => {
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Settings and help"
+        accessibilityLabel={copy.header.helpAccessibility}
         onPress={() => router.push('/settings-and-help')}
         style={({ pressed }) => [
           styles.iconButton,

@@ -5,3 +5,4 @@ export * from './Field';
 export * from './EmptyState';
 export * from './Screen';
 export * from './HeaderActions';
+export * from './DateField';

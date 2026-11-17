@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Person } from '../types';
+import { copy } from '../../../copy/en';
 
 export interface PersonSwitcherProps {
   people: Person[];
@@ -59,7 +60,7 @@ export const PersonSwitcher: React.FC<PersonSwitcherProps> = ({
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Add another person"
+          accessibilityLabel={copy.moneyRadar.personSwitcherAdd}
           onPress={onAddPersonPress}
           style={[
             styles.chip,
@@ -74,7 +75,7 @@ export const PersonSwitcher: React.FC<PersonSwitcherProps> = ({
         >
           <Ionicons name="add" size={20} color={colors.primary} />
           <Text size="body" color="primary" style={{ fontWeight: '600' }}>
-            Add person
+            {copy.moneyRadar.personSwitcherAdd}
           </Text>
         </Pressable>
       </ScrollView>

@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Case, CaseInput, CaseStore } from './types';
 import { logger } from '../../lib/logger';
+import { parseIsoDate, parseLocalDate, LocalDate } from '../../lib/dates';
 
 export interface KeyValueStorage {
   getItem(key: string): Promise<string | null>;
@@ -68,6 +69,28 @@ export interface StoredCasesDocument {
   cases: Case[];
 }
 
+function migrateCaseItem(rawItem: unknown): Case | null {
+  if (!rawItem || typeof rawItem !== 'object') return null;
+  const item = rawItem as Record<string, unknown>;
+  if (typeof item.id !== 'string') return null;
+
+  const rawIncident = typeof item.incidentDate === 'string' ? item.incidentDate : '';
+  const parsed = parseLocalDate(rawIncident);
+  const incidentDate: LocalDate = parsed || '';
+  const legacyIncidentDate =
+    !parsed && rawIncident.trim()
+      ? rawIncident.trim()
+      : typeof item.legacyIncidentDate === 'string'
+        ? item.legacyIncidentDate
+        : undefined;
+
+  return {
+    ...(item as unknown as Case),
+    incidentDate,
+    legacyIncidentDate,
+  };
+}
+
 /**
  * Migrates raw stored data from older, missing, or future versions into a typed Case array.
  */
@@ -77,13 +100,13 @@ export function migrateStoredData(raw: unknown): Case[] {
   }
   // Missing version: raw is directly an array of cases
   if (Array.isArray(raw)) {
-    return raw.filter((item): item is Case => Boolean(item && typeof item.id === 'string'));
+    return raw.map(migrateCaseItem).filter((item): item is Case => item !== null);
   }
   // Object with version and cases
   if (typeof raw === 'object' && raw !== null) {
     const obj = raw as Record<string, unknown>;
     if (Array.isArray(obj.cases)) {
-      return obj.cases.filter((item): item is Case => Boolean(item && typeof item.id === 'string'));
+      return obj.cases.map(migrateCaseItem).filter((item): item is Case => item !== null);
     }
   }
   return [];
@@ -163,7 +186,7 @@ export class PersistentCaseStore implements CaseStore {
   async list(): Promise<Case[]> {
     await this.ensureInitialized();
     return Array.from(this.casesMap.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) => parseIsoDate(b.createdAt).getTime() - parseIsoDate(a.createdAt).getTime()
     );
   }
 
@@ -181,7 +204,8 @@ export class PersistentCaseStore implements CaseStore {
       company: input.company?.trim() || '',
       amount: input.amount?.trim() || '',
       reference: input.reference?.trim() || '',
-      incidentDate: input.incidentDate?.trim() || '',
+      incidentDate: input.incidentDate || '',
+      legacyIncidentDate: input.legacyIncidentDate,
       note: input.note?.trim() || '',
       userName: input.userName?.trim() || '',
       fraudWhen: input.fraudWhen,

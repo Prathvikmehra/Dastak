@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
+import { copy } from '../../../copy/en';
 
 export const PrivacySection: React.FC = () => {
   const { colors } = useTheme();
@@ -12,12 +13,11 @@ export const PrivacySection: React.FC = () => {
       <View style={styles.header}>
         <Ionicons name="shield-checkmark" size={24} color={colors.success} />
         <Text size="subtitle" color="ink" style={styles.title}>
-          Privacy guarantee
+          {copy.settings.privacyTitle}
         </Text>
       </View>
       <Text size="body" color="ink" style={styles.description}>
-        No data leaves your device unless you choose to share a complaint letter. Your complaint
-        drafts, case numbers, and name stay safely on your phone.
+        {copy.settings.privacySubtitle}
       </Text>
     </Card>
   );

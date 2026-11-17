@@ -3,6 +3,7 @@ import { KeyValueStorage, asyncStorageAdapter, backupCorruptData } from '../case
 import { Medicine, MedicineTotals } from './types';
 import { calculateTotals } from './helpers';
 import { logger } from '../../lib/logger';
+import { parseLocalDate } from '../../lib/dates';
 
 export const MEDICINES_STORAGE_KEY = 'dastak_meds_v1';
 export const CURRENT_MEDICINES_VERSION = 1;
@@ -10,6 +11,33 @@ export const CURRENT_MEDICINES_VERSION = 1;
 export interface StoredMedicinesDocument {
   version: number;
   medicines: Medicine[];
+}
+
+function migrateMedicineItem(rawItem: unknown): Medicine | null {
+  if (!rawItem || typeof rawItem !== 'object') return null;
+  const item = rawItem as Record<string, unknown>;
+  if (
+    typeof item.id !== 'string' ||
+    typeof item.personId !== 'string' ||
+    typeof item.name !== 'string'
+  ) {
+    return null;
+  }
+  const rawRefill = typeof item.lastRefillDate === 'string' ? item.lastRefillDate : undefined;
+  const parsed = parseLocalDate(rawRefill);
+  const lastRefillDate = parsed || undefined;
+  const legacyLastRefillDate =
+    !parsed && rawRefill && rawRefill.trim()
+      ? rawRefill.trim()
+      : typeof item.legacyLastRefillDate === 'string'
+        ? item.legacyLastRefillDate
+        : undefined;
+
+  return {
+    ...(item as unknown as Medicine),
+    lastRefillDate,
+    legacyLastRefillDate,
+  };
 }
 
 export function migrateMedicinesData(raw: unknown): Medicine[] {
@@ -23,14 +51,7 @@ export function migrateMedicinesData(raw: unknown): Medicine[] {
       ? (raw as unknown[])
       : [];
 
-  return list.filter((item): item is Medicine =>
-    Boolean(
-      item &&
-      typeof (item as Medicine).id === 'string' &&
-      typeof (item as Medicine).personId === 'string' &&
-      typeof (item as Medicine).name === 'string'
-    )
-  );
+  return list.map(migrateMedicineItem).filter((item): item is Medicine => item !== null);
 }
 
 export class PersistentMedicineStore {

@@ -9,7 +9,7 @@ function createMockCase(overrides: Partial<Case> = {}): Case {
     company: 'Flipkart',
     amount: '1999',
     reference: 'OD123456789',
-    incidentDate: '10 Nov 2026',
+    incidentDate: '2026-11-10',
     note: 'Returned shoes on 5th Nov, refund not received.',
     createdAt: '2026-11-01T10:00:00.000Z',
     evidence: {},
@@ -126,6 +126,19 @@ describe('Complaint Drafts and Call Scripts', () => {
       expect(script).toContain('UTR123456');
       expect(script).toContain('freeze the recipient account');
       expect(script).not.toContain('undefined');
+    });
+
+    it('prints structured dates via toDisplay in complaint draft and call script', () => {
+      const step = LADDERS.bank.steps[0];
+      const caseWithDate = createMockCase({
+        issueType: 'bank',
+        incidentDate: '2026-10-28',
+      });
+      const draft = buildDraft(caseWithDate, step);
+      expect(draft).toContain('The incident occurred on 28 Oct 2026.');
+
+      const script = buildCallScript(caseWithDate, step);
+      expect(script).toContain('The incident occurred on 28 Oct 2026.');
     });
 
     it('builds a 4 to 6 line call script for refund helpline 1915 with all empty fields', () => {

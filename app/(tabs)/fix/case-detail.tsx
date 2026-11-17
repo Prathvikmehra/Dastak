@@ -14,6 +14,7 @@ import {
 } from '../../../src/features/cases/engine';
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
 import { openPhone, openWeb } from '../../../src/lib/links';
+import { toDisplay } from '../../../src/lib/dates';
 import { copy } from '../../../src/copy/en';
 import { UrgentBanner } from '../../../src/features/cases/components/UrgentBanner';
 import { DoThisNowCard } from '../../../src/features/cases/components/DoThisNowCard';
@@ -35,9 +36,9 @@ export default function CaseDetailScreen() {
       <Screen>
         <EmptyState
           iconName="alert-circle-outline"
-          title="Case not found"
-          description="We could not find the case you selected. It may have been removed or not saved yet."
-          actionLabel="View all cases"
+          title={copy.caseDetail.emptyTitle}
+          description={copy.caseDetail.emptyMessage}
+          actionLabel={copy.common.back}
           onAction={() => router.push('/fix/my-cases')}
         />
       </Screen>
@@ -117,7 +118,7 @@ export default function CaseDetailScreen() {
 
         {caseItem.reference ? (
           <Text size="caption" color="muted" style={styles.referenceText}>
-            Ref: {caseItem.reference}
+            {`Ref: ${caseItem.reference}`}
           </Text>
         ) : null}
 
@@ -135,7 +136,7 @@ export default function CaseDetailScreen() {
             <Ionicons name="checkmark-circle" size={18} color={colors.success} />
             <Text size="caption" color="success" style={styles.resolvedBannerText}>
               {copy.caseDetail.resolve.resolvedBanner(
-                new Date(caseItem.resolvedAt).toLocaleDateString(),
+                toDisplay(caseItem.resolvedAt.slice(0, 10)),
                 caseItem.recoveredAmount !== undefined
                   ? formatRupees(caseItem.recoveredAmount)
                   : undefined

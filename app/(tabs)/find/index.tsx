@@ -7,21 +7,23 @@ import { useTheme } from '../../../src/theme/ThemeContext';
 import { useMoney } from '../../../src/features/money/store';
 import { useMedicines } from '../../../src/features/medicine/store';
 import { formatRupees } from '../../../src/lib/formatters';
+import { copy } from '../../../src/copy/en';
 
 export default function FindHomeScreen() {
   const router = useRouter();
   const { colors, radius } = useTheme();
   const { summary } = useMoney();
   const { globalTotals } = useMedicines();
+  const f = copy.find;
 
   return (
     <Screen scrollable>
       <View style={styles.headerContainer}>
         <Text size="title" color="ink" style={styles.title}>
-          Find money you are owed or can save
+          {f.title}
         </Text>
         <Text size="body" color="muted">
-          Check forgotten deposits or find lower-cost medicines.
+          {f.subtitle}
         </Text>
       </View>
 
@@ -30,7 +32,7 @@ export default function FindHomeScreen() {
         <Card
           onPress={() => router.push('/find/money-radar')}
           style={styles.featureCard}
-          accessibilityLabel="Open Money radar"
+          accessibilityLabel={f.openMoneyRadarAccessibility}
         >
           <View style={styles.cardHeaderRow}>
             <View
@@ -48,12 +50,11 @@ export default function FindHomeScreen() {
           </View>
 
           <Text size="subtitle" color="ink" style={styles.cardTitle}>
-            Money radar
+            {f.moneyRadarCardTitle}
           </Text>
 
           <Text size="body" color="muted" style={styles.cardDescription}>
-            Search old bank accounts, inactive fixed deposits, unclaimed life insurance, and
-            forgotten provident fund money.
+            {f.moneyRadarCardDesc}
           </Text>
 
           {/* Progress and recovery tracker */}
@@ -68,7 +69,7 @@ export default function FindHomeScreen() {
               ]}
             >
               <Text size="caption" color="primary" style={{ fontWeight: '600' }}>
-                Checked {summary.checked} of {summary.total} places
+                {f.moneyRadarCheckedOfPlaces(summary.checked, summary.total)}
               </Text>
             </View>
 
@@ -83,7 +84,7 @@ export default function FindHomeScreen() {
                 ]}
               >
                 <Text size="caption" color="primary" style={{ fontWeight: '600' }}>
-                  Found so far {formatRupees(summary.found)}
+                  {f.moneyRadarFoundSoFar(formatRupees(summary.found))}
                 </Text>
               </View>
             )}
@@ -99,7 +100,7 @@ export default function FindHomeScreen() {
                 ]}
               >
                 <Text size="caption" color="success" style={{ fontWeight: '600' }}>
-                  Received {formatRupees(summary.received)}
+                  {f.moneyRadarReceived(formatRupees(summary.received))}
                 </Text>
               </View>
             )}
@@ -107,8 +108,7 @@ export default function FindHomeScreen() {
 
           {/* Plain truthful framing */}
           <Text size="caption" color="muted" style={styles.disclaimerText}>
-            Note: RBI UDGAM covers participating banks only. It does not search post office savings,
-            EPF, or insurance.
+            {f.moneyRadarUdgamNote}
           </Text>
         </Card>
 
@@ -116,7 +116,7 @@ export default function FindHomeScreen() {
         <Card
           onPress={() => router.push('/find/medicine-saver')}
           style={styles.featureCard}
-          accessibilityLabel="Open Medicine saver"
+          accessibilityLabel={f.openMedicineSaverAccessibility}
         >
           <View style={styles.cardHeaderRow}>
             <View
@@ -134,11 +134,10 @@ export default function FindHomeScreen() {
           </View>
 
           <Text size="subtitle" color="ink" style={styles.cardTitle}>
-            Medicine saver
+            {f.medicineSaverCardTitle}
           </Text>
           <Text size="body" color="muted" style={styles.cardDescription}>
-            Keep track of your monthly medicine expenses and see the difference when using generic
-            alternatives with the same salt.
+            {f.medicineSaverCardDesc}
           </Text>
 
           {/* Spend and potential saving metrics */}
@@ -154,7 +153,7 @@ export default function FindHomeScreen() {
                 ]}
               >
                 <Text size="caption" color="primary" style={{ fontWeight: '600' }}>
-                  Spending {formatRupees(globalTotals.monthlySpend)} a month
+                  {f.spendingMonthly(formatRupees(globalTotals.monthlySpend))}
                 </Text>
               </View>
             )}
@@ -170,7 +169,7 @@ export default function FindHomeScreen() {
                 ]}
               >
                 <Text size="caption" color="success" style={{ fontWeight: '600' }}>
-                  You could save {formatRupees(globalTotals.monthlySaving)} a month
+                  {f.couldSaveMonthly(formatRupees(globalTotals.monthlySaving))}
                 </Text>
               </View>
             )}
@@ -183,17 +182,17 @@ export default function FindHomeScreen() {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   title: {
-    marginBottom: 8,
+    marginBottom: 6,
   },
   cardsContainer: {
     gap: 16,
-    marginBottom: 24,
+    paddingBottom: 24,
   },
   featureCard: {
-    paddingVertical: 18,
+    padding: 16,
   },
   cardHeaderRow: {
     flexDirection: 'row',
@@ -202,8 +201,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   iconCircle: {
-    width: 52,
-    height: 52,
+    width: 48,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -211,8 +210,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   cardDescription: {
+    marginBottom: 14,
     lineHeight: 22,
-    marginBottom: 12,
   },
   statusRow: {
     flexDirection: 'row',
@@ -221,11 +220,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   statusBadge: {
-    paddingHorizontal: 10,
     paddingVertical: 6,
+    paddingHorizontal: 10,
   },
   disclaimerText: {
+    marginTop: 6,
     lineHeight: 18,
-    marginTop: 4,
   },
 });

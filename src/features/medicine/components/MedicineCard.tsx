@@ -18,6 +18,7 @@ export interface MedicineCardProps {
 export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine, onEdit, onDelete }) => {
   const { colors, radius } = useTheme();
   const [reminderMsg, setReminderMsg] = useState<string | null>(null);
+  const m = copy.medicineSaver;
 
   const saving = monthlySaving(medicine);
   const brandAmt = parseAmount(medicine.brandPricePerStrip) ?? 0;
@@ -30,47 +31,33 @@ export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine, onEdit, on
 
   const handleScheduleRefillReminder = async () => {
     if (!nextDate) {
-      Alert.alert(
-        'Refill date needed',
-        'Add your last refill date first so we know when your next refill is due.'
-      );
+      Alert.alert(m.refillDateNeededTitle, m.refillDateNeededMessage);
       return;
     }
 
     const res = await defaultReminders.scheduleFollowUp(
       medicine.id,
-      'Medicine refill reminder',
-      copy.medicineSaver.refillReminderText(medicine.name),
+      m.refillReminderText(medicine.name),
+      m.refillReminderText(medicine.name),
       nextDate
     );
 
     if (res.scheduled) {
-      const dateStr = nextDate.toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-      });
-      setReminderMsg(`Reminder set for 9:00 AM on ${dateStr}.`);
+      setReminderMsg(m.reminderScheduled(medicine.name));
     } else {
-      Alert.alert(
-        'Reminders are off',
-        'Turn on reminders in Settings to receive alerts on refill days.'
-      );
+      Alert.alert(m.remindersOffTitle, m.remindersOffMessage);
     }
   };
 
   const confirmDelete = () => {
-    Alert.alert(
-      'Delete medicine',
-      `Are you sure you want to remove ${medicine.name} from your list?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => onDelete(medicine.id),
-        },
-      ]
-    );
+    Alert.alert(m.deleteConfirmTitle, m.deleteConfirmMessage(medicine.name), [
+      { text: m.cancelAction, style: 'cancel' },
+      {
+        text: m.deleteAction,
+        style: 'destructive',
+        onPress: () => onDelete(medicine.id),
+      },
+    ]);
   };
 
   return (
@@ -81,7 +68,7 @@ export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine, onEdit, on
             {medicine.name}
           </Text>
           <Text size="caption" color="muted">
-            {medicine.stripsPerMonth} strip{medicine.stripsPerMonth === 1 ? '' : 's'} / month
+            {m.stripsPerMonthCount(medicine.stripsPerMonth)}
           </Text>
         </View>
         <Ionicons name="medkit-outline" size={24} color={colors.primary} />
@@ -90,21 +77,15 @@ export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine, onEdit, on
       {/* Prices comparison */}
       <View style={styles.priceRow}>
         <View style={styles.priceBox}>
-          <Text size="caption" color="muted">
-            Brand price
-          </Text>
           <Text size="body" color="ink" style={{ fontWeight: '600' }}>
-            {formatRupees(brandAmt)} / strip
+            {m.brandPricePerStrip(formatRupees(brandAmt))}
           </Text>
         </View>
 
         {genericAmt !== null && (
           <View style={styles.priceBox}>
-            <Text size="caption" color="muted">
-              Price you found
-            </Text>
             <Text size="body" color="primary" style={{ fontWeight: '600' }}>
-              {formatRupees(genericAmt)} / strip
+              {m.priceFoundPerStrip(formatRupees(genericAmt))}
             </Text>
           </View>
         )}
@@ -120,7 +101,7 @@ export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine, onEdit, on
         >
           <Ionicons name="trending-down" size={16} color={colors.success} />
           <Text size="caption" color="success" style={{ fontWeight: '600' }}>
-            Difference: save {formatRupees(saving)} / month
+            {m.saveMonthlyAmount(formatRupees(saving))}
           </Text>
         </View>
       )}
@@ -130,12 +111,16 @@ export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine, onEdit, on
         <View style={styles.refillRow}>
           <Ionicons name="time-outline" size={16} color={colors.muted} />
           <Text size="caption" color="muted">
-            {dueDays <= 0
-              ? 'Refill due now'
-              : `Refill due in ${dueDays} day${dueDays === 1 ? '' : 's'}`}
+            {dueDays <= 0 ? m.refillDueToday : m.refillDueInDays(dueDays)}
           </Text>
         </View>
       )}
+
+      {medicine.legacyLastRefillDate ? (
+        <Text size="caption" color="muted" style={styles.legacyText}>
+          {copy.dateField.legacySaved} {medicine.legacyLastRefillDate}
+        </Text>
+      ) : null}
 
       {reminderMsg && (
         <Text size="caption" color="success" style={styles.reminderMsg}>
@@ -146,73 +131,49 @@ export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine, onEdit, on
       {/* Action buttons */}
       <View style={styles.actionsRow}>
         <Button
-          label="Remind me for refill"
+          label={m.remindMe}
           variant="quiet"
           onPress={handleScheduleRefillReminder}
           style={styles.actionBtn}
         />
         <Button
-          label="Edit"
+          label={copy.common.edit}
           variant="quiet"
           onPress={() => onEdit(medicine)}
           style={styles.actionBtn}
         />
-        <Button label="Delete" variant="quiet" onPress={confirmDelete} style={styles.actionBtn} />
+        <Button
+          label={copy.common.delete}
+          variant="quiet"
+          onPress={confirmDelete}
+          style={styles.actionBtn}
+        />
       </View>
     </Card>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    marginBottom: 14,
-  },
+  card: { marginBottom: 14 },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
   },
-  titleBox: {
-    flex: 1,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 10,
-  },
-  priceBox: {
-    gap: 2,
-  },
+  titleBox: { flex: 1 },
+  priceRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginBottom: 10 },
+  priceBox: { gap: 2 },
   savingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    padding: 8,
     marginBottom: 10,
-    alignSelf: 'flex-start',
   },
-  refillRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 12,
-  },
-  reminderMsg: {
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
-    paddingTop: 10,
-  },
-  actionBtn: {
-    minHeight: 40,
-    paddingHorizontal: 12,
-  },
+  refillRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
+  legacyText: { marginBottom: 8, fontStyle: 'italic' },
+  reminderMsg: { marginBottom: 10, fontWeight: '500' },
+  actionsRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
+  actionBtn: { flex: 1 },
 });

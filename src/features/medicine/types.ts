@@ -1,3 +1,5 @@
+import { LocalDate } from '../../lib/dates';
+
 export interface Medicine {
   id: string;
   personId: string;
@@ -5,7 +7,8 @@ export interface Medicine {
   brandPricePerStrip: string;
   genericPricePerStrip?: string;
   stripsPerMonth: number;
-  lastRefillDate?: string;
+  lastRefillDate?: LocalDate;
+  legacyLastRefillDate?: string;
   refillEveryDays?: number;
   note?: string;
 }

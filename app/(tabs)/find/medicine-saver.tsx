@@ -65,7 +65,7 @@ export default function MedicineSaverScreen() {
       {/* Official portal link */}
       <Card style={styles.linkCard}>
         <Text size="body" color="ink">
-          Check prices and find government Jan Aushadhi Kendras:
+          {copy.medicineSaver.findKendras}
         </Text>
         <Button
           label={copy.medicineSaver.openJanAushadhi}
@@ -78,20 +78,20 @@ export default function MedicineSaverScreen() {
       {/* Monthly Spend & Potential Saving Totals */}
       <Card style={styles.totalsCard}>
         <Text size="subtitle" color="ink">
-          Monthly spend for {activePerson.name}
+          {copy.medicineSaver.monthlySpendFor(activePerson.name)}
         </Text>
         <Text size="body" color="primary" style={styles.spendText}>
-          Spending {formatRupees(totals.monthlySpend)} a month
+          {copy.medicineSaver.spendingMonthly(formatRupees(totals.monthlySpend))}
         </Text>
 
         {totals.monthlySaving !== null && totals.monthlySaving > 0 && (
           <View style={styles.savingBox}>
             <Text size="body" color="success" style={{ fontWeight: '600' }}>
-              You could save {formatRupees(totals.monthlySaving)} a month
+              {copy.medicineSaver.couldSaveMonthly(formatRupees(totals.monthlySaving))}
             </Text>
             {totals.yearlySaving !== null && (
               <Text size="caption" color="muted">
-                Difference across the year: {formatRupees(totals.yearlySaving)}
+                {copy.medicineSaver.yearlyDifference(formatRupees(totals.yearlySaving))}
               </Text>
             )}
           </View>
@@ -102,8 +102,8 @@ export default function MedicineSaverScreen() {
       {list.length === 0 ? (
         <EmptyState
           iconName="medkit-outline"
-          title="No medicines added yet"
-          description={`Add medicines taken by ${activePerson.name} to track monthly spending and check savings.`}
+          title={copy.medicineSaver.emptyTitle}
+          description={copy.medicineSaver.emptyMessage}
         />
       ) : (
         <View style={styles.medsList}>
@@ -124,7 +124,7 @@ export default function MedicineSaverScreen() {
       {/* Primary Action Button */}
       <View style={styles.footer}>
         <Button
-          label="Add a medicine"
+          label={copy.medicineSaver.addMedicine}
           onPress={() => {
             setEditingMed(null);
             setAddMedModalVisible(true);

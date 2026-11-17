@@ -177,4 +177,21 @@ describe('migrateStoredData helper', () => {
     expect(res).toHaveLength(1);
     expect(res[0].id).toBe('c1');
   });
+
+  it('converts parseable legacy date to LocalDate and preserves unparseable text in legacy field', () => {
+    const doc = {
+      version: 1,
+      cases: [
+        { id: 'c1', issueType: 'refund', incidentDate: '28 Oct 2026' },
+        { id: 'c2', issueType: 'fraud', incidentDate: 'last Tuesday' },
+      ],
+    };
+    const res = migrateStoredData(doc);
+    expect(res).toHaveLength(2);
+    expect(res[0].incidentDate).toBe('2026-10-28');
+    expect(res[0].legacyIncidentDate).toBeUndefined();
+
+    expect(res[1].incidentDate).toBe('');
+    expect(res[1].legacyIncidentDate).toBe('last Tuesday');
+  });
 });

@@ -12,6 +12,7 @@ import { PlaceGuideCards } from '../../../src/features/money/components/PlaceGui
 import { OtpSafetyTip } from '../../../src/features/money/components/OtpSafetyTip';
 import { openWeb } from '../../../src/lib/links';
 import { defaultReminders } from '../../../src/features/cases/reminders';
+import { copy } from '../../../src/copy/en';
 
 const STATUS_OPTIONS: MoneyPlaceStatus[] = [
   'not_checked',
@@ -60,10 +61,7 @@ export default function PlaceDetailScreen() {
     if (res.scheduled) {
       setReminderMessage(`Reminder set for 9:00 AM on ${dateFormatted}.`);
     } else {
-      Alert.alert(
-        'Reminders are off',
-        'Turn on reminders in Settings to receive alerts on follow-up days.'
-      );
+      Alert.alert(copy.settings.remindersOffTitle, copy.settings.remindersOffTip);
     }
   };
 
@@ -84,10 +82,10 @@ export default function PlaceDetailScreen() {
           {place.title}
         </Text>
         <Text size="body" color="primary" style={styles.portalSubtitle}>
-          Official portal: {place.portalName}
+          {copy.placeDetail.officialPortalLabel(place.portalName)}
         </Text>
         <Text size="body" color="muted">
-          Tracking records for: {activePerson.name}
+          {copy.placeDetail.trackingRecordsFor(activePerson.name)}
         </Text>
       </View>
 
@@ -98,9 +96,13 @@ export default function PlaceDetailScreen() {
       {place.source && (
         <Card style={styles.actionCard}>
           <Text size="body" color="ink" style={styles.actionText}>
-            Visit the official portal to search for records:
+            {copy.placeDetail.visitOfficialPortal}
           </Text>
-          <Button label={`Open ${place.portalName}`} variant="quiet" onPress={handleOpenSite} />
+          <Button
+            label={copy.placeDetail.openPortalButton(place.portalName)}
+            variant="quiet"
+            onPress={handleOpenSite}
+          />
         </Card>
       )}
 
@@ -110,7 +112,7 @@ export default function PlaceDetailScreen() {
       {/* Status Picker & Update Form */}
       <Card style={styles.sectionCard}>
         <Text size="subtitle" color="ink" style={styles.sectionTitle}>
-          Your check status
+          {copy.placeDetail.checkStatusHeading}
         </Text>
         <View style={styles.statusOptions}>
           {STATUS_OPTIONS.map((opt) => {
@@ -149,24 +151,24 @@ export default function PlaceDetailScreen() {
 
         {showAmountField && (
           <Field
-            label="Amount (if known)"
-            placeholder="e.g. 15000"
+            label={copy.placeDetail.foundAmountLabel}
+            placeholder={copy.placeDetail.foundAmountPlaceholder}
             value={amount}
             onChangeText={setAmount}
-            helper="Enter numbers only. Formatted as rupees."
+            helper={copy.placeDetail.amountHelper}
           />
         )}
 
         <Field
-          label="Notes (optional)"
-          placeholder="e.g. Visited branch, token number 42"
+          label={copy.placeDetail.notesLabel}
+          placeholder={copy.placeDetail.notesPlaceholder}
           value={note}
           onChangeText={setNote}
-          helper="Keep record of reference numbers or branch contacts"
+          helper={copy.placeDetail.notesHelper}
         />
 
         <Button
-          label="Remind me in 7 days to check again"
+          label={copy.placeDetail.remind7Days}
           variant="quiet"
           onPress={handleScheduleReminder}
           style={styles.reminderButton}
@@ -181,7 +183,7 @@ export default function PlaceDetailScreen() {
 
       {/* Single primary action on screen */}
       <View style={styles.footer}>
-        <Button label="Save update" onPress={handleSave} />
+        <Button label={copy.placeDetail.saveUpdate} onPress={handleSave} />
       </View>
     </Screen>
   );

@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
+import { copy } from '../../../copy/en';
 
 export interface CorruptDataBannerProps {
   show: boolean;
@@ -19,7 +20,7 @@ export const CorruptDataBanner: React.FC<CorruptDataBannerProps> = ({ show }) =>
       style={[styles.card, { borderColor: colors.danger, backgroundColor: colors.dangerSurface }]}
     >
       <Text size="body" color="danger">
-        We could not read your saved cases. A backup was kept.
+        {copy.settings.corruptBanner}
       </Text>
     </Card>
   );

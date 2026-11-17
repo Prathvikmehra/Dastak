@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Modal } from 'react-native';
-import { Card, Text, Field, Button } from '../../../components';
+import { Card, Text, Field, Button, DateField } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Medicine } from '../types';
 import { copy } from '../../../copy/en';
+import { LocalDate } from '../../../lib/dates';
 
 export interface AddMedicineModalProps {
   visible: boolean;
@@ -21,12 +22,15 @@ export const AddMedicineModal: React.FC<AddMedicineModalProps> = ({
   initialMedicine,
 }) => {
   const { colors, radius } = useTheme();
+  const m = copy.addMedicineModal;
 
   const [name, setName] = useState(initialMedicine?.name || '');
   const [brandPrice, setBrandPrice] = useState(initialMedicine?.brandPricePerStrip || '');
   const [genericPrice, setGenericPrice] = useState(initialMedicine?.genericPricePerStrip || '');
   const [strips, setStrips] = useState(String(initialMedicine?.stripsPerMonth || '1'));
-  const [lastRefill, setLastRefill] = useState(initialMedicine?.lastRefillDate || '');
+  const [lastRefill, setLastRefill] = useState<LocalDate | ''>(
+    initialMedicine?.lastRefillDate || ''
+  );
   const [refillDays, setRefillDays] = useState(String(initialMedicine?.refillEveryDays ?? 30));
   const [note, setNote] = useState(initialMedicine?.note || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,7 +45,7 @@ export const AddMedicineModal: React.FC<AddMedicineModalProps> = ({
         brandPricePerStrip: brandPrice.trim(),
         genericPricePerStrip: genericPrice.trim() || undefined,
         stripsPerMonth: Math.max(1, Number(strips) || 1),
-        lastRefillDate: lastRefill.trim() || undefined,
+        lastRefillDate: lastRefill.trim() ? (lastRefill as LocalDate) : undefined,
         refillEveryDays: Math.max(1, Number(refillDays) || 30),
         note: note.trim() || undefined,
       });
@@ -56,10 +60,9 @@ export const AddMedicineModal: React.FC<AddMedicineModalProps> = ({
       <View style={styles.backdrop}>
         <Card style={styles.modalCard}>
           <Text size="subtitle" color="ink" style={styles.title}>
-            {initialMedicine ? 'Edit medicine' : 'Add a medicine'}
+            {initialMedicine ? m.titleEdit : m.titleAdd}
           </Text>
 
-          {/* Mandatory doctor safety disclaimer */}
           <Card
             style={[
               styles.safetyNotice,
@@ -72,69 +75,68 @@ export const AddMedicineModal: React.FC<AddMedicineModalProps> = ({
           </Card>
 
           <Field
-            label="Medicine name"
-            placeholder="e.g. Telmisartan 40mg"
+            label={m.nameLabel}
+            placeholder={m.namePlaceholder}
             value={name}
             onChangeText={setName}
           />
 
           <Field
-            label="Brand price per strip (₹)"
-            placeholder="e.g. 180"
+            label={m.brandPriceLabel}
+            placeholder={m.brandPricePlaceholder}
             value={brandPrice}
             onChangeText={setBrandPrice}
-            helper="Price you currently pay per strip"
           />
 
           <Field
-            label="Generic price per strip (₹) (optional)"
-            placeholder="e.g. 25"
+            label={m.genericPriceLabel}
+            placeholder={m.genericPricePlaceholder}
             value={genericPrice}
             onChangeText={setGenericPrice}
-            helper={copy.medicineSaver.genericHelper}
+            helper={m.genericHelper}
           />
 
           <View style={styles.row}>
             <View style={styles.halfCol}>
               <Field
-                label="Strips / month"
-                placeholder="1"
+                label={m.stripsLabel}
+                placeholder={m.stripsPlaceholder}
                 value={strips}
                 onChangeText={setStrips}
               />
             </View>
             <View style={styles.halfCol}>
               <Field
-                label="Refill every (days)"
-                placeholder="30"
+                label={m.refillDaysLabel}
+                placeholder={m.refillDaysPlaceholder}
                 value={refillDays}
                 onChangeText={setRefillDays}
               />
             </View>
           </View>
 
-          <Field
-            label="Last refill date (optional)"
-            placeholder="e.g. 1 Nov 2026"
+          <DateField
+            label={m.lastRefillLabel}
             value={lastRefill}
-            onChangeText={setLastRefill}
-            helper="Used to calculate your next refill date"
+            onChange={setLastRefill}
+            helper={m.lastRefillHelper}
+            legacyValue={initialMedicine?.legacyLastRefillDate}
           />
 
           <Field
-            label="Note (optional)"
-            placeholder="e.g. After breakfast, or doctor instructions"
+            label={m.noteLabel}
+            placeholder={m.notePlaceholder}
             value={note}
             onChangeText={setNote}
           />
 
           <Button
-            label="Save medicine"
+            label={m.saveButton}
             onPress={handleSubmit}
             disabled={!name.trim() || !brandPrice.trim() || isSubmitting}
             style={styles.saveBtn}
           />
-          <Button label="Cancel" variant="quiet" onPress={onClose} />
+          <Button label={m.cancelButton} variant="quiet" onPress={onClose} />
         </Card>
       </View>
     </Modal>

@@ -10,6 +10,7 @@ import { defaultReminders } from '../src/features/cases/reminders';
 import { defaultPreferencesStore } from '../src/features/settings/preferences';
 import { defaultNotificationsPort } from '../src/lib/notificationsPort';
 import { logger } from '../src/lib/logger';
+import { copy } from '../src/copy/en';
 
 export const NOTIFICATION_ASKED_KEY = 'dastak_notifications_prompted';
 
@@ -73,32 +74,29 @@ export default function NotificationPromptScreen() {
         </View>
 
         <Text size="title" color="ink" style={styles.title}>
-          Case reminders
+          {copy.notificationPrompt.title}
         </Text>
 
         <Text size="body" color="muted" style={styles.subtitle}>
-          We can remind you the day your case moves to the next step.
+          {copy.notificationPrompt.subtitle}
         </Text>
 
         <Card style={styles.infoCard}>
           <View style={styles.infoRow}>
             <Ionicons name="checkmark-circle" size={20} color={colors.success} />
             <Text size="body" color="ink" style={styles.infoText}>
-              A quiet reminder at 9:00 AM on the day action is needed.
-            </Text>
-          </View>
-
-          <View style={styles.infoRow}>
-            <Ionicons name="shield-checkmark" size={20} color={colors.primary} />
-            <Text size="body" color="ink" style={styles.infoText}>
-              No spam or promotions. All data stays local to your phone.
+              {copy.notificationPrompt.explanation}
             </Text>
           </View>
         </Card>
 
-        <Button label="Enable reminders" onPress={handleEnable} style={styles.primaryButton} />
+        <Button
+          label={copy.notificationPrompt.enableButton}
+          onPress={handleEnable}
+          style={styles.primaryButton}
+        />
 
-        <Button label="Not now" variant="quiet" onPress={handleSkip} />
+        <Button label={copy.notificationPrompt.skipButton} variant="quiet" onPress={handleSkip} />
       </View>
     </Screen>
   );

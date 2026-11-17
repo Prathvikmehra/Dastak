@@ -1,5 +1,6 @@
 import { Case, LadderStep } from './types';
 import { formatRupees, parseAmount } from '../../lib/formatters';
+import { toDisplay } from '../../lib/dates';
 
 /**
  * Generates an honest, factual plain-text complaint draft with per-issue wording.
@@ -52,7 +53,9 @@ export function buildDraft(caseItem: Case, step: LadderStep): string {
   const sentences: string[] = [];
   const parsedAmt = parseAmount(caseItem.amount);
   const amountStr = parsedAmt !== null ? formatRupees(parsedAmt) : '';
-  const incidentDate = caseItem.incidentDate?.trim() || '';
+  const incidentDate = caseItem.incidentDate
+    ? toDisplay(caseItem.incidentDate)
+    : caseItem.legacyIncidentDate?.trim() || '';
 
   if (caseItem.issueType === 'refund') {
     if (company && amountStr) {
@@ -201,7 +204,9 @@ export function buildCallScript(caseItem: Case, step: LadderStep): string {
     lines.push(`The reference ID is ${ref}.`);
   }
 
-  const date = caseItem.incidentDate?.trim();
+  const date = caseItem.incidentDate
+    ? toDisplay(caseItem.incidentDate)
+    : caseItem.legacyIncidentDate?.trim() || '';
   if (date) {
     lines.push(`The incident occurred on ${date}.`);
   }

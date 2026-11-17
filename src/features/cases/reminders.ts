@@ -7,6 +7,7 @@ import {
 } from '../../lib/notificationsPort';
 import { PreferencesStore, defaultPreferencesStore } from '../settings/preferences';
 import { logger } from '../../lib/logger';
+import { parseIsoDate } from '../../lib/dates';
 
 export interface PlannedReminder {
   stepId: string;
@@ -37,7 +38,7 @@ export function planReminders(caseItem: Case, now: Date): PlannedReminder[] {
     return [];
   }
 
-  const created = new Date(caseItem.createdAt);
+  const created = parseIsoDate(caseItem.createdAt);
   const company = caseItem.company?.trim() || 'the company';
   const results: PlannedReminder[] = [];
 
@@ -147,7 +148,7 @@ export class RemindersService implements Reminders {
     let skipped = 0;
     let failed = 0;
 
-    const created = new Date(caseItem.createdAt);
+    const created = parseIsoDate(caseItem.createdAt);
     const company = caseItem.company?.trim() || 'the company';
 
     for (const step of ladder.steps) {

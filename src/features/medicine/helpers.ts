@@ -1,5 +1,6 @@
 import { Medicine, MedicineTotals } from './types';
 import { parseAmount } from '../../lib/formatters';
+import { parseLocalDate, addDays } from '../../lib/dates';
 
 /**
  * Calculates monthly saving for a medicine:
@@ -63,13 +64,18 @@ export function nextRefillDate(medicine: Medicine): Date | null {
     return null;
   }
 
-  const last = new Date(medicine.lastRefillDate);
-  if (isNaN(last.getTime())) {
+  const parsed = parseLocalDate(medicine.lastRefillDate);
+  if (!parsed) {
     return null;
   }
 
   const days = medicine.refillEveryDays ?? 30;
-  return new Date(last.getFullYear(), last.getMonth(), last.getDate() + days, 9, 0, 0, 0);
+  const nextDateStr = addDays(parsed, days);
+  const parts = nextDateStr.split('-');
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10) - 1;
+  const d = parseInt(parts[2], 10);
+  return new Date(y, m, d, 9, 0, 0, 0);
 }
 
 /**

@@ -1,0 +1,184 @@
+import { UiFindCopy } from '../types/uiFind';
+
+export const enUiFind: UiFindCopy = {
+  notificationPrompt: {
+    title: 'Never miss an escalation step',
+    subtitle: 'Stay on track with calm reminders',
+    explanation:
+      'We send a quiet notification at 9:00 AM on the day your case moves to the next escalation authority. Your details never leave your phone.',
+    enableButton: 'Turn on reminders',
+    skipButton: 'Maybe later',
+  },
+
+  find: {
+    title: 'Find money you are owed or can save',
+    subtitle: 'Check forgotten deposits or review medicine expenses.',
+    moneyRadarCardTitle: 'Money radar',
+    moneyRadarCardDesc:
+      'Search old bank accounts, inactive fixed deposits, unclaimed life insurance, and forgotten provident fund money.',
+    moneyRadarCheckedOfPlaces: (checked: number, total: number) =>
+      `Checked ${checked} of ${total} places`,
+    moneyRadarFoundSoFar: (amount: string) => `Found so far: ${amount}`,
+    moneyRadarReceived: (amount: string) => `Received: ${amount}`,
+    moneyRadarUdgamNote:
+      'Note: RBI UDGAM covers participating banks only. It does not search post office savings, EPF, or insurance.',
+    openMoneyRadarAccessibility: 'Open Money radar',
+    medicineSaverCardTitle: 'Medicine saver',
+    medicineSaverCardDesc:
+      'Keep track of what you spend on medicines each month, and note any lower price you have found.',
+    openMedicineSaverAccessibility: 'Open Medicine saver',
+    spendingMonthly: (amount: string) => `Spending ${amount} a month`,
+    couldSaveMonthly: (amount: string) => `You could save ${amount} a month`,
+  },
+
+  moneyRadar: {
+    title: 'Money radar',
+    subtitle:
+      'Search official portals for forgotten bank accounts, unclaimed insurance policies, mutual funds, and provident funds.',
+    emptyTitle: 'No searches recorded yet',
+    emptyMessage: 'Select a portal below to record your search progress.',
+    foundTotal: (amount: string) => `Found: ${amount}`,
+    receivedTotal: (amount: string) => `Received: ${amount}`,
+    searchGuidanceCardTitle: 'How to search',
+    searchGuidanceCardDesc: 'Official portals are free. Never pay an agent or share an OTP.',
+    checkedStatus: 'Checked',
+    notCheckedStatus: 'Not checked yet',
+    personSwitcherAdd: '+ Add person',
+    claimingOnBehalfOf: (name: string) => `Claiming on behalf of ${name}`,
+    deceasedNotice:
+      'Claiming usually needs a death certificate and proof that you are the nominee or legal heir; check each place’s rules.',
+    progressFor: (name: string) => `Progress for ${name}`,
+    checkedOfPlaces: (checked: number, total: number) => `Checked ${checked} of ${total} places`,
+    foundSoFar: (amount: string) => `Found so far: ${amount}`,
+    receivedAmount: (amount: string) => `Received: ${amount}`,
+    udgamCaveat:
+      'UDGAM covers participating banks only; it does not cover post office savings, PF, or insurance. We do not promise any recovered money.',
+  },
+
+  placeDetail: {
+    whatThisCovers: 'What this covers',
+    whatToKeepReady: 'What to keep ready',
+    howToSearch: 'How to search',
+    howToClaim: 'How to claim',
+    statusFound: 'Found money here',
+    statusReceived: 'Claim received',
+    statusNone: 'Not checked yet',
+    remind7Days: 'Remind me in 7 days to check again',
+    remindScheduledTitle: 'Reminder scheduled',
+    remindScheduledMessage: (placeName: string) =>
+      `We will remind you in 7 days to follow up on ${placeName}.`,
+    saveUpdate: 'Save update',
+    foundAmountLabel: 'Amount (if known)',
+    foundAmountPlaceholder: 'e.g. 15000',
+    notesLabel: 'Notes (optional)',
+    notesPlaceholder: 'e.g. Visited branch, token number 42',
+    officialPortalLabel: (portal: string) => `Official portal: ${portal}`,
+    trackingRecordsFor: (name: string) => `Tracking records for: ${name}`,
+    visitOfficialPortal: 'Visit the official portal to search for records:',
+    checkStatusHeading: 'Your check status',
+    openPortalButton: (portal: string) => `Open ${portal}`,
+    amountHelper: 'Enter numbers only. Formatted as rupees.',
+    notesHelper: 'Keep record of reference numbers or branch contacts',
+  },
+
+  addPersonModal: {
+    title: 'Add a person to check',
+    subtitle: 'Keep track of records and claims for yourself or a family member.',
+    nameLabel: 'Person name',
+    namePlaceholder: 'e.g. Ramesh Kumar',
+    nameHelper: 'Name as recorded on official identity or bank documents',
+    relLabel: 'Relationship',
+    deceasedNotice:
+      'Claiming usually needs a death certificate and proof that you are the nominee or legal heir; check each place’s rules.',
+    saveButton: 'Save person',
+    cancelButton: 'Cancel',
+  },
+
+  medicineSaver: {
+    title: 'Medicine saver',
+    subtitle: 'See what you spend on medicines and what you could save, and never miss a refill.',
+    safetyNotice:
+      'Generic and brand medicines can contain the same salt, but never change or stop a medicine without asking your doctor or pharmacist first.',
+    findKendras: 'Find government Jan Aushadhi Kendras:',
+    openJanAushadhi: 'Open Jan Aushadhi website',
+    spendingMonthly: (amount: string) => `Spending ${amount} a month`,
+    couldSaveMonthly: (amount: string) => `You could save ${amount} a month`,
+    yearlyDifference: (amount: string) => `Difference across the year: ${amount}`,
+    monthlySpendFor: (name: string) => `Monthly spend for ${name}`,
+    refillReminderText: (name: string) => `Time to check your refill of ${name}`,
+    remindMe: 'Remind me',
+    reminderScheduledTitle: 'Reminder set',
+    reminderScheduled: (name: string) => `We will remind you when it is time to refill ${name}.`,
+    refillDateNeededTitle: 'Refill date needed',
+    refillDateNeededMessage:
+      'Add your last refill date first so we know when your next refill is due.',
+    remindersOffTitle: 'Reminders are off',
+    remindersOffMessage: 'Turn on reminders in Settings to receive alerts on refill days.',
+    deleteConfirmTitle: 'Delete medicine',
+    deleteConfirmMessage: (name: string) => `Are you sure you want to delete ${name}?`,
+    deleteAction: 'Delete',
+    cancelAction: 'Cancel',
+    emptyTitle: 'No medicines added yet',
+    emptyMessage:
+      'Add a prescribed medicine to track monthly spending and see the difference when lower-price options are found.',
+    addMedicine: '+ Add medicine',
+    brandVsGeneric: (brand: string, generic: string) =>
+      `Brand: ${brand} · Option found: ${generic}`,
+    refillDueInDays: (days: number) => `Refill due in ${days} days`,
+    refillDueToday: 'Refill due today',
+    refillOverdueDays: (days: number) => `Refill overdue by ${days} days`,
+    noteLabel: 'Note:',
+    stripsPerMonthCount: (strips: number) =>
+      strips === 1 ? '1 strip / month' : `${strips} strips / month`,
+    brandPricePerStrip: (amt: string) => `Brand price: ${amt} / strip`,
+    priceFoundPerStrip: (amt: string) => `Price you found: ${amt} / strip`,
+    saveMonthlyAmount: (amt: string) => `Difference: save ${amt} / month`,
+  },
+
+  addMedicineModal: {
+    titleAdd: 'Add medicine',
+    titleEdit: 'Edit medicine',
+    nameLabel: 'Medicine name and dosage',
+    namePlaceholder: 'e.g. Telmisartan 40mg',
+    brandPriceLabel: 'Price per strip of brand you buy (₹)',
+    brandPricePlaceholder: 'e.g. 120',
+    genericPriceLabel: 'Lower price you found per strip (₹, optional)',
+    genericPricePlaceholder: 'e.g. 25',
+    genericHelper: 'Look this up in the Jan Aushadhi Sugam app or ask your pharmacist',
+    stripsLabel: 'Strips / month',
+    stripsPlaceholder: '1',
+    refillDaysLabel: 'Refill every (days)',
+    refillDaysPlaceholder: '30',
+    lastRefillLabel: 'Last refill date (optional)',
+    lastRefillHelper: 'Used to calculate your next refill date',
+    noteLabel: 'Note (optional)',
+    notePlaceholder: 'e.g. After breakfast, or doctor instructions',
+    saveButton: 'Save medicine',
+    cancelButton: 'Cancel',
+  },
+
+  settings: {
+    title: 'Settings and help',
+    languageTitle: 'App language',
+    languageSubtitle: 'Choose the language you prefer for complaint letters and guidance.',
+    remindersTitle: 'Escalation reminders',
+    remindersSubtitle: 'Remind you at 9:00 AM on the day your case moves to the next step.',
+    remindersToggleAccessibility: 'Toggle escalation reminders',
+    remindersOffNotice: 'Reminders are off. You can still see your next step inside the app.',
+    remindersOffTitle: 'Reminders are off',
+    remindersOffTip: 'Turn on reminders in Settings to receive alerts on follow-up days.',
+    openSettingsButton: 'Open phone settings',
+    openSettingsAccessibility: 'Open phone settings',
+    themeTitle: 'Display mode',
+    themeSubtitle: 'Light mode is recommended for reading outdoors and in direct sunlight.',
+    themeLight: 'Light',
+    themeDark: 'Dark',
+    privacyTitle: 'Privacy guarantee',
+    privacySubtitle:
+      'No data leaves your device unless you choose to share a complaint letter. Your complaint drafts, case numbers, and name stay safely on your phone.',
+    corruptBanner: 'We could not read your saved cases. A backup was kept.',
+    reminderNotificationTitle: 'Case update reminder',
+    reminderNotificationBody: (company: string, who: string) =>
+      `Your case with ${company} moves to the ${who} today.`,
+  },
+};

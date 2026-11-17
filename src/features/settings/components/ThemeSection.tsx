@@ -3,6 +3,7 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
+import { copy } from '../../../copy/en';
 
 export const ThemeSection: React.FC = () => {
   const { colors, mode, setMode, radius } = useTheme();
@@ -10,10 +11,10 @@ export const ThemeSection: React.FC = () => {
   return (
     <Card style={styles.card}>
       <Text size="subtitle" color="ink" style={styles.heading}>
-        Display mode
+        {copy.settings.themeTitle}
       </Text>
       <Text size="body" color="muted" style={styles.subtitle}>
-        Light mode is recommended for reading outdoors and in direct sunlight.
+        {copy.settings.themeSubtitle}
       </Text>
 
       <View style={styles.row}>
@@ -39,7 +40,7 @@ export const ThemeSection: React.FC = () => {
             color={mode === 'light' ? 'primary' : 'ink'}
             style={{ fontWeight: mode === 'light' ? '600' : '400' }}
           >
-            Light
+            {copy.settings.themeLight}
           </Text>
         </Pressable>
 
@@ -65,7 +66,7 @@ export const ThemeSection: React.FC = () => {
             color={mode === 'dark' ? 'primary' : 'ink'}
             style={{ fontWeight: mode === 'dark' ? '600' : '400' }}
           >
-            Dark
+            {copy.settings.themeDark}
           </Text>
         </Pressable>
       </View>

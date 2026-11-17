@@ -1,3 +1,5 @@
+import { LocalDate } from '../../lib/dates';
+
 export type IssueType = 'refund' | 'fraud' | 'bank' | 'insurance';
 
 export interface Case {
@@ -6,7 +8,8 @@ export interface Case {
   company: string;
   amount: string;
   reference: string;
-  incidentDate: string;
+  incidentDate: LocalDate;
+  legacyIncidentDate?: string;
   note: string;
   fraudWhen?: 'hour' | 'today' | 'yesterday' | 'earlier';
   createdAt: string; // ISO string
@@ -21,7 +24,8 @@ export interface CaseInput {
   company?: string;
   amount?: string;
   reference?: string;
-  incidentDate?: string;
+  incidentDate?: LocalDate;
+  legacyIncidentDate?: string;
   note?: string;
   userName?: string;
   fraudWhen?: 'hour' | 'today' | 'yesterday' | 'earlier';

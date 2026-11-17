@@ -3,6 +3,7 @@ import { View, StyleSheet, Modal, Pressable } from 'react-native';
 import { Card, Text, Field, Button } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Relationship } from '../types';
+import { copy } from '../../../copy/en';
 
 export interface AddPersonModalProps {
   visible: boolean;
@@ -17,6 +18,7 @@ export const AddPersonModal: React.FC<AddPersonModalProps> = ({ visible, onClose
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState<Relationship>('Parent');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const m = copy.addPersonModal;
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
@@ -36,22 +38,22 @@ export const AddPersonModal: React.FC<AddPersonModalProps> = ({ visible, onClose
       <View style={styles.backdrop}>
         <Card style={styles.modalCard}>
           <Text size="subtitle" color="ink" style={styles.title}>
-            Add a person to check
+            {m.title}
           </Text>
           <Text size="body" color="muted" style={styles.subtitle}>
-            Keep track of records and claims for yourself or a family member.
+            {m.subtitle}
           </Text>
 
           <Field
-            label="Person name"
-            placeholder="e.g. Ramesh Kumar"
+            label={m.nameLabel}
+            placeholder={m.namePlaceholder}
             value={name}
             onChangeText={setName}
-            helper="Name as recorded on official identity or bank documents"
+            helper={m.nameHelper}
           />
 
           <Text size="caption" color="muted" style={styles.relLabel}>
-            Relationship
+            {m.relLabel}
           </Text>
           <View style={styles.relRow}>
             {RELATIONSHIPS.map((rel) => {
@@ -93,19 +95,18 @@ export const AddPersonModal: React.FC<AddPersonModalProps> = ({ visible, onClose
               ]}
             >
               <Text size="caption" color="ink" style={{ lineHeight: 18 }}>
-                Claiming usually needs a death certificate and proof that you are the nominee or
-                legal heir; check each place’s rules.
+                {m.deceasedNotice}
               </Text>
             </Card>
           )}
 
           <Button
-            label="Save person"
+            label={m.saveButton}
             onPress={handleSubmit}
             disabled={!name.trim() || isSubmitting}
             style={styles.saveButton}
           />
-          <Button label="Cancel" variant="quiet" onPress={onClose} />
+          <Button label={m.cancelButton} variant="quiet" onPress={onClose} />
         </Card>
       </View>
     </Modal>

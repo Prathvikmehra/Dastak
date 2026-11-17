@@ -1,5 +1,6 @@
 import { Case, LadderStep } from './types';
 import { LADDERS } from './ladders';
+import { parseIsoDate } from '../../lib/dates';
 
 export { buildDraft, buildCallScript } from './drafts';
 
@@ -9,7 +10,7 @@ export { buildDraft, buildCallScript } from './drafts';
  * daylight saving or slight midnight clock drift.
  */
 export function daysElapsed(caseItem: Case, now: Date): number {
-  const created = new Date(caseItem.createdAt);
+  const created = parseIsoDate(caseItem.createdAt);
   const startLocalMidnight = new Date(
     created.getFullYear(),
     created.getMonth(),
@@ -27,7 +28,7 @@ export function daysElapsed(caseItem: Case, now: Date): number {
  * using exact timestamps.
  */
 export function hoursSince(caseItem: Case, now: Date): number {
-  const createdMs = new Date(caseItem.createdAt).getTime();
+  const createdMs = parseIsoDate(caseItem.createdAt).getTime();
   const nowMs = now.getTime();
   return Math.max(0, (nowMs - createdMs) / (1000 * 60 * 60));
 }

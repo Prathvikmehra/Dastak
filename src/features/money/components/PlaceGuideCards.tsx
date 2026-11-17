@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { MoneyPlace } from '../types';
+import { copy } from '../../../copy/en';
 
 export interface PlaceGuideCardsProps {
   place: MoneyPlace;
@@ -17,7 +18,7 @@ export const PlaceGuideCards: React.FC<PlaceGuideCardsProps> = ({ place }) => {
       {/* What this covers */}
       <Card style={styles.card}>
         <Text size="subtitle" color="ink" style={styles.title}>
-          What this covers
+          {copy.placeDetail.whatThisCovers}
         </Text>
         <Text size="body" color="muted" style={styles.body}>
           {place.covers}
@@ -27,7 +28,7 @@ export const PlaceGuideCards: React.FC<PlaceGuideCardsProps> = ({ place }) => {
       {/* What to keep ready */}
       <Card style={styles.card}>
         <Text size="subtitle" color="ink" style={styles.title}>
-          What to keep ready
+          {copy.placeDetail.whatToKeepReady}
         </Text>
         {place.keepReady.map((item, idx) => (
           <View key={idx} style={styles.bulletRow}>
@@ -42,12 +43,12 @@ export const PlaceGuideCards: React.FC<PlaceGuideCardsProps> = ({ place }) => {
       {/* How to search */}
       <Card style={styles.card}>
         <Text size="subtitle" color="ink" style={styles.title}>
-          How to search
+          {copy.placeDetail.howToSearch}
         </Text>
         {place.howToSearch.map((step, idx) => (
           <View key={idx} style={styles.stepRow}>
             <Text size="body" color="primary" style={styles.stepNumber}>
-              {idx + 1}.
+              {`${idx + 1}.`}
             </Text>
             <Text size="body" color="ink" style={styles.bulletText}>
               {step}
@@ -59,12 +60,12 @@ export const PlaceGuideCards: React.FC<PlaceGuideCardsProps> = ({ place }) => {
       {/* How to claim */}
       <Card style={styles.card}>
         <Text size="subtitle" color="ink" style={styles.title}>
-          How to claim
+          {copy.placeDetail.howToClaim}
         </Text>
         {place.howToClaim.map((step, idx) => (
           <View key={idx} style={styles.stepRow}>
             <Text size="body" color="primary" style={styles.stepNumber}>
-              {idx + 1}.
+              {`${idx + 1}.`}
             </Text>
             <Text size="body" color="ink" style={styles.bulletText}>
               {step}

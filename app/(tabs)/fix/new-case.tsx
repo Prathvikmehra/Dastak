@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Screen, Text, Card, Field, Button } from '../../../src/components';
+import { Screen, Text, Card, Field, Button, DateField } from '../../../src/components';
 import { IssueType } from '../../../src/features/cases/types';
 import { useCases } from '../../../src/features/cases/store';
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
+import { LocalDate } from '../../../src/lib/dates';
 import { copy } from '../../../src/copy/en';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NOTIFICATION_ASKED_KEY } from '../../notification-prompt';
@@ -33,7 +34,7 @@ export default function NewCaseScreen() {
   const [company, setCompany] = useState('');
   const [amount, setAmount] = useState('');
   const [reference, setReference] = useState('');
-  const [incidentDate, setIncidentDate] = useState('');
+  const [incidentDate, setIncidentDate] = useState<LocalDate | ''>('');
   const [note, setNote] = useState(params.note || params.initialDesc || '');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -139,11 +140,10 @@ export default function NewCaseScreen() {
           helper="Helps locate your transaction"
         />
 
-        <Field
+        <DateField
           label={copy.newCase.incidentDateLabel}
-          placeholder={copy.newCase.incidentDatePlaceholder}
           value={incidentDate}
-          onChangeText={setIncidentDate}
+          onChange={setIncidentDate}
         />
 
         <Field

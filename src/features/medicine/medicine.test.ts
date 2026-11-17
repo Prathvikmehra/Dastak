@@ -219,11 +219,26 @@ describe('PersistentMedicineStore integration', () => {
         name: 'Metformin 500mg',
         brandPricePerStrip: '40',
         stripsPerMonth: 2,
+        lastRefillDate: '1 Nov 2026',
+      },
+      {
+        id: 'med-legacy-2',
+        personId: 'me',
+        name: 'Aspirin',
+        brandPricePerStrip: '20',
+        stripsPerMonth: 1,
+        lastRefillDate: 'earlier this month',
       },
     ];
 
     const migrated = migrateMedicinesData(raw);
-    expect(migrated).toHaveLength(1);
+    expect(migrated).toHaveLength(2);
     expect(migrated[0].id).toBe('med-legacy-1');
+    expect(migrated[0].lastRefillDate).toBe('2026-11-01');
+    expect(migrated[0].legacyLastRefillDate).toBeUndefined();
+
+    expect(migrated[1].id).toBe('med-legacy-2');
+    expect(migrated[1].lastRefillDate).toBeUndefined();
+    expect(migrated[1].legacyLastRefillDate).toBe('earlier this month');
   });
 });

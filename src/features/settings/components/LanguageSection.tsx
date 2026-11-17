@@ -5,14 +5,12 @@ import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { defaultPreferencesStore } from '../preferences';
 import { logger } from '../../../lib/logger';
+import { copy } from '../../../copy/en';
 
 const LANGUAGES = [
-  { id: 'en', label: 'English', native: 'English' },
-  { id: 'hi', label: 'Hindi', native: 'हिन्दी' },
-  { id: 'mr', label: 'Marathi', native: 'मराठी' },
-  { id: 'ta', label: 'Tamil', native: 'தமிழ்' },
-  { id: 'te', label: 'Telugu', native: 'తెలుగు' },
-  { id: 'bn', label: 'Bengali', native: 'বাংলা' },
+  { id: 'en', native: 'English' },
+  { id: 'hi', native: 'हिन्दी' },
+  { id: 'gu', native: 'ગુજરાતી' },
 ];
 
 export const LanguageSection: React.FC = () => {
@@ -48,10 +46,10 @@ export const LanguageSection: React.FC = () => {
   return (
     <Card style={styles.card}>
       <Text size="subtitle" color="ink" style={styles.heading}>
-        App language
+        {copy.settings.languageTitle}
       </Text>
       <Text size="body" color="muted" style={styles.subtitle}>
-        Choose the language you prefer for complaint letters and guidance.
+        {copy.settings.languageSubtitle}
       </Text>
 
       <View style={styles.grid}>
@@ -63,7 +61,7 @@ export const LanguageSection: React.FC = () => {
               onPress={() => handleSelect(lang.id)}
               accessibilityRole="radio"
               accessibilityState={{ selected: isSelected }}
-              accessibilityLabel={`${lang.label} - ${lang.native}`}
+              accessibilityLabel={lang.native}
               style={[
                 styles.pill,
                 {
@@ -78,7 +76,7 @@ export const LanguageSection: React.FC = () => {
                 color={isSelected ? 'primary' : 'ink'}
                 style={{ fontWeight: isSelected ? '600' : '400' }}
               >
-                {lang.native} ({lang.label})
+                {lang.native}
               </Text>
               {isSelected ? (
                 <Ionicons name="checkmark-circle" size={18} color={colors.primary} />

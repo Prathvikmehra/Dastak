@@ -108,7 +108,7 @@ export const EscalationTimeline: React.FC<EscalationTimelineProps> = ({
                   )}
                 </View>
                 <Text size="caption" color={isCurrent ? 'ink' : 'muted'}>
-                  Day {s.dayOffset}
+                  {copy.caseDetail.daysCount(s.dayOffset)}
                 </Text>
               </View>
             </View>

@@ -129,8 +129,8 @@ export default function FixHomeScreen() {
         </Text>
 
         <Field
-          label="Describe your problem"
-          placeholder="For example: 2,000 rupees cut from bank via UPI but shopkeeper did not receive it"
+          label={copy.fixHome.boxTitle}
+          placeholder={copy.fixHome.boxPlaceholder}
           value={description}
           onChangeText={setDescription}
           multiline
@@ -139,7 +139,7 @@ export default function FixHomeScreen() {
         />
 
         <Button
-          label="Start a case"
+          label={copy.fixHome.title}
           onPress={handleStartCase}
           icon={<Ionicons name="arrow-forward" size={20} color={colors.onAction} />}
         />
@@ -147,7 +147,7 @@ export default function FixHomeScreen() {
 
       <View style={styles.sectionHeaderRow}>
         <Text size="subtitle" color="ink">
-          Common problems
+          {copy.fixHome.commonProblemsHeading}
         </Text>
         <Pressable
           accessibilityRole="button"

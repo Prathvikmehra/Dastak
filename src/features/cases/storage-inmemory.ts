@@ -1,4 +1,5 @@
 import { Case, CaseInput, CaseStore } from './types';
+import { parseIsoDate } from '../../lib/dates';
 
 export class InMemoryCaseStore implements CaseStore {
   private cases: Map<string, Case> = new Map();
@@ -11,7 +12,7 @@ export class InMemoryCaseStore implements CaseStore {
 
   async list(): Promise<Case[]> {
     return Array.from(this.cases.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) => parseIsoDate(b.createdAt).getTime() - parseIsoDate(a.createdAt).getTime()
     );
   }
 
@@ -27,7 +28,8 @@ export class InMemoryCaseStore implements CaseStore {
       company: input.company?.trim() || '',
       amount: input.amount?.trim() || '',
       reference: input.reference?.trim() || '',
-      incidentDate: input.incidentDate?.trim() || '',
+      incidentDate: input.incidentDate || '',
+      legacyIncidentDate: input.legacyIncidentDate,
       note: input.note?.trim() || '',
       userName: input.userName?.trim() || '',
       fraudWhen: input.fraudWhen,

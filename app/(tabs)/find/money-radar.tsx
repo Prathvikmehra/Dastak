@@ -11,6 +11,7 @@ import { PersonSwitcher } from '../../../src/features/money/components/PersonSwi
 import { AddPersonModal } from '../../../src/features/money/components/AddPersonModal';
 import { OtpSafetyTip } from '../../../src/features/money/components/OtpSafetyTip';
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
+import { copy } from '../../../src/copy/en';
 
 export default function MoneyRadarScreen() {
   const router = useRouter();
@@ -41,12 +42,11 @@ export default function MoneyRadarScreen() {
           <View style={styles.deceasedHeader}>
             <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
             <Text size="body" color="ink" style={{ fontWeight: '600' }}>
-              Claiming on behalf of {activePerson.name}
+              {copy.moneyRadar.claimingOnBehalfOf(activePerson.name)}
             </Text>
           </View>
           <Text size="body" color="muted" style={styles.deceasedText}>
-            Claiming usually needs a death certificate and proof that you are the nominee or legal
-            heir; check each place’s rules.
+            {copy.moneyRadar.deceasedNotice}
           </Text>
         </Card>
       )}
@@ -57,10 +57,10 @@ export default function MoneyRadarScreen() {
       {/* Radar Progress Summary */}
       <Card style={styles.summaryCard}>
         <Text size="subtitle" color="ink" style={styles.summaryTitle}>
-          Progress for {activePerson.name}
+          {copy.moneyRadar.progressFor(activePerson.name)}
         </Text>
         <Text size="body" color="muted">
-          Checked {summary.checked} of {summary.total} places
+          {copy.moneyRadar.checkedOfPlaces(summary.checked, summary.total)}
         </Text>
 
         <View style={styles.amountsRow}>
@@ -72,7 +72,7 @@ export default function MoneyRadarScreen() {
               ]}
             >
               <Text size="caption" color="primary" style={{ fontWeight: '600' }}>
-                Found so far: {formatRupees(summary.found)}
+                {copy.moneyRadar.foundSoFar(formatRupees(summary.found))}
               </Text>
             </View>
           )}
@@ -85,15 +85,14 @@ export default function MoneyRadarScreen() {
               ]}
             >
               <Text size="caption" color="success" style={{ fontWeight: '600' }}>
-                Received: {formatRupees(summary.received)}
+                {copy.moneyRadar.receivedAmount(formatRupees(summary.received))}
               </Text>
             </View>
           )}
         </View>
 
         <Text size="caption" color="muted" style={styles.framingText}>
-          UDGAM covers participating banks only; it does not cover post office savings, PF, or
-          insurance. We do not promise any recovered money.
+          {copy.moneyRadar.udgamCaveat}
         </Text>
       </Card>
 

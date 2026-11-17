@@ -8,6 +8,7 @@ import { defaultReminders } from '../../cases/reminders';
 import { defaultPreferencesStore } from '../preferences';
 import { defaultNotificationsPort, PermissionStatus } from '../../../lib/notificationsPort';
 import { logger } from '../../../lib/logger';
+import { copy } from '../../../copy/en';
 
 export const RemindersSection: React.FC = () => {
   const { colors } = useTheme();
@@ -85,10 +86,10 @@ export const RemindersSection: React.FC = () => {
       <View style={styles.headerRow}>
         <View style={styles.textContainer}>
           <Text size="subtitle" color="ink" style={styles.heading}>
-            Escalation reminders
+            {copy.settings.remindersTitle}
           </Text>
           <Text size="body" color="muted">
-            Remind you at 9:00 AM on the day your case moves to the next step.
+            {copy.settings.remindersSubtitle}
           </Text>
         </View>
         <Switch
@@ -96,7 +97,7 @@ export const RemindersSection: React.FC = () => {
           onValueChange={handleToggle}
           trackColor={{ false: colors.border, true: colors.primary }}
           thumbColor={colors.surface}
-          accessibilityLabel="Toggle escalation reminders"
+          accessibilityLabel={copy.settings.remindersToggleAccessibility}
         />
       </View>
 
@@ -104,16 +105,16 @@ export const RemindersSection: React.FC = () => {
       {showRemindersOffNotice && (
         <View style={styles.noticeContainer}>
           <Text size="body" color="muted" style={styles.noticeText}>
-            Reminders are off. You can still see your next step inside the app.
+            {copy.settings.remindersOffNotice}
           </Text>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Open phone settings"
+            accessibilityLabel={copy.settings.openSettingsAccessibility}
             onPress={() => Linking.openSettings()}
             style={styles.settingsButton}
           >
             <Text size="body" color="primary" style={styles.settingsButtonText}>
-              Open phone settings
+              {copy.settings.openSettingsButton}
             </Text>
           </Pressable>
         </View>

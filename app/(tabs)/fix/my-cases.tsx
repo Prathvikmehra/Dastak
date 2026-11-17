@@ -51,7 +51,7 @@ export default function MyCasesScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
               <Text size="subtitle" color="ink">
-                {copy.myCases.inProgressSection} ({openCases.length})
+                {copy.myCases.activeCount(openCases.length)}
               </Text>
               <Button label={copy.myCases.startCaseButton} onPress={handleStartNew} />
             </View>
@@ -59,7 +59,7 @@ export default function MyCasesScreen() {
             {openCases.length === 0 ? (
               <Card style={styles.emptySectionCard}>
                 <Text size="body" color="muted">
-                  No active cases in progress.
+                  {copy.myCases.emptyMessage}
                 </Text>
               </Card>
             ) : (
@@ -73,7 +73,7 @@ export default function MyCasesScreen() {
           {resolvedCases.length > 0 ? (
             <View style={styles.section}>
               <Text size="subtitle" color="ink" style={styles.resolvedSectionHeader}>
-                {copy.myCases.resolvedSection} ({resolvedCases.length})
+                {copy.myCases.resolvedCount(resolvedCases.length)}
               </Text>
 
               {resolvedCases.map((c) => (
