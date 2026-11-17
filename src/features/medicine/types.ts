@@ -1,8 +1,17 @@
-export interface MedicineComparison {
+export interface Medicine {
   id: string;
-  prescribedBrand: string;
-  genericSalt: string;
-  brandPrice: number;
-  genericPrice: number;
-  savingsPercentage: number;
+  personId: string;
+  name: string;
+  brandPricePerStrip: string;
+  genericPricePerStrip?: string;
+  stripsPerMonth: number;
+  lastRefillDate?: string;
+  refillEveryDays?: number;
+  note?: string;
+}
+
+export interface MedicineTotals {
+  monthlySpend: number;
+  monthlySaving: number | null;
+  yearlySaving: number | null;
 }

@@ -9,12 +9,7 @@ export const OtpSafetyTip: React.FC = () => {
   const { colors, radius } = useTheme();
 
   return (
-    <Card
-      style={[
-        styles.card,
-        { backgroundColor: colors.surfaceAlt, borderRadius: radius.card },
-      ]}
-    >
+    <Card style={[styles.card, { backgroundColor: colors.surfaceAlt, borderRadius: radius.card }]}>
       <View style={styles.row}>
         <Ionicons name="shield-checkmark-outline" size={20} color={colors.primary} />
         <Text size="caption" color="ink" style={styles.text}>

@@ -1,10 +1,5 @@
 import { summarize, followUpDate } from './helpers';
-import {
-  PersistentMoneyStore,
-  migrateMoneyData,
-  DEFAULT_PERSON,
-  MONEY_STORAGE_KEY,
-} from './store';
+import { PersistentMoneyStore, migrateMoneyData, DEFAULT_PERSON, MONEY_STORAGE_KEY } from './store';
 import { PLACES } from './places';
 import { PlaceRecord } from './types';
 import { KeyValueStorage } from '../cases/storage';

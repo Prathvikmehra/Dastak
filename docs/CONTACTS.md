@@ -17,4 +17,4 @@
 | IEPF Authority                        | Web Portal   | https://www.iepf.gov.in                   | checked-against-secondary-sources |             | Unclaimed shares and unpaid dividends search and refund portal      |
 | EPFO Member Portal                    | Web Portal   | https://unifiedportal-mem.epfindia.gov.in | checked-against-secondary-sources |             | Inoperative and un-transferred provident fund accounts portal       |
 | Department of Posts                   | Office Visit | Nearest Post Office                       | general-guidance                  |             | Inactive post office savings certificates, NSC, and passbook claims |
-| Pradhan Mantri Bhartiya Janaushadhi   | Web Portal   | https://janaushadhi.gov.in                | official-portal                   |             | Official portal for generic medicines and Kendra store locator     |
+| Pradhan Mantri Bhartiya Janaushadhi   | Web Portal   | https://janaushadhi.gov.in                | official-portal                   |             | Official portal for generic medicines and Kendra store locator      |

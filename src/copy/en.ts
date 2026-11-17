@@ -163,4 +163,16 @@ export const copy = {
     saveUpdate: 'Save update',
     remindIn7Days: 'Remind me in 7 days to check again',
   },
+  medicineSaver: {
+    title: 'Medicine saver',
+    subtitle: 'See what you spend on medicines and what you could save, and never miss a refill.',
+    safetyNotice:
+      'Generic and brand medicines can contain the same salt, but never switch or stop a medicine without asking your doctor or pharmacist first.',
+    spendingMonthly: (amount: string) => `Spending ${amount} a month`,
+    couldSaveMonthly: (amount: string) => `You could save ${amount} a month`,
+    yearlyDifference: (amount: string) => `Difference across the year: ${amount}`,
+    genericHelper: 'Look this up in the Jan Aushadhi Sugam app or ask your pharmacist',
+    openJanAushadhi: 'Open Jan Aushadhi website',
+    refillReminderText: (name: string) => `Time to check your refill of ${name}`,
+  },
 };

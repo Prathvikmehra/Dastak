@@ -5,12 +5,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Screen, Text, Card } from '../../../src/components';
 import { useTheme } from '../../../src/theme/ThemeContext';
 import { useMoney } from '../../../src/features/money/store';
+import { useMedicines } from '../../../src/features/medicine/store';
 import { formatRupees } from '../../../src/lib/formatters';
 
 export default function FindHomeScreen() {
   const router = useRouter();
   const { colors, radius } = useTheme();
   const { summary } = useMoney();
+  const { globalTotals } = useMedicines();
 
   return (
     <Screen scrollable>
@@ -135,9 +137,44 @@ export default function FindHomeScreen() {
             Medicine saver
           </Text>
           <Text size="body" color="muted" style={styles.cardDescription}>
-            Check lower-cost generic alternatives with the exact same chemical salts. Cut up to 80%
-            from monthly pharmacy bills.
+            Keep track of your monthly medicine expenses and see the difference when using generic
+            alternatives with the same salt.
           </Text>
+
+          {/* Spend and potential saving metrics */}
+          <View style={styles.statusRow}>
+            {globalTotals.monthlySpend > 0 && (
+              <View
+                style={[
+                  styles.statusBadge,
+                  {
+                    backgroundColor: colors.surfaceAlt,
+                    borderRadius: radius.button,
+                  },
+                ]}
+              >
+                <Text size="caption" color="primary" style={{ fontWeight: '600' }}>
+                  Spending {formatRupees(globalTotals.monthlySpend)} a month
+                </Text>
+              </View>
+            )}
+
+            {globalTotals.monthlySaving !== null && globalTotals.monthlySaving > 0 && (
+              <View
+                style={[
+                  styles.statusBadge,
+                  {
+                    backgroundColor: colors.surfaceAlt,
+                    borderRadius: radius.button,
+                  },
+                ]}
+              >
+                <Text size="caption" color="success" style={{ fontWeight: '600' }}>
+                  You could save {formatRupees(globalTotals.monthlySaving)} a month
+                </Text>
+              </View>
+            )}
+          </View>
         </Card>
       </View>
     </Screen>

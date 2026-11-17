@@ -52,10 +52,7 @@ export const PLACES: MoneyPlace[] = [
       'Open Bima Bharosa’s Unclaimed Amount page to find links to each insurer’s search page.',
       'You can also use the IRDAI query form on the site, which asks for name, mobile number, date of birth, insurer, and policy number.',
     ],
-    howToClaim: [
-      'Contact the insurer with KYC and bank details.',
-      FOLLOW_OFFICIAL_SITE_NOTICE,
-    ],
+    howToClaim: ['Contact the insurer with KYC and bank details.', FOLLOW_OFFICIAL_SITE_NOTICE],
   },
   {
     id: 'mfcentral',
@@ -135,13 +132,8 @@ export const PLACES: MoneyPlace[] = [
     verifiedOn: null,
     contentStatus: 'general-guidance',
     covers: 'Older post office certificates or savings passbooks.',
-    keepReady: [
-      'Original certificate or passbook',
-      'Identity proof and address proof',
-    ],
-    howToSearch: [
-      'There is no central online search for older certificates or passbooks.',
-    ],
+    keepReady: ['Original certificate or passbook', 'Identity proof and address proof'],
+    howToSearch: ['There is no central online search for older certificates or passbooks.'],
     howToClaim: [
       'Visit the issuing post office or your nearest Head Post Office with the original certificate or passbook and ID, and ask what form and documents they need.',
       FOLLOW_OFFICIAL_SITE_NOTICE,

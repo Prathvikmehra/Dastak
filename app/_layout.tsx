@@ -4,6 +4,7 @@ import * as Notifications from 'expo-notifications';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
 import { CasesProvider } from '../src/features/cases/store';
 import { MoneyProvider } from '../src/features/money/store';
+import { MedicineProvider } from '../src/features/medicine/store';
 
 // Set notification handler once at app start with current SDK 58 types
 Notifications.setNotificationHandler({
@@ -59,7 +60,9 @@ export default function RootLayout() {
     <ThemeProvider>
       <CasesProvider>
         <MoneyProvider>
-          <RootLayoutContent />
+          <MedicineProvider>
+            <RootLayoutContent />
+          </MedicineProvider>
         </MoneyProvider>
       </CasesProvider>
     </ThemeProvider>
