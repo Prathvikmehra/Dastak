@@ -1,5 +1,7 @@
-import { planReminders, FakeReminders } from './reminders';
+import { planReminders, RemindersService } from './reminders';
 import { Case } from './types';
+import { FakeNotificationsPort } from '../../lib/notificationsPort';
+import { PreferencesStore, UserPreferences } from '../settings/preferences';
 
 function createMockCase(overrides: Partial<Case> = {}): Case {
   return {
@@ -16,16 +18,33 @@ function createMockCase(overrides: Partial<Case> = {}): Case {
   };
 }
 
+class FakePreferencesStore implements PreferencesStore {
+  public prefs: UserPreferences;
+  public hadCorruptedData = false;
+
+  constructor(initial: UserPreferences = { remindersEnabled: true, language: 'en' }) {
+    this.prefs = { ...initial };
+  }
+
+  async get(): Promise<UserPreferences> {
+    return { ...this.prefs };
+  }
+
+  async set(updates: Partial<UserPreferences>): Promise<UserPreferences> {
+    this.prefs = { ...this.prefs, ...updates };
+    return { ...this.prefs };
+  }
+}
+
 describe('planReminders pure function', () => {
   it('schedules reminders for future ladder steps at 9:00 local time on that step day', () => {
-    // Created on Nov 1 at 10:00 local time
     const c = createMockCase({
       issueType: 'refund',
       company: 'Acme Mart',
       createdAt: new Date(2026, 10, 1, 10, 0, 0).toISOString(),
     });
 
-    // Checked on Nov 1 at 11:00 local time (Day 0 9:00 has already passed)
+    // Checked on Nov 1 at 11:00 local time (Day 0 9:00 is already past)
     const now = new Date(2026, 10, 1, 11, 0, 0);
     const planned = planReminders(c, now);
 
@@ -33,7 +52,6 @@ describe('planReminders pure function', () => {
     // Day 0 (Nov 1 9:00) is past -> 2 future reminders remaining (day 7 and day 30)
     expect(planned).toHaveLength(2);
 
-    // Day 7 reminder
     const day7 = planned[0];
     expect(day7.stepId).toBe('refund-step-7');
     expect(day7.fireAt.getFullYear()).toBe(2026);
@@ -45,7 +63,6 @@ describe('planReminders pure function', () => {
       'Your case with Acme Mart moves to the National Consumer Helpline today'
     );
 
-    // Day 30 reminder
     const day30 = planned[1];
     expect(day30.stepId).toBe('refund-step-30');
     expect(day30.fireAt.getHours()).toBe(9);
@@ -58,7 +75,6 @@ describe('planReminders pure function', () => {
       resolvedAt: new Date(2026, 10, 5).toISOString(),
     });
     const now = new Date(2026, 10, 2, 10, 0, 0);
-
     const planned = planReminders(c, now);
     expect(planned).toEqual([]);
   });
@@ -68,24 +84,110 @@ describe('planReminders pure function', () => {
       issueType: 'refund',
       createdAt: new Date(2026, 9, 1, 10, 0, 0).toISOString(),
     });
-    // 60 days later
     const now = new Date(2026, 11, 1, 10, 0, 0);
-
     const planned = planReminders(c, now);
     expect(planned).toEqual([]);
   });
 });
 
-describe('FakeReminders implementation', () => {
-  it('schedules and cancels reminders correctly', async () => {
-    const fakeReminders = new FakeReminders();
-    const c = createMockCase({ id: 'case-test-xyz' });
+describe('RemindersService integration with FakeNotificationsPort', () => {
+  let fakePort: FakeNotificationsPort;
+  let fakePrefs: FakePreferencesStore;
+  let service: RemindersService;
+
+  beforeEach(() => {
+    fakePort = new FakeNotificationsPort();
+    fakePrefs = new FakePreferencesStore({ remindersEnabled: true, language: 'en' });
+    service = new RemindersService(fakePort, fakePrefs);
+  });
+
+  it('schedules using absolute DATE trigger shape and proper identifiers', async () => {
+    const c = createMockCase({
+      id: 'case-date-1',
+      createdAt: new Date(2026, 10, 1, 10, 0, 0).toISOString(),
+    });
     const now = new Date(2026, 10, 1, 11, 0, 0);
 
-    await fakeReminders.schedule(c, now);
-    expect(fakeReminders.scheduled.get('case-test-xyz')).toHaveLength(2);
+    const result = await service.schedule(c, now);
 
-    await fakeReminders.cancel('case-test-xyz');
-    expect(fakeReminders.scheduled.has('case-test-xyz')).toBe(false);
+    expect(result.permission).toBe('granted');
+    expect(result.scheduled).toBe(2);
+    expect(result.skipped).toBe(1); // Day 0 (Nov 1 09:00) is past
+    expect(result.failed).toBe(0);
+
+    // Verify scheduled items in fake port
+    const scheduledList = Array.from(fakePort.scheduled.values());
+    expect(scheduledList).toHaveLength(2);
+
+    for (const req of scheduledList) {
+      expect(req.identifier).toMatch(/^dastak_case-date-1_refund-step-/);
+      // Absolute DATE trigger, never TIME_INTERVAL
+      expect(req.trigger.type).toBe('date');
+      expect(req.trigger.date).toBeInstanceOf(Date);
+      expect(req.trigger.date.getTime()).toBeGreaterThan(now.getTime());
+    }
+  });
+
+  it('skips scheduling when preference is false', async () => {
+    fakePrefs.prefs.remindersEnabled = false;
+    const c = createMockCase({ id: 'case-pref-false' });
+    const now = new Date(2026, 10, 1, 11, 0, 0);
+
+    const result = await service.schedule(c, now);
+
+    expect(result.scheduled).toBe(0);
+    expect(result.skipped).toBe(0);
+    expect(result.failed).toBe(0);
+    expect(fakePort.scheduled.size).toBe(0);
+  });
+
+  it('cancels all scheduled reminders on toggle OFF', async () => {
+    const c = createMockCase({ id: 'case-cancel-all' });
+    const now = new Date(2026, 10, 1, 11, 0, 0);
+
+    await service.schedule(c, now);
+    expect(fakePort.scheduled.size).toBe(2);
+
+    await service.cancelAll();
+    expect(fakePort.scheduled.size).toBe(0);
+  });
+
+  it('correctly tracks skipped past reminders', async () => {
+    // Created 40 days ago, so day 0, day 7, day 30 have all passed
+    const c = createMockCase({
+      issueType: 'refund',
+      createdAt: new Date(2026, 8, 1, 10, 0, 0).toISOString(),
+    });
+    const now = new Date(2026, 10, 1, 10, 0, 0);
+
+    const result = await service.schedule(c, now);
+
+    expect(result.scheduled).toBe(0);
+    expect(result.skipped).toBe(3);
+    expect(result.failed).toBe(0);
+    expect(fakePort.scheduled.size).toBe(0);
+  });
+
+  it('reports failure instead of swallowing errors when port throws', async () => {
+    fakePort.shouldFailSchedule = true;
+    const c = createMockCase({ id: 'case-failure-report' });
+    const now = new Date(2026, 10, 1, 11, 0, 0);
+
+    const result = await service.schedule(c, now);
+
+    expect(result.failed).toBe(2);
+    expect(result.scheduled).toBe(0);
+  });
+
+  it('returns denied permission without scheduling when OS permission is denied', async () => {
+    fakePort.permission = 'denied';
+    const c = createMockCase();
+    const now = new Date(2026, 10, 1, 11, 0, 0);
+
+    const result = await service.schedule(c, now);
+
+    expect(result.permission).toBe('denied');
+    expect(result.scheduled).toBe(0);
+    expect(fakePort.scheduled.size).toBe(0);
   });
 });

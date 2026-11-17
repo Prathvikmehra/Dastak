@@ -12,8 +12,8 @@ export const HeaderActions: React.FC = () => {
     <View style={styles.container}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Settings and reminders"
-        onPress={() => router.push('/help')}
+        accessibilityLabel="Settings and help"
+        onPress={() => router.push('/settings-and-help')}
         style={({ pressed }) => [
           styles.iconButton,
           {
@@ -28,8 +28,8 @@ export const HeaderActions: React.FC = () => {
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Settings, language, and help"
-        onPress={() => router.push('/help')}
+        accessibilityLabel="Settings and help"
+        onPress={() => router.push('/settings-and-help')}
         style={({ pressed }) => [
           styles.iconButton,
           {

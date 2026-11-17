@@ -1,20 +1,67 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Case, CaseInput, CaseStore } from './types';
+import { logger } from '../../lib/logger';
 
 export interface KeyValueStorage {
   getItem(key: string): Promise<string | null>;
   setItem(key: string, value: string): Promise<void>;
   removeItem(key: string): Promise<void>;
+  getAllKeys?(): Promise<readonly string[]>;
 }
 
 export const asyncStorageAdapter: KeyValueStorage = {
   getItem: (key) => AsyncStorage.getItem(key),
   setItem: (key, value) => AsyncStorage.setItem(key, value),
   removeItem: (key) => AsyncStorage.removeItem(key),
+  getAllKeys: () => AsyncStorage.getAllKeys(),
 };
 
 export const CASES_STORAGE_KEY = 'dastak_cases_v1';
 export const CURRENT_STORAGE_VERSION = 1;
+
+let backupSequence = 0;
+
+/**
+ * Stores corrupt data to a backup key and prunes older backups so at most
+ * the 3 most recent backups for this storageKey are kept.
+ */
+export async function backupCorruptData(
+  storage: KeyValueStorage,
+  storageKey: string,
+  rawStr: string,
+  now: number = Date.now()
+): Promise<string> {
+  const timestampStr = String(now).padStart(15, '0');
+  const seqStr = String(backupSequence++ % 10000).padStart(4, '0');
+  const backupKey = `${storageKey}_backup_${timestampStr}_${seqStr}`;
+
+  try {
+    await storage.setItem(backupKey, rawStr);
+  } catch (err) {
+    logger.error(`Failed to store corrupt backup for key ${storageKey}`, err);
+    return backupKey;
+  }
+
+  if (storage.getAllKeys) {
+    try {
+      const allKeys = await storage.getAllKeys();
+      const prefix = `${storageKey}_backup_`;
+      const backupKeys = allKeys.filter((k) => k.startsWith(prefix));
+      if (backupKeys.length > 3) {
+        // Sort descending (newest first based on timestamp and sequence)
+        backupKeys.sort((a, b) => b.localeCompare(a));
+        const toDelete = backupKeys.slice(3);
+        for (const k of toDelete) {
+          await storage.removeItem(k);
+        }
+      }
+    } catch (err) {
+      logger.warn(`Failed to prune old corrupt backups for key ${storageKey}`, err);
+    }
+  }
+
+  return backupKey;
+}
 
 export interface StoredCasesDocument {
   version: number;
@@ -48,6 +95,7 @@ export function migrateStoredData(raw: unknown): Case[] {
  * - Persists all cases as a single versioned JSON document.
  * - Serializes writes to guarantee concurrent write safety.
  * - Backs up corrupt JSON to a backup key without crashing or wiping silently.
+ * - Keeps at most the 3 most recent corrupt backups.
  */
 export class PersistentCaseStore implements CaseStore {
   private storage: KeyValueStorage;
@@ -88,13 +136,13 @@ export class PersistentCaseStore implements CaseStore {
           this.casesMap.set(c.id, c);
         }
       } catch {
-        // Corrupt JSON! Copy to backup key and start empty
-        const backupKey = `dastak_cases_backup_${Date.now()}`;
-        await this.storage.setItem(backupKey, rawStr);
+        // Corrupt JSON: copy to backup key, prune older backups, and start empty
+        await backupCorruptData(this.storage, this.storageKey, rawStr);
         this.hadCorruptedData = true;
         this.casesMap.clear();
       }
-    } catch {
+    } catch (err) {
+      logger.error('Failed reading cases from storage', err);
       this.casesMap.clear();
     } finally {
       this.isInitialized = true;

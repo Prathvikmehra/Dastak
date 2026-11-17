@@ -1,14 +1,25 @@
-import { Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
-import { AndroidImportance } from 'expo-notifications';
 import { Case } from './types';
 import { LADDERS } from './ladders';
+import {
+  NotificationsPort,
+  defaultNotificationsPort,
+  PermissionStatus,
+} from '../../lib/notificationsPort';
+import { PreferencesStore, defaultPreferencesStore } from '../settings/preferences';
+import { logger } from '../../lib/logger';
 
 export interface PlannedReminder {
   stepId: string;
   fireAt: Date;
   title: string;
   body: string;
+}
+
+export interface ScheduleResult {
+  scheduled: number;
+  skipped: number;
+  failed: number;
+  permission: PermissionStatus;
 }
 
 /**
@@ -42,7 +53,7 @@ export function planReminders(caseItem: Case, now: Date): PlannedReminder[] {
       0
     );
 
-    // Future dates only: fireAt must be strictly after now
+    // Skip any reminder whose fireAt is not in the future
     if (fireAt.getTime() <= now.getTime()) {
       continue;
     }
@@ -62,93 +73,148 @@ export function planReminders(caseItem: Case, now: Date): PlannedReminder[] {
 }
 
 export interface Reminders {
-  schedule(caseItem: Case, now?: Date): Promise<void>;
+  schedule(caseItem: Case, now?: Date): Promise<ScheduleResult>;
   cancel(caseId: string): Promise<void>;
+  cancelAll(): Promise<void>;
 }
 
-export class FakeReminders implements Reminders {
-  public scheduled: Map<string, PlannedReminder[]> = new Map();
+export class RemindersService implements Reminders {
+  private port: NotificationsPort;
+  private preferencesStore: PreferencesStore;
 
-  async schedule(caseItem: Case, now: Date = new Date()): Promise<void> {
-    const planned = planReminders(caseItem, now);
-    this.scheduled.set(caseItem.id, planned);
+  constructor(
+    port: NotificationsPort = defaultNotificationsPort,
+    preferencesStore: PreferencesStore = defaultPreferencesStore
+  ) {
+    this.port = port;
+    this.preferencesStore = preferencesStore;
   }
 
-  async cancel(caseId: string): Promise<void> {
-    this.scheduled.delete(caseId);
-  }
-}
+  async schedule(caseItem: Case, now: Date = new Date()): Promise<ScheduleResult> {
+    const prefs = await this.preferencesStore.get();
+    const perm = await this.port.getPermission();
 
-export class ExpoNotificationsReminders implements Reminders {
-  private channelCreated = false;
-
-  private async ensureChannel(): Promise<void> {
-    if (this.channelCreated || Platform.OS !== 'android') {
-      return;
+    // If preference is off, do not schedule any reminder
+    if (!prefs.remindersEnabled) {
+      return {
+        scheduled: 0,
+        skipped: 0,
+        failed: 0,
+        permission: perm,
+      };
     }
-    try {
-      await Notifications.setNotificationChannelAsync('dastak_reminders', {
-        name: 'Case Escalation Reminders',
-        importance: AndroidImportance.HIGH,
-        sound: 'default',
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#1E4D8F',
-      });
-      this.channelCreated = true;
-    } catch {
-      // Safe fallback
-    }
-  }
 
-  async schedule(caseItem: Case, now: Date = new Date()): Promise<void> {
+    // If permission is denied or undetermined, return status without scheduling
+    if (perm !== 'granted') {
+      return {
+        scheduled: 0,
+        skipped: 0,
+        failed: 0,
+        permission: perm,
+      };
+    }
+
     await this.cancel(caseItem.id);
+
     if (caseItem.resolvedAt) {
-      return;
+      return {
+        scheduled: 0,
+        skipped: 0,
+        failed: 0,
+        permission: perm,
+      };
     }
 
-    const planned = planReminders(caseItem, now);
-    if (planned.length === 0) {
-      return;
+    const ladder = LADDERS[caseItem.issueType];
+    if (!ladder) {
+      return {
+        scheduled: 0,
+        skipped: 0,
+        failed: 0,
+        permission: perm,
+      };
     }
 
-    await this.ensureChannel();
+    await this.port.ensureChannel('dastak_reminders', 'Case Escalation Reminders');
 
-    for (const r of planned) {
-      const identifier = `dastak_${caseItem.id}_${r.stepId}`;
-      const triggerSeconds = Math.max(1, Math.round((r.fireAt.getTime() - Date.now()) / 1000));
+    let scheduled = 0;
+    let skipped = 0;
+    let failed = 0;
+
+    const created = new Date(caseItem.createdAt);
+    const company = caseItem.company?.trim() || 'the company';
+
+    for (const step of ladder.steps) {
+      const fireAt = new Date(
+        created.getFullYear(),
+        created.getMonth(),
+        created.getDate() + step.dayOffset,
+        9,
+        0,
+        0,
+        0
+      );
+
+      // Skip any reminder whose fireAt is not in the future
+      if (fireAt.getTime() <= now.getTime()) {
+        skipped++;
+        continue;
+      }
+
+      const identifier = `dastak_${caseItem.id}_${step.id}`;
+      const title = 'Case update reminder';
+      const body = `Your case with ${company} moves to the ${step.who} today.`;
+
       try {
-        await Notifications.scheduleNotificationAsync({
+        await this.port.scheduleNotification({
           identifier,
           content: {
-            title: r.title,
-            body: r.body,
-            data: { caseId: caseItem.id, stepId: r.stepId },
+            title,
+            body,
+            data: { caseId: caseItem.id, stepId: step.id },
           },
           trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-            seconds: triggerSeconds,
-            repeats: false,
+            type: 'date',
+            date: fireAt,
+            channelId: 'dastak_reminders',
           },
         });
-      } catch {
-        // Safe catch on unsupported platform / permission denied
+        scheduled++;
+      } catch (err) {
+        logger.error(`Failed to schedule reminder ${identifier}`, err);
+        failed++;
       }
     }
+
+    return {
+      scheduled,
+      skipped,
+      failed,
+      permission: perm,
+    };
   }
 
   async cancel(caseId: string): Promise<void> {
     try {
-      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      const scheduled = await this.port.getAllScheduled();
       const prefix = `dastak_${caseId}_`;
       for (const item of scheduled) {
         if (item.identifier && item.identifier.startsWith(prefix)) {
-          await Notifications.cancelScheduledNotificationAsync(item.identifier);
+          await this.port.cancelScheduledNotification(item.identifier);
         }
       }
-    } catch {
-      // Safe catch
+    } catch (err) {
+      logger.warn(`Failed to cancel reminders for case ${caseId}`, err);
+    }
+  }
+
+  async cancelAll(): Promise<void> {
+    try {
+      await this.port.cancelAllScheduled();
+    } catch (err) {
+      logger.warn('Failed to cancel all reminders', err);
     }
   }
 }
 
-export const defaultReminders: Reminders = new ExpoNotificationsReminders();
+export const defaultReminders: Reminders = new RemindersService();

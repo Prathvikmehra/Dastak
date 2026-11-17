@@ -1,0 +1,42 @@
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Card, Text } from '../../../components';
+import { useTheme } from '../../../theme/ThemeContext';
+
+export const PrivacySection: React.FC = () => {
+  const { colors } = useTheme();
+
+  return (
+    <Card style={styles.card}>
+      <View style={styles.header}>
+        <Ionicons name="shield-checkmark" size={24} color={colors.success} />
+        <Text size="subtitle" color="ink" style={styles.title}>
+          Privacy guarantee
+        </Text>
+      </View>
+      <Text size="body" color="ink" style={styles.description}>
+        No data leaves your device unless you choose to share a complaint letter. Your complaint
+        drafts, case numbers, and name stay safely on your phone.
+      </Text>
+    </Card>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    marginBottom: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  title: {
+    fontWeight: '600',
+  },
+  description: {
+    lineHeight: 22,
+  },
+});

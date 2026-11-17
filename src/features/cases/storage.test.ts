@@ -20,6 +20,10 @@ class FakeKeyValueStorage implements KeyValueStorage {
   async removeItem(key: string): Promise<void> {
     this.data.delete(key);
   }
+
+  async getAllKeys(): Promise<readonly string[]> {
+    return Array.from(this.data.keys());
+  }
 }
 
 describe('PersistentCaseStore with KeyValueStorage', () => {
@@ -93,10 +97,24 @@ describe('PersistentCaseStore with KeyValueStorage', () => {
 
     // Verifies backup key was created with the raw string
     const backupKeys = Array.from(fakeStorage.data.keys()).filter((k) =>
-      k.startsWith('dastak_cases_backup_')
+      k.startsWith(`${CASES_STORAGE_KEY}_backup_`)
     );
     expect(backupKeys.length).toBe(1);
     expect(fakeStorage.data.get(backupKeys[0])).toBe(corruptString);
+  });
+
+  it('keeps at most 3 corrupt backups for cases storage and removes older ones', async () => {
+    // Repeatedly load corrupt JSON 5 times
+    for (let i = 1; i <= 5; i++) {
+      await fakeStorage.setItem(CASES_STORAGE_KEY, `corrupt_case_content_${i}`);
+      const store = new PersistentCaseStore(fakeStorage);
+      await store.list();
+    }
+
+    const backupKeys = Array.from(fakeStorage.data.keys()).filter((k) =>
+      k.startsWith(`${CASES_STORAGE_KEY}_backup_`)
+    );
+    expect(backupKeys.length).toBe(3);
   });
 
   it('ensures concurrent writes do not lose data', async () => {

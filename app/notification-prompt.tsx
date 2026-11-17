@@ -2,12 +2,14 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Screen, Text, Card, Button } from '../src/components';
 import { useTheme } from '../src/theme/ThemeContext';
 import { useCases } from '../src/features/cases/store';
 import { defaultReminders } from '../src/features/cases/reminders';
+import { defaultPreferencesStore } from '../src/features/settings/preferences';
+import { defaultNotificationsPort } from '../src/lib/notificationsPort';
+import { logger } from '../src/lib/logger';
 
 export const NOTIFICATION_ASKED_KEY = 'dastak_notifications_prompted';
 
@@ -23,12 +25,13 @@ export default function NotificationPromptScreen() {
   const handleEnable = async () => {
     try {
       await AsyncStorage.setItem(NOTIFICATION_ASKED_KEY, 'true');
-      const { status } = await Notifications.requestPermissionsAsync();
+      await defaultPreferencesStore.set({ remindersEnabled: true });
+      const status = await defaultNotificationsPort.requestPermission();
       if (status === 'granted' && caseItem) {
         await defaultReminders.schedule(caseItem);
       }
-    } catch {
-      // Safe fallback on environments without notification support
+    } catch (err) {
+      logger.warn('Failed to enable notifications in prompt', err);
     }
     proceed();
   };
@@ -36,8 +39,9 @@ export default function NotificationPromptScreen() {
   const handleSkip = async () => {
     try {
       await AsyncStorage.setItem(NOTIFICATION_ASKED_KEY, 'true');
-    } catch {
-      // Safe fallback
+      await defaultPreferencesStore.set({ remindersEnabled: false });
+    } catch (err) {
+      logger.warn('Failed to record notification skip', err);
     }
     proceed();
   };

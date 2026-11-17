@@ -1,7 +1,18 @@
 import React from 'react';
 import { Stack } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
 import { CasesProvider } from '../src/features/cases/store';
+
+// Set notification handler once at app start with current SDK 58 types
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 function RootLayoutContent() {
   const { colors } = useTheme();
@@ -25,7 +36,7 @@ function RootLayoutContent() {
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
-        name="help"
+        name="settings-and-help"
         options={{
           presentation: 'modal',
           title: 'Settings and help',
