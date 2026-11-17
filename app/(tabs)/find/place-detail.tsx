@@ -9,6 +9,7 @@ import { PLACES } from '../../../src/features/money/places';
 import { MoneyPlaceStatus } from '../../../src/features/money/types';
 import { STATUS_LABELS, followUpDate } from '../../../src/features/money/helpers';
 import { PlaceGuideCards } from '../../../src/features/money/components/PlaceGuideCards';
+import { OtpSafetyTip } from '../../../src/features/money/components/OtpSafetyTip';
 import { openWeb } from '../../../src/lib/links';
 import { defaultReminders } from '../../../src/features/cases/reminders';
 
@@ -89,6 +90,9 @@ export default function PlaceDetailScreen() {
           Tracking records for: {activePerson.name}
         </Text>
       </View>
+
+      {/* Calm tip on official searches and OTP security */}
+      <OtpSafetyTip />
 
       {/* Official website button if source URL exists */}
       {place.source && (

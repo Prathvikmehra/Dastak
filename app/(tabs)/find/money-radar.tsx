@@ -9,6 +9,7 @@ import { PLACES } from '../../../src/features/money/places';
 import { STATUS_LABELS } from '../../../src/features/money/helpers';
 import { PersonSwitcher } from '../../../src/features/money/components/PersonSwitcher';
 import { AddPersonModal } from '../../../src/features/money/components/AddPersonModal';
+import { OtpSafetyTip } from '../../../src/features/money/components/OtpSafetyTip';
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
 
 export default function MoneyRadarScreen() {
@@ -49,6 +50,9 @@ export default function MoneyRadarScreen() {
           </Text>
         </Card>
       )}
+
+      {/* Calm tip on official searches and OTP security */}
+      <OtpSafetyTip />
 
       {/* Radar Progress Summary */}
       <Card style={styles.summaryCard}>

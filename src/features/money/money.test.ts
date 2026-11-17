@@ -1,5 +1,11 @@
 import { summarize, followUpDate } from './helpers';
-import { PersistentMoneyStore, migrateMoneyData, DEFAULT_PERSON, MONEY_STORAGE_KEY } from './store';
+import {
+  PersistentMoneyStore,
+  migrateMoneyData,
+  DEFAULT_PERSON,
+  MONEY_STORAGE_KEY,
+} from './store';
+import { PLACES } from './places';
 import { PlaceRecord } from './types';
 import { KeyValueStorage } from '../cases/storage';
 
@@ -176,5 +182,34 @@ describe('PersistentMoneyStore integration', () => {
     expect(meSummary.found).toBe(25000);
     expect(fatherSummary.found).toBe(0);
     expect(fatherSummary.checked).toBe(1);
+  });
+});
+
+describe('PLACES content audit', () => {
+  it('ensures every place ends howToClaim with "follow the official site" line', () => {
+    for (const place of PLACES) {
+      expect(place.howToClaim.length).toBeGreaterThan(0);
+      const lastLine = place.howToClaim[place.howToClaim.length - 1];
+      expect(lastLine).toBe(
+        'If the official site says something different, follow the official site.'
+      );
+    }
+  });
+
+  it('ensures every place has contentStatus, verifiedOn: null, and source (except post office)', () => {
+    for (const place of PLACES) {
+      expect(place.verifiedOn).toBeNull();
+      expect(['checked-against-secondary-sources', 'general-guidance']).toContain(
+        place.contentStatus
+      );
+      if (place.id === 'postoffice') {
+        expect(place.source).toBeNull();
+        expect(place.contentStatus).toBe('general-guidance');
+      } else {
+        expect(typeof place.source).toBe('string');
+        expect(place.source?.startsWith('https://')).toBe(true);
+        expect(place.contentStatus).toBe('checked-against-secondary-sources');
+      }
+    }
   });
 });

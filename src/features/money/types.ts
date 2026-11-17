@@ -18,6 +18,8 @@ export interface PlaceRecord {
   updatedAt: string;
 }
 
+export type ContentStatus = 'checked-against-secondary-sources' | 'general-guidance';
+
 export interface MoneyPlace {
   id: string;
   title: string;
@@ -25,6 +27,7 @@ export interface MoneyPlace {
   portalName: string;
   source: string | null;
   verifiedOn: null;
+  contentStatus: ContentStatus;
   covers: string;
   keepReady: string[];
   howToSearch: string[];
