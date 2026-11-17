@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Card, Text, Button } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Case } from '../types';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface UrgentBannerProps {
   caseItem: Case;
@@ -13,6 +13,7 @@ export interface UrgentBannerProps {
 
 export const UrgentBanner: React.FC<UrgentBannerProps> = ({ caseItem, onCall1930 }) => {
   const { colors, radius } = useTheme();
+  const copy = useCopy();
 
   const bodyText =
     caseItem.fraudWhen === 'earlier'

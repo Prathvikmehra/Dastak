@@ -3,7 +3,7 @@ import { View, StyleSheet, Modal } from 'react-native';
 import { Card, Text, Field, Button, DateField } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Medicine } from '../types';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 import { LocalDate } from '../../../lib/dates';
 
 export interface AddMedicineModalProps {
@@ -22,6 +22,7 @@ export const AddMedicineModal: React.FC<AddMedicineModalProps> = ({
   initialMedicine,
 }) => {
   const { colors, radius } = useTheme();
+  const copy = useCopy();
   const m = copy.addMedicineModal;
 
   const [name, setName] = useState(initialMedicine?.name || '');

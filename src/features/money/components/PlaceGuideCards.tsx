@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { MoneyPlace } from '../types';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface PlaceGuideCardsProps {
   place: MoneyPlace;
@@ -12,6 +12,7 @@ export interface PlaceGuideCardsProps {
 
 export const PlaceGuideCards: React.FC<PlaceGuideCardsProps> = ({ place }) => {
   const { colors } = useTheme();
+  const copy = useCopy();
 
   return (
     <>

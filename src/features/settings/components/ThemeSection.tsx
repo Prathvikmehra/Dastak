@@ -3,10 +3,11 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export const ThemeSection: React.FC = () => {
   const { colors, mode, setMode, radius } = useTheme();
+  const copy = useCopy();
 
   return (
     <Card style={styles.card}>

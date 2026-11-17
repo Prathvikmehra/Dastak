@@ -8,10 +8,11 @@ import { defaultReminders } from '../../cases/reminders';
 import { defaultPreferencesStore } from '../preferences';
 import { defaultNotificationsPort, PermissionStatus } from '../../../lib/notificationsPort';
 import { logger } from '../../../lib/logger';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export const RemindersSection: React.FC = () => {
   const { colors } = useTheme();
+  const copy = useCopy();
   const { openCases } = useCases();
   const [prefEnabled, setPrefEnabled] = useState(false);
   const [osPermission, setOsPermission] = useState<PermissionStatus>('undetermined');

@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { LadderStep } from '../types';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface EscalationTimelineProps {
   steps: LadderStep[];
@@ -20,6 +20,7 @@ export const EscalationTimeline: React.FC<EscalationTimelineProps> = ({
   elapsedDays,
 }) => {
   const { colors, radius } = useTheme();
+  const copy = useCopy();
 
   return (
     <Card style={styles.card}>

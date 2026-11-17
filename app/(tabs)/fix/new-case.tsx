@@ -6,7 +6,7 @@ import { IssueType } from '../../../src/features/cases/types';
 import { useCases } from '../../../src/features/cases/store';
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
 import { LocalDate } from '../../../src/lib/dates';
-import { copy } from '../../../src/copy/en';
+import { useCopy } from '../../../src/copy/context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NOTIFICATION_ASKED_KEY } from '../../notification-prompt';
 import {
@@ -17,6 +17,7 @@ import {
 
 export default function NewCaseScreen() {
   const router = useRouter();
+  const copy = useCopy();
   const params = useLocalSearchParams<{
     issueType?: string;
     initialDesc?: string;

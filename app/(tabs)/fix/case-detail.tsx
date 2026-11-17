@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Screen, Text, Card, EmptyState } from '../../../src/components';
 import { useTheme } from '../../../src/theme/ThemeContext';
 import { useCases } from '../../../src/features/cases/store';
-import { LADDERS } from '../../../src/features/cases/ladders';
+import { getLocalizedLadder } from '../../../src/features/cases/ladders';
 import {
   daysElapsed,
   currentStep,
@@ -15,7 +15,7 @@ import {
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
 import { openPhone, openWeb } from '../../../src/lib/links';
 import { toDisplay } from '../../../src/lib/dates';
-import { copy } from '../../../src/copy/en';
+import { useCopy } from '../../../src/copy/context';
 import { UrgentBanner } from '../../../src/features/cases/components/UrgentBanner';
 import { DoThisNowCard } from '../../../src/features/cases/components/DoThisNowCard';
 import { EvidenceChecklist } from '../../../src/features/cases/components/EvidenceChecklist';
@@ -27,6 +27,7 @@ export default function CaseDetailScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const { colors, radius } = useTheme();
   const { getCase, updateCase, resolveCase } = useCases();
+  const copy = useCopy();
   const [notice, setNotice] = useState<string | null>(null);
 
   const caseItem = params.id ? getCase(params.id) : undefined;
@@ -47,8 +48,8 @@ export default function CaseDetailScreen() {
 
   const now = new Date();
   const elapsed = daysElapsed(caseItem, now);
-  const ladder = LADDERS[caseItem.issueType];
-  const step = currentStep(caseItem, now);
+  const ladder = getLocalizedLadder(caseItem.issueType, copy);
+  const step = currentStep(caseItem, now, ladder);
   const isUrgent = isFraudUrgent(caseItem, now);
 
   const numericAmount = parseAmount(caseItem.amount);

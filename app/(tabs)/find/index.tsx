@@ -7,13 +7,14 @@ import { useTheme } from '../../../src/theme/ThemeContext';
 import { useMoney } from '../../../src/features/money/store';
 import { useMedicines } from '../../../src/features/medicine/store';
 import { formatRupees } from '../../../src/lib/formatters';
-import { copy } from '../../../src/copy/en';
+import { useCopy } from '../../../src/copy/context';
 
 export default function FindHomeScreen() {
   const router = useRouter();
   const { colors, radius } = useTheme();
   const { summary } = useMoney();
   const { globalTotals } = useMedicines();
+  const copy = useCopy();
   const f = copy.find;
 
   return (

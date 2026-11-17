@@ -6,6 +6,8 @@ export interface LadderCopy {
 
 export interface PlaceCopy {
   name: string;
+  title?: string;
+  subtitle?: string;
   covers: string;
   keepReady: string[];
   howToSearch: string[];

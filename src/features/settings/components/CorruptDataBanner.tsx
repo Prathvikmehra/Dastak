@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface CorruptDataBannerProps {
   show: boolean;
@@ -10,6 +10,7 @@ export interface CorruptDataBannerProps {
 
 export const CorruptDataBanner: React.FC<CorruptDataBannerProps> = ({ show }) => {
   const { colors } = useTheme();
+  const copy = useCopy();
 
   if (!show) {
     return null;

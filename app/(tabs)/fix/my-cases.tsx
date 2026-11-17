@@ -4,12 +4,13 @@ import { useRouter } from 'expo-router';
 import { Screen, Text, Card, EmptyState, Button } from '../../../src/components';
 import { useCases } from '../../../src/features/cases/store';
 import { Case } from '../../../src/features/cases/types';
-import { copy } from '../../../src/copy/en';
+import { useCopy } from '../../../src/copy/context';
 import { CaseCard } from '../../../src/features/cases/components/CaseCard';
 
 export default function MyCasesScreen() {
   const router = useRouter();
   const { openCases, resolvedCases, cases } = useCases();
+  const copy = useCopy();
 
   const handleOpenDetail = (caseItem: Case) => {
     router.push({

@@ -3,11 +3,12 @@ import { View, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../theme/ThemeContext';
-import { copy } from '../copy/en';
+import { useCopy } from '../copy/context';
 
 export const HeaderActions: React.FC = () => {
   const router = useRouter();
   const { colors, minTouchTarget } = useTheme();
+  const copy = useCopy();
 
   return (
     <View style={styles.container}>

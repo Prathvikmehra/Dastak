@@ -5,7 +5,7 @@ import { Card, Text, Button } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Case, LadderStep } from '../types';
 import { buildCallScript } from '../engine';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface DoThisNowCardProps {
   caseItem: Case;
@@ -25,9 +25,10 @@ export const DoThisNowCard: React.FC<DoThisNowCardProps> = ({
   onShareDraft,
 }) => {
   const { colors, radius } = useTheme();
+  const copy = useCopy();
 
   const hasPhone = Boolean(step.phone);
-  const callScript = hasPhone ? buildCallScript(caseItem, step) : '';
+  const callScript = hasPhone ? buildCallScript(caseItem, step, copy.callScript) : '';
 
   return (
     <Card style={styles.card}>

@@ -5,7 +5,7 @@ import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Case } from '../types';
 import { evidenceProgress } from '../engine';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface EvidenceChecklistProps {
   caseItem: Case;
@@ -19,6 +19,7 @@ export const EvidenceChecklist: React.FC<EvidenceChecklistProps> = ({
   onToggleItem,
 }) => {
   const { colors, radius } = useTheme();
+  const copy = useCopy();
   const progress = evidenceProgress(caseItem);
 
   return (

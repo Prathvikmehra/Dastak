@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Card, Text, Button, Field } from '../../../components';
 import { Case } from '../types';
 import { parseAmount } from '../../../lib/formatters';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface ResolveCardProps {
   caseItem: Case;
@@ -11,6 +11,7 @@ export interface ResolveCardProps {
 }
 
 export const ResolveCard: React.FC<ResolveCardProps> = ({ caseItem, onResolve }) => {
+  const copy = useCopy();
   const [showModal, setShowModal] = useState(false);
   const [recoveredInput, setRecoveredInput] = useState(caseItem.amount || '');
   const [isResolving, setIsResolving] = useState(false);

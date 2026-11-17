@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable, TextInput } from 'react-native';
 import { Text } from './Text';
 import { Card } from './Card';
 import { useTheme } from '../theme/ThemeContext';
-import { copy as defaultCopy } from '../copy/en';
+import { useCopy } from '../copy/context';
 import { LocalDate, today, addDays, isValidParts } from '../lib/dates';
 
 export interface DateFieldProps {
@@ -24,7 +24,8 @@ export const DateField: React.FC<DateFieldProps> = ({
   legacyValue,
 }) => {
   const { colors, radius } = useTheme();
-  const c = defaultCopy.dateField;
+  const copy = useCopy();
+  const c = copy.dateField;
 
   const todayStr = today();
   const yesterdayStr = addDays(todayStr, -1);

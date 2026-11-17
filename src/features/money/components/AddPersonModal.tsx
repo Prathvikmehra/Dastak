@@ -3,7 +3,7 @@ import { View, StyleSheet, Modal, Pressable } from 'react-native';
 import { Card, Text, Field, Button } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Relationship } from '../types';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface AddPersonModalProps {
   visible: boolean;
@@ -15,6 +15,7 @@ const RELATIONSHIPS: Relationship[] = ['Parent', 'Spouse', 'Someone who has pass
 
 export const AddPersonModal: React.FC<AddPersonModalProps> = ({ visible, onClose, onAdd }) => {
   const { colors, radius, minTouchTarget } = useTheme();
+  const copy = useCopy();
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState<Relationship>('Parent');
   const [isSubmitting, setIsSubmitting] = useState(false);

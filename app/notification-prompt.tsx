@@ -10,12 +10,13 @@ import { defaultReminders } from '../src/features/cases/reminders';
 import { defaultPreferencesStore } from '../src/features/settings/preferences';
 import { defaultNotificationsPort } from '../src/lib/notificationsPort';
 import { logger } from '../src/lib/logger';
-import { copy } from '../src/copy/en';
+import { useCopy } from '../src/copy/context';
 
 export const NOTIFICATION_ASKED_KEY = 'dastak_notifications_prompted';
 
 export default function NotificationPromptScreen() {
   const router = useRouter();
+  const copy = useCopy();
   const params = useLocalSearchParams<{ id?: string }>();
   const { colors, radius } = useTheme();
   const { getCase } = useCases();

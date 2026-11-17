@@ -3,6 +3,7 @@ import { Text as RNText, TextProps as RNTextProps, TextStyle } from 'react-nativ
 import { useTheme } from '../theme/ThemeContext';
 import { TextSize } from '../theme/typography';
 import { ColorTokens } from '../theme/colors';
+import { useLanguage } from '../copy/context';
 
 export interface TextProps extends RNTextProps {
   size?: TextSize;
@@ -20,6 +21,7 @@ export const Text: React.FC<TextProps> = ({
   ...rest
 }) => {
   const { colors, typography } = useTheme();
+  const { language } = useLanguage();
 
   const resolvedColor =
     typeof color === 'string' && color in colors
@@ -27,10 +29,13 @@ export const Text: React.FC<TextProps> = ({
       : (color as string);
 
   const typo = typography[size];
+  const minLineHeight =
+    language === 'hi' || language === 'gu' ? Math.ceil(typo.fontSize * 1.5) : typo.lineHeight;
+  const resolvedLineHeight = Math.max(typo.lineHeight, minLineHeight);
 
   const combinedStyle: TextStyle = {
     fontSize: typo.fontSize,
-    lineHeight: typo.lineHeight,
+    lineHeight: resolvedLineHeight,
     fontWeight: typo.fontWeight,
     color: resolvedColor,
     textAlign: align,

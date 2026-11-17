@@ -12,7 +12,7 @@ import {
   hasEscalatedPastFirstStep,
 } from '../../../src/features/cases/engine';
 import { formatRupees } from '../../../src/lib/formatters';
-import { copy } from '../../../src/copy/en';
+import { useCopy } from '../../../src/copy/context';
 import { OpenCasesSummary } from '../../../src/features/cases/components/OpenCasesSummary';
 
 interface DoorItem {
@@ -22,38 +22,39 @@ interface DoorItem {
   iconName: keyof typeof Ionicons.glyphMap;
 }
 
-const DOORS: DoorItem[] = [
-  {
-    id: 'refund',
-    title: copy.fixHome.doors.refund.title,
-    description: copy.fixHome.doors.refund.subtitle,
-    iconName: 'cart-outline',
-  },
-  {
-    id: 'fraud',
-    title: copy.fixHome.doors.fraud.title,
-    description: copy.fixHome.doors.fraud.subtitle,
-    iconName: 'alert-circle-outline',
-  },
-  {
-    id: 'bank',
-    title: copy.fixHome.doors.bank.title,
-    description: copy.fixHome.doors.bank.subtitle,
-    iconName: 'business-outline',
-  },
-  {
-    id: 'insurance',
-    title: copy.fixHome.doors.insurance.title,
-    description: copy.fixHome.doors.insurance.subtitle,
-    iconName: 'shield-outline',
-  },
-];
-
 export default function FixHomeScreen() {
   const router = useRouter();
   const { colors, radius } = useTheme();
   const { openCases, totalRecovered } = useCases();
+  const copy = useCopy();
   const [description, setDescription] = useState('');
+
+  const doors: DoorItem[] = [
+    {
+      id: 'refund',
+      title: copy.fixHome.doors.refund.title,
+      description: copy.fixHome.doors.refund.subtitle,
+      iconName: 'cart-outline',
+    },
+    {
+      id: 'fraud',
+      title: copy.fixHome.doors.fraud.title,
+      description: copy.fixHome.doors.fraud.subtitle,
+      iconName: 'alert-circle-outline',
+    },
+    {
+      id: 'bank',
+      title: copy.fixHome.doors.bank.title,
+      description: copy.fixHome.doors.bank.subtitle,
+      iconName: 'business-outline',
+    },
+    {
+      id: 'insurance',
+      title: copy.fixHome.doors.insurance.title,
+      description: copy.fixHome.doors.insurance.subtitle,
+      iconName: 'shield-outline',
+    },
+  ];
 
   const now = new Date();
 
@@ -162,7 +163,7 @@ export default function FixHomeScreen() {
       </View>
 
       <View style={styles.doorsList}>
-        {DOORS.map((door) => (
+        {doors.map((door) => (
           <Card
             key={door.id}
             onPress={() => handleSelectDoor(door.id)}

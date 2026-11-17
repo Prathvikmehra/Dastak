@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Case } from '../types';
-import { LADDERS } from '../ladders';
+import { getLocalizedLadder } from '../ladders';
 import {
   daysElapsed,
   currentStep,
@@ -13,7 +13,7 @@ import {
   hasEscalatedPastFirstStep,
 } from '../engine';
 import { formatRupees, parseAmount } from '../../../lib/formatters';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface CaseCardProps {
   caseItem: Case;
@@ -23,7 +23,8 @@ export interface CaseCardProps {
 
 export const CaseCard: React.FC<CaseCardProps> = ({ caseItem, onPress, now = new Date() }) => {
   const { colors, radius } = useTheme();
-  const ladder = LADDERS[caseItem.issueType];
+  const copy = useCopy();
+  const ladder = getLocalizedLadder(caseItem.issueType, copy);
   const isResolved = Boolean(caseItem.resolvedAt);
 
   const parsed = parseAmount(caseItem.amount);
@@ -89,8 +90,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({ caseItem, onPress, now = new
 
   // Open case
   const elapsed = daysElapsed(caseItem, now);
-  const step = currentStep(caseItem, now);
-  const next = nextStep(caseItem, now);
+  const step = currentStep(caseItem, now, ladder);
+  const next = nextStep(caseItem, now, ladder);
   const remaining = daysUntilNext(caseItem, now);
   const isOverdue = hasEscalatedPastFirstStep(caseItem, now);
 

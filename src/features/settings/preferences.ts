@@ -1,5 +1,6 @@
 import { KeyValueStorage, asyncStorageAdapter, backupCorruptData } from '../cases/storage';
 import { logger } from '../../lib/logger';
+import { detectDeviceLanguage } from '../../lib/locale';
 
 export interface UserPreferences {
   remindersEnabled: boolean;
@@ -11,7 +12,7 @@ export const CURRENT_PREFS_VERSION = 1;
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   remindersEnabled: false,
-  language: 'en',
+  language: detectDeviceLanguage(),
 };
 
 export interface StoredPreferencesDocument {
@@ -35,7 +36,8 @@ export function migratePreferences(raw: unknown): UserPreferences {
 
   return {
     remindersEnabled: Boolean(prefsSource.remindersEnabled),
-    language: typeof prefsSource.language === 'string' ? prefsSource.language : 'en',
+    language:
+      typeof prefsSource.language === 'string' ? prefsSource.language : detectDeviceLanguage(),
   };
 }
 

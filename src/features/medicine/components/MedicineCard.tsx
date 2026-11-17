@@ -7,7 +7,7 @@ import { Medicine } from '../types';
 import { monthlySaving, refillDueIn, nextRefillDate } from '../helpers';
 import { formatRupees, parseAmount } from '../../../lib/formatters';
 import { defaultReminders } from '../../cases/reminders';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface MedicineCardProps {
   medicine: Medicine;
@@ -17,6 +17,7 @@ export interface MedicineCardProps {
 
 export const MedicineCard: React.FC<MedicineCardProps> = ({ medicine, onEdit, onDelete }) => {
   const { colors, radius } = useTheme();
+  const copy = useCopy();
   const [reminderMsg, setReminderMsg] = useState<string | null>(null);
   const m = copy.medicineSaver;
 

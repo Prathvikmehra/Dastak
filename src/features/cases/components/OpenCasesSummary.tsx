@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Text, Button } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface OpenCasesSummaryProps {
   count: number;
@@ -17,6 +17,7 @@ export const OpenCasesSummary: React.FC<OpenCasesSummaryProps> = ({
   onViewCases,
 }) => {
   const { colors } = useTheme();
+  const copy = useCopy();
 
   return (
     <Card style={styles.summaryCard}>

@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { IssueType } from '../types';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 interface IssueOption {
   id: IssueType;
@@ -12,33 +12,6 @@ interface IssueOption {
   subtitle: string;
   iconName: keyof typeof Ionicons.glyphMap;
 }
-
-const ISSUE_OPTIONS: IssueOption[] = [
-  {
-    id: 'refund',
-    label: copy.fixHome.doors.refund.title,
-    subtitle: copy.fixHome.doors.refund.subtitle,
-    iconName: 'cart-outline',
-  },
-  {
-    id: 'fraud',
-    label: copy.fixHome.doors.fraud.title,
-    subtitle: copy.fixHome.doors.fraud.subtitle,
-    iconName: 'alert-circle-outline',
-  },
-  {
-    id: 'bank',
-    label: copy.fixHome.doors.bank.title,
-    subtitle: copy.fixHome.doors.bank.subtitle,
-    iconName: 'business-outline',
-  },
-  {
-    id: 'insurance',
-    label: copy.fixHome.doors.insurance.title,
-    subtitle: copy.fixHome.doors.insurance.subtitle,
-    iconName: 'shield-outline',
-  },
-];
 
 export interface IssueSelectorProps {
   selected: IssueType | null;
@@ -48,6 +21,34 @@ export interface IssueSelectorProps {
 
 export const IssueSelector: React.FC<IssueSelectorProps> = ({ selected, onSelect, error }) => {
   const { colors, radius } = useTheme();
+  const copy = useCopy();
+
+  const issueOptions: IssueOption[] = [
+    {
+      id: 'refund',
+      label: copy.fixHome.doors.refund.title,
+      subtitle: copy.fixHome.doors.refund.subtitle,
+      iconName: 'cart-outline',
+    },
+    {
+      id: 'fraud',
+      label: copy.fixHome.doors.fraud.title,
+      subtitle: copy.fixHome.doors.fraud.subtitle,
+      iconName: 'alert-circle-outline',
+    },
+    {
+      id: 'bank',
+      label: copy.fixHome.doors.bank.title,
+      subtitle: copy.fixHome.doors.bank.subtitle,
+      iconName: 'business-outline',
+    },
+    {
+      id: 'insurance',
+      label: copy.fixHome.doors.insurance.title,
+      subtitle: copy.fixHome.doors.insurance.subtitle,
+      iconName: 'shield-outline',
+    },
+  ];
 
   return (
     <View style={styles.section}>
@@ -56,7 +57,7 @@ export const IssueSelector: React.FC<IssueSelectorProps> = ({ selected, onSelect
       </Text>
 
       <View style={styles.grid}>
-        {ISSUE_OPTIONS.map((opt) => {
+        {issueOptions.map((opt) => {
           const isSelected = selected === opt.id;
           return (
             <Pressable
@@ -135,15 +136,16 @@ export interface FraudTimingSelectorProps {
   onSelect: (val: FraudWhenOption) => void;
 }
 
-const TIMING_OPTIONS: { id: FraudWhenOption; label: string }[] = [
-  { id: 'hour', label: copy.newCase.fraudTiming.hour },
-  { id: 'today', label: copy.newCase.fraudTiming.today },
-  { id: 'yesterday', label: copy.newCase.fraudTiming.yesterday },
-  { id: 'earlier', label: copy.newCase.fraudTiming.earlier },
-];
-
 export const FraudTimingSelector: React.FC<FraudTimingSelectorProps> = ({ selected, onSelect }) => {
   const { colors, radius } = useTheme();
+  const copy = useCopy();
+
+  const timingOptions: { id: FraudWhenOption; label: string }[] = [
+    { id: 'hour', label: copy.newCase.fraudTiming.hour },
+    { id: 'today', label: copy.newCase.fraudTiming.today },
+    { id: 'yesterday', label: copy.newCase.fraudTiming.yesterday },
+    { id: 'earlier', label: copy.newCase.fraudTiming.earlier },
+  ];
 
   return (
     <View style={styles.section}>
@@ -151,7 +153,7 @@ export const FraudTimingSelector: React.FC<FraudTimingSelectorProps> = ({ select
         {copy.newCase.fraudTiming.label}
       </Text>
       <View style={styles.timingGrid}>
-        {TIMING_OPTIONS.map((item) => {
+        {timingOptions.map((item) => {
           const isSelected = selected === item.id;
           return (
             <Pressable

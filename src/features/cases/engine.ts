@@ -1,4 +1,4 @@
-import { Case, LadderStep } from './types';
+import { Case, LadderStep, IssueLadder } from './types';
 import { LADDERS } from './ladders';
 import { parseIsoDate } from '../../lib/dates';
 
@@ -47,8 +47,11 @@ export function isFraudUrgent(caseItem: Case, now: Date): boolean {
 /**
  * Returns the current ladder step for a case at time `now`.
  */
-export function currentStep(caseItem: Case, now: Date): LadderStep {
-  const ladder = LADDERS[caseItem.issueType];
+export function currentStep(
+  caseItem: Case,
+  now: Date,
+  ladder: IssueLadder = LADDERS[caseItem.issueType]
+): LadderStep {
   const elapsed = daysElapsed(caseItem, now);
 
   let active = ladder.steps[0];
@@ -65,8 +68,11 @@ export function currentStep(caseItem: Case, now: Date): LadderStep {
 /**
  * Returns the next ladder step if one exists, or null if the case is at or past the final step.
  */
-export function nextStep(caseItem: Case, now: Date): LadderStep | null {
-  const ladder = LADDERS[caseItem.issueType];
+export function nextStep(
+  caseItem: Case,
+  now: Date,
+  ladder: IssueLadder = LADDERS[caseItem.issueType]
+): LadderStep | null {
   const elapsed = daysElapsed(caseItem, now);
 
   for (const step of ladder.steps) {

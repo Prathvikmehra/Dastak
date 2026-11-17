@@ -5,14 +5,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Screen, Text, Card, Field, Button } from '../../../src/components';
 import { useTheme } from '../../../src/theme/ThemeContext';
 import { useMoney } from '../../../src/features/money/store';
-import { PLACES } from '../../../src/features/money/places';
+import { getLocalizedPlaces } from '../../../src/features/money/places';
 import { MoneyPlaceStatus } from '../../../src/features/money/types';
 import { STATUS_LABELS, followUpDate } from '../../../src/features/money/helpers';
 import { PlaceGuideCards } from '../../../src/features/money/components/PlaceGuideCards';
 import { OtpSafetyTip } from '../../../src/features/money/components/OtpSafetyTip';
 import { openWeb } from '../../../src/lib/links';
 import { defaultReminders } from '../../../src/features/cases/reminders';
-import { copy } from '../../../src/copy/en';
+import { useCopy } from '../../../src/copy/context';
 
 const STATUS_OPTIONS: MoneyPlaceStatus[] = [
   'not_checked',
@@ -27,9 +27,11 @@ export default function PlaceDetailScreen() {
   const params = useLocalSearchParams<{ placeId?: string; personId?: string }>();
   const { colors, radius, minTouchTarget } = useTheme();
   const { activePerson, records, updatePlace } = useMoney();
+  const copy = useCopy();
+  const places = getLocalizedPlaces(copy);
 
   const placeId = params.placeId || 'udgam';
-  const place = PLACES.find((p) => p.id === placeId) || PLACES[0];
+  const place = places.find((p) => p.id === placeId) || places[0];
   const currentRecord = records[place.id];
 
   const [status, setStatus] = useState<MoneyPlaceStatus>(currentRecord?.status || 'not_checked');

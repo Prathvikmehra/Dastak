@@ -11,10 +11,11 @@ import { MedicineCard } from '../../../src/features/medicine/components/Medicine
 import { AddMedicineModal } from '../../../src/features/medicine/components/AddMedicineModal';
 import { formatRupees } from '../../../src/lib/formatters';
 import { openWeb } from '../../../src/lib/links';
-import { copy } from '../../../src/copy/en';
+import { useCopy } from '../../../src/copy/context';
 
 export default function MedicineSaverScreen() {
   const { colors, radius } = useTheme();
+  const copy = useCopy();
   const { people, activePersonId, setActivePersonId, activePerson, addPerson } = useMoney();
 
   const { personMedicines, personTotals, addMedicine, updateMedicine, deleteMedicine } =

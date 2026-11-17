@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
-import { defaultPreferencesStore } from '../preferences';
-import { logger } from '../../../lib/logger';
-import { copy } from '../../../copy/en';
+import { useLanguage } from '../../../copy/context';
+import { AppLanguage } from '../../../copy/types';
 
-const LANGUAGES = [
+const LANGUAGES: { id: AppLanguage; native: string }[] = [
   { id: 'en', native: 'English' },
   { id: 'hi', native: 'हिन्दी' },
   { id: 'gu', native: 'ગુજરાતી' },
@@ -15,32 +14,10 @@ const LANGUAGES = [
 
 export const LanguageSection: React.FC = () => {
   const { colors, radius } = useTheme();
-  const [selectedLang, setSelectedLang] = useState('en');
+  const { language, setLanguage, copy } = useLanguage();
 
-  useEffect(() => {
-    let isMounted = true;
-    defaultPreferencesStore
-      .get()
-      .then((prefs) => {
-        if (isMounted) {
-          setSelectedLang(prefs.language || 'en');
-        }
-      })
-      .catch((err) => {
-        logger.warn('Failed loading language preference', err);
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleSelect = async (langId: string) => {
-    setSelectedLang(langId);
-    try {
-      await defaultPreferencesStore.set({ language: langId });
-    } catch (err) {
-      logger.error('Failed saving language preference', err);
-    }
+  const handleSelect = (langId: AppLanguage) => {
+    void setLanguage(langId);
   };
 
   return (
@@ -54,7 +31,7 @@ export const LanguageSection: React.FC = () => {
 
       <View style={styles.grid}>
         {LANGUAGES.map((lang) => {
-          const isSelected = selectedLang === lang.id;
+          const isSelected = language === lang.id;
           return (
             <Pressable
               key={lang.id}

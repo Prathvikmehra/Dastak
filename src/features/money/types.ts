@@ -20,6 +20,14 @@ export interface PlaceRecord {
 
 export type ContentStatus = 'checked-against-secondary-sources' | 'general-guidance';
 
+export interface MoneyPlaceDefinition {
+  id: string;
+  portalName: string;
+  source: string | null;
+  verifiedOn: null;
+  contentStatus: ContentStatus;
+}
+
 export interface MoneyPlace {
   id: string;
   title: string;

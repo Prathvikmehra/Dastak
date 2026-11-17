@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Person } from '../types';
-import { copy } from '../../../copy/en';
+import { useCopy } from '../../../copy/context';
 
 export interface PersonSwitcherProps {
   people: Person[];
@@ -20,6 +20,7 @@ export const PersonSwitcher: React.FC<PersonSwitcherProps> = ({
   onAddPersonPress,
 }) => {
   const { colors, radius, minTouchTarget } = useTheme();
+  const copy = useCopy();
 
   return (
     <View style={styles.container}>

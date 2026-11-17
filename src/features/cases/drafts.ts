@@ -1,6 +1,8 @@
 import { Case, LadderStep } from './types';
 import { formatRupees, parseAmount } from '../../lib/formatters';
 import { toDisplay } from '../../lib/dates';
+import { CallScriptCopy } from '../../copy/types/domain';
+import { en } from '../../copy/en';
 
 /**
  * Generates an honest, factual plain-text complaint draft with per-issue wording.
@@ -170,58 +172,48 @@ export function buildDraft(caseItem: Case, step: LadderStep): string {
  * Builds a short call script (4 to 6 plain lines) for steps that have a phone number.
  * Uses only facts supplied by the user.
  */
-export function buildCallScript(caseItem: Case, step: LadderStep): string {
+export function buildCallScript(
+  caseItem: Case,
+  step: LadderStep,
+  callScriptCopy: CallScriptCopy = en.callScript
+): string {
   const lines: string[] = [];
 
-  if (caseItem.issueType === 'fraud') {
-    lines.push('Hello, I want to report an online payment fraud.');
-  } else if (caseItem.issueType === 'refund') {
-    lines.push('Hello, I want to report an unreturned refund from a seller.');
-  } else if (caseItem.issueType === 'bank') {
-    lines.push('Hello, I want to dispute a transaction with my bank.');
-  } else {
-    lines.push('Hello, I am calling regarding a rejected insurance claim.');
-  }
+  lines.push(callScriptCopy.openers[caseItem.issueType]);
 
   const parsedAmt = parseAmount(caseItem.amount);
   if (parsedAmt !== null) {
-    lines.push(`The disputed amount is ${formatRupees(parsedAmt)}.`);
+    lines.push(callScriptCopy.amount(formatRupees(parsedAmt)));
   }
 
   const company = caseItem.company?.trim();
   if (company) {
-    if (caseItem.issueType === 'fraud') {
-      lines.push(`The suspected recipient or platform is ${company}.`);
-    } else if (caseItem.issueType === 'refund') {
-      lines.push(`The order was placed with ${company}.`);
-    } else {
-      lines.push(`The company or bank involved is ${company}.`);
-    }
+    lines.push(callScriptCopy.companies[caseItem.issueType](company));
   }
 
   const ref = caseItem.reference?.trim();
   if (ref) {
-    lines.push(`The reference ID is ${ref}.`);
+    lines.push(callScriptCopy.reference(ref));
   }
 
   const date = caseItem.incidentDate
     ? toDisplay(caseItem.incidentDate)
     : caseItem.legacyIncidentDate?.trim() || '';
   if (date) {
-    lines.push(`The incident occurred on ${date}.`);
+    lines.push(callScriptCopy.incidentDate(date));
   }
 
   if (lines.length === 1) {
-    lines.push('I need to register this formal dispute on your helpline.');
-    lines.push('I have my account and transaction records ready to share.');
+    lines.push(callScriptCopy.generalFallback1);
+    lines.push(callScriptCopy.generalFallback2);
   }
 
   if (caseItem.issueType === 'fraud') {
-    lines.push('Please help me record this complaint and freeze the recipient account.');
+    lines.push(callScriptCopy.closers.fraud);
   } else if (step.phone === '1915') {
-    lines.push('Please help me register this complaint with the National Consumer Helpline.');
+    lines.push(callScriptCopy.closers.nch);
   } else {
-    lines.push('Please record my grievance and provide a complaint reference number.');
+    lines.push(callScriptCopy.closers.general);
   }
 
   return lines.join('\n');

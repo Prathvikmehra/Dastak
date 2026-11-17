@@ -2,6 +2,7 @@ import React from 'react';
 import { Stack } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
+import { LanguageProvider } from '../src/copy/context';
 import { CasesProvider } from '../src/features/cases/store';
 import { MoneyProvider } from '../src/features/money/store';
 import { MedicineProvider } from '../src/features/medicine/store';
@@ -58,13 +59,15 @@ function RootLayoutContent() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <CasesProvider>
-        <MoneyProvider>
-          <MedicineProvider>
-            <RootLayoutContent />
-          </MedicineProvider>
-        </MoneyProvider>
-      </CasesProvider>
+      <LanguageProvider>
+        <CasesProvider>
+          <MoneyProvider>
+            <MedicineProvider>
+              <RootLayoutContent />
+            </MedicineProvider>
+          </MoneyProvider>
+        </CasesProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

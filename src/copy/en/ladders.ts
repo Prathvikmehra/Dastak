@@ -1,132 +1,115 @@
-import { LadderCopy } from '../types';
+import { LadderCopy, CallScriptCopy } from '../types/domain';
 
 export const enLadders: Record<'refund' | 'fraud' | 'bank' | 'insurance', LadderCopy> = {
   refund: {
-    title: 'Refund dispute',
+    title: 'Failed online refund',
     evidence: {
       orderId: 'Order ID',
       invoice: 'Invoice or screenshot',
-      chatLog: 'Chat or email with seller',
-      bankProof: 'Bank statement showing debit',
+      chat: 'Chat or email with seller',
+      deliveryDate: 'Promised delivery date',
     },
     steps: {
-      seller: {
-        who: 'Seller support',
-        how: 'Send a formal email or message through their app or support portal. Attach your order ID and invoice.',
+      'refund-step-0': {
+        who: 'Seller grievance officer',
+        how: 'Send the complaint to the seller grievance officer and ask for resolution within 7 days. Keep a copy of your email or chat.',
         request: 'I request a full refund of the amount within 7 days.',
       },
-      payment: {
-        who: 'Payment app or gateway',
-        how: 'Open the transaction in your payment app and tap report a problem. Quote the seller ticket number.',
-        request:
-          'I request your assistance in reversing this charge since goods were returned or not delivered.',
-      },
-      nch: {
+      'refund-step-7': {
         who: 'National Consumer Helpline',
-        how: 'Call 1915 or register on consumerhelpline.gov.in. Keep your order and payment details ready.',
-        request:
-          'I request the helpline to register my grievance against the seller for non-refund.',
+        how: 'Call 1915, send a message on WhatsApp to 8800001915, or register your dispute on the National Consumer Helpline portal.',
+        request: 'I request a full refund of the amount within 7 days.',
       },
-      consumer_commission: {
-        who: 'District Consumer Commission',
-        how: 'File online via e-daakhil.nic.in. The commission can order a refund and compensation.',
-        request: 'I request an order directing the seller to refund the disputed sum.',
+      'refund-step-30': {
+        who: 'e-Jagriti consumer commission',
+        how: 'File a formal consumer dispute online through the government e-Jagriti portal, which can order a refund.',
+        request: 'I request a full refund of the amount within 7 days.',
       },
     },
   },
   fraud: {
-    title: 'UPI or payment fraud',
+    title: 'UPI and payment fraud',
     evidence: {
-      utr: 'UTR or UPI reference number',
-      screenshot: 'Screenshot of payment confirmation',
-      passbook: 'Bank statement or passbook page',
-      phone: 'Phone number or UPI ID fraudster used',
+      txId: 'Transaction ID',
+      messages: 'Screenshots of messages or calls',
+      scammerInfo: 'Scammer number or UPI ID',
+      smsAlert: 'Bank SMS alert',
     },
     steps: {
-      cybercell: {
-        who: 'Cyber Crime Helpline 1930',
-        how: 'Call 1930 immediately. Give the transaction ID, bank name, and time of debit so the beneficiary account can be frozen quickly.',
+      'fraud-step-0': {
+        who: 'Cybercrime helpline',
+        how: 'Call 1930 immediately today, then tell your bank. Reporting within 24 hours improves the chance of recovery before the scammer withdraws the money.',
         request:
-          'I request you to register this complaint, freeze the recipient account where possible, and record a fraud report.',
+          'I request you to investigate this matter, freeze the receiving account where possible, and reverse the debit.',
       },
-      bank: {
-        who: 'Your bank branch and fraud desk',
-        how: 'Submit a written dispute form at your home branch. Quote the 1930 complaint number.',
+      'fraud-step-1': {
+        who: 'Cybercrime portal',
+        how: 'Register your formal financial fraud complaint on the National Cyber Crime portal with transaction IDs and call screenshots.',
         request:
-          'I request you to investigate, freeze the receiving account where possible and reverse the debit.',
+          'I request you to investigate this matter, freeze the receiving account where possible, and reverse the debit.',
       },
-      ncrp: {
-        who: 'National Cyber Crime Reporting Portal',
-        how: 'File on cybercrime.gov.in. Download the acknowledgment slip.',
-        request: 'I request formal investigation and legal recording of this financial cybercrime.',
-      },
-      rbi_ombudsman: {
-        who: 'RBI Ombudsman',
-        how: 'If your bank rejects or does not reply within 30 days, complain at cms.rbi.org.in citing the limited liability guidelines for electronic transactions.',
+      'fraud-step-30': {
+        who: 'RBI complaint portal',
+        how: 'File a complaint with the Reserve Bank of India Ombudsman via CMS portal if your bank failed to reverse the fraudulent debit within 30 days.',
         request:
-          'I request the Banking Ombudsman to direct the bank to restore the disputed funds under RBI zero-liability norms.',
+          'I request you to investigate this matter, freeze the receiving account where possible, and reverse the debit.',
       },
     },
   },
   bank: {
-    title: 'Bank or card dispute',
+    title: 'Bank account dispute',
     evidence: {
-      accountNum: 'Account or card number',
-      statement: 'Bank statement showing error',
-      atmSlip: 'ATM slip or transaction SMS',
-      branchLetter: 'Copy of written complaint to branch',
+      accountRef: 'Account or card last 4 digits',
+      bankStatement: 'Statement showing the issue',
+      complaintRef: 'Complaint reference from the bank',
     },
     steps: {
-      branch: {
-        who: 'Home branch manager',
-        how: 'Submit a letter in person or by email. Get an acknowledgment stamp or ticket number.',
-        request: 'I request you to investigate, correct the error and reply in writing.',
-      },
-      nodal: {
-        who: 'Principal Nodal Officer',
-        how: 'Escalate to the Principal Nodal Officer of your bank. Find their contact on the bank website.',
-        request: 'I request an independent escalation review of my unresolved branch grievance.',
-      },
-      rbi_ombudsman: {
-        who: 'RBI Ombudsman',
-        how: 'Complain on cms.rbi.org.in 30 days after branch submission if unresolved. Can award up to ₹20 lakh compensation.',
+      'bank-step-0': {
+        who: 'Bank grievance team',
+        how: 'Submit your written dispute to your bank grievance team or nodal desk and collect a reference ticket number.',
         request:
-          'I request the Ombudsman to investigate this dispute and direct the bank to correct the account balance.',
+          'I request you to investigate this matter, correct the error, and reply to me in writing.',
+      },
+      'bank-step-30': {
+        who: 'RBI complaint portal',
+        how: 'Escalate to the Reserve Bank of India Ombudsman on the CMS portal if the bank does not resolve the dispute within 30 days.',
+        request:
+          'I request you to investigate this matter, correct the error, and reply to me in writing.',
       },
     },
   },
   insurance: {
-    title: 'Insurance claim dispute',
+    title: 'Insurance claim rejection',
     evidence: {
-      policyDoc: 'Policy document and schedule',
-      rejectionLetter: 'Claim rejection letter or email',
-      bills: 'Hospital or repair bills',
-      discharge: 'Discharge summary or claim form',
+      policyNum: 'Policy number',
+      claimNum: 'Claim number',
+      rejectionLetter: 'Rejection letter',
+      medicalBills: 'Medical or loss documents',
     },
     steps: {
-      gro: {
-        who: 'Grievance Redressal Officer (GRO)',
-        how: 'Submit a formal written grievance to the insurer GRO. The insurer must resolve within 14 days.',
+      'insurance-step-0': {
+        who: 'Insurer grievance officer',
+        how: 'Send a formal reconsideration letter to your insurance company grievance officer quoting your policy number and doctor reports.',
         request:
-          'I request you to reconsider and settle the claim, or give the specific policy clause relied on for rejection.',
+          'I request you to reconsider and settle the claim, or provide in writing the specific policy clause relied on for rejection.',
       },
-      bima_bharosa: {
+      'insurance-step-15': {
         who: 'IRDAI Bima Bharosa',
-        how: 'Register on bimabharosa.irdai.gov.in or call 155255. IRDAI tracks insurer turnaround times.',
+        how: 'Register a complaint on the IRDAI Bima Bharosa portal if the insurer rejects without valid reason or does not respond within 15 days.',
         request:
-          'I request IRDAI to record this claim grievance against the insurer for non-settlement.',
+          'I request you to reconsider and settle the claim, or provide in writing the specific policy clause relied on for rejection.',
       },
-      insurance_ombudsman: {
+      'insurance-step-45': {
         who: 'Insurance Ombudsman',
-        how: 'File with the Ombudsman for your region within one year of GRO rejection. Hearing is free and can order the insurer to pay.',
+        how: 'File a complaint with the Insurance Ombudsman in your state for an independent hearing, which can order the insurer to pay.',
         request:
-          'I request the Insurance Ombudsman to adjudicate this dispute and direct settlement of the claim.',
+          'I request you to reconsider and settle the claim, or provide in writing the specific policy clause relied on for rejection.',
       },
     },
   },
 };
 
-export const enCallScript = {
+export const enCallScript: CallScriptCopy = {
   openers: {
     fraud: 'Hello, I want to report an online payment fraud.',
     refund: 'Hello, I want to report an unreturned refund from a seller.',

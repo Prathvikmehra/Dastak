@@ -5,17 +5,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { Screen, Text, Card } from '../../../src/components';
 import { useTheme } from '../../../src/theme/ThemeContext';
 import { useMoney } from '../../../src/features/money/store';
-import { PLACES } from '../../../src/features/money/places';
+import { getLocalizedPlaces } from '../../../src/features/money/places';
 import { STATUS_LABELS } from '../../../src/features/money/helpers';
 import { PersonSwitcher } from '../../../src/features/money/components/PersonSwitcher';
 import { AddPersonModal } from '../../../src/features/money/components/AddPersonModal';
 import { OtpSafetyTip } from '../../../src/features/money/components/OtpSafetyTip';
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
-import { copy } from '../../../src/copy/en';
+import { useCopy } from '../../../src/copy/context';
 
 export default function MoneyRadarScreen() {
   const router = useRouter();
   const { colors, radius } = useTheme();
+  const copy = useCopy();
+  const places = getLocalizedPlaces(copy);
   const { people, activePersonId, setActivePersonId, activePerson, records, summary, addPerson } =
     useMoney();
 
@@ -98,7 +100,7 @@ export default function MoneyRadarScreen() {
 
       {/* Six Places List */}
       <View style={styles.placesList}>
-        {PLACES.map((place) => {
+        {places.map((place) => {
           const rec = records[place.id];
           const status = rec?.status || 'not_checked';
           const isDone = status === 'checked_nothing' || status === 'money_received';
