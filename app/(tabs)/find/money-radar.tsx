@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,7 +8,6 @@ import { useMoney } from '../../../src/features/money/store';
 import { getLocalizedPlaces } from '../../../src/features/money/places';
 import { STATUS_LABELS } from '../../../src/features/money/helpers';
 import { PersonSwitcher } from '../../../src/features/money/components/PersonSwitcher';
-import { AddPersonModal } from '../../../src/features/money/components/AddPersonModal';
 import { OtpSafetyTip } from '../../../src/features/money/components/OtpSafetyTip';
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
 import { useCopy } from '../../../src/copy/context';
@@ -18,10 +17,7 @@ export default function MoneyRadarScreen() {
   const { colors, radius } = useTheme();
   const copy = useCopy();
   const places = getLocalizedPlaces(copy);
-  const { people, activePersonId, setActivePersonId, activePerson, records, summary, addPerson } =
-    useMoney();
-
-  const [modalVisible, setModalVisible] = useState(false);
+  const { people, activePersonId, setActivePersonId, activePerson, records, summary } = useMoney();
 
   return (
     <Screen scrollable>
@@ -30,7 +26,7 @@ export default function MoneyRadarScreen() {
         people={people}
         activePersonId={activePersonId}
         onSelectPerson={setActivePersonId}
-        onAddPersonPress={() => setModalVisible(true)}
+        onAddPersonPress={() => router.push('/(tabs)/find/person-form')}
       />
 
       {/* Deceased family member gentle guidance note */}
@@ -167,14 +163,6 @@ export default function MoneyRadarScreen() {
           );
         })}
       </View>
-
-      <AddPersonModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onAdd={async (name, rel) => {
-          await addPerson(name, rel);
-        }}
-      />
     </Screen>
   );
 }

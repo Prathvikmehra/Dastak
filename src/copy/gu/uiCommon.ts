@@ -29,11 +29,21 @@ export const guUiCommon: UiCommonCopy = {
     share: 'શેર કરો',
   },
 
+  unsavedChanges: {
+    title: 'સાચવ્યા વગર પાછા જવું છે?',
+    message: 'તમે દાખલ કરેલી વિગતો સાચવવામાં આવશે નહીં.',
+    keepEditing: 'ફેરફાર ચાલુ રાખો',
+    leave: 'છોડો',
+  },
+
   dateField: {
     today: 'આજે',
     yesterday: 'ગઈકાલે',
     weekAgo: 'એક અઠવાડિયા પહેલા',
     pickDate: 'તારીખ પસંદ કરો',
+    dayLabel: 'દિવસ',
+    monthLabel: 'મહિનો',
+    yearLabel: 'વર્ષ',
     dayPlaceholder: 'DD',
     monthPlaceholder: 'MM',
     yearPlaceholder: 'YYYY',

@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
+import { useCopy } from '../../src/copy/context';
 
 export function getTabBarBottomPadding(bottomInset: number): number {
   return Math.max(bottomInset, 8);
@@ -10,6 +11,7 @@ export function getTabBarBottomPadding(bottomInset: number): number {
 
 export default function TabsLayout() {
   const { colors } = useTheme();
+  const copy = useCopy();
   const insets = useSafeAreaInsets();
   const bottomInset = getTabBarBottomPadding(insets.bottom);
 
@@ -39,8 +41,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="fix"
         options={{
-          title: 'Fix',
-          tabBarLabel: 'Fix',
+          title: copy.tabs.fix,
+          tabBarLabel: copy.tabs.fix,
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? 'shield-checkmark' : 'shield-checkmark-outline'}
@@ -53,8 +55,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="find"
         options={{
-          title: 'Find',
-          tabBarLabel: 'Find',
+          title: copy.tabs.find,
+          tabBarLabel: copy.tabs.find,
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? 'search' : 'search-outline'}

@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Screen, Button } from '../src/components';
 import { useCases } from '../src/features/cases/store';
+import { useCopy } from '../src/copy/context';
 import { RemindersSection } from '../src/features/settings/components/RemindersSection';
 import { LanguageSection } from '../src/features/settings/components/LanguageSection';
 import { ThemeSection } from '../src/features/settings/components/ThemeSection';
@@ -11,6 +12,7 @@ import { CorruptDataBanner } from '../src/features/settings/components/CorruptDa
 
 export default function SettingsAndHelpScreen() {
   const router = useRouter();
+  const copy = useCopy();
   const { hadCorruptedData } = useCases();
 
   return (
@@ -22,7 +24,7 @@ export default function SettingsAndHelpScreen() {
       <PrivacySection />
 
       <View style={styles.closeContainer}>
-        <Button label="Back to app" onPress={() => router.back()} />
+        <Button label={copy.settings.backToApp} onPress={() => router.back()} />
       </View>
     </Screen>
   );

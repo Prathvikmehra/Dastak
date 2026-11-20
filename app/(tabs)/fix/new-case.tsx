@@ -138,7 +138,7 @@ export default function NewCaseScreen() {
           placeholder={activeLabels.referencePlaceholder}
           value={reference}
           onChangeText={setReference}
-          helper="Helps locate your transaction"
+          helper={copy.newCase.referenceHelper}
         />
 
         <DateField
@@ -158,7 +158,7 @@ export default function NewCaseScreen() {
         />
 
         <Button
-          label={isSubmitting ? 'Saving...' : copy.newCase.saveButton}
+          label={isSubmitting ? copy.newCase.savingButton : copy.newCase.saveButton}
           onPress={handleSave}
           disabled={isSubmitting}
           style={styles.saveButton}

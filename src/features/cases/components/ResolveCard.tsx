@@ -49,11 +49,15 @@ export const ResolveCard: React.FC<ResolveCardProps> = ({ caseItem, onResolve })
             value={recoveredInput}
             onChangeText={setRecoveredInput}
             keyboardType="numeric"
-            helper="Leave blank if the full amount was recovered"
+            helper={copy.caseDetail.resolve.helper}
           />
 
           <Button
-            label={isResolving ? 'Resolving...' : copy.caseDetail.resolve.confirmButton}
+            label={
+              isResolving
+                ? copy.caseDetail.resolve.resolvingButton
+                : copy.caseDetail.resolve.confirmButton
+            }
             variant="primary"
             onPress={handleConfirm}
             disabled={isResolving}

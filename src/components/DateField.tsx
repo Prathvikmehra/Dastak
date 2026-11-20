@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, StyleSheet, Pressable, TextInput } from 'react-native';
 import { Text } from './Text';
 import { Card } from './Card';
@@ -13,6 +13,7 @@ export interface DateFieldProps {
   maxDate?: LocalDate;
   helper?: string;
   legacyValue?: string;
+  onError?: (hasError: boolean) => void;
 }
 
 export const DateField: React.FC<DateFieldProps> = ({
@@ -22,10 +23,15 @@ export const DateField: React.FC<DateFieldProps> = ({
   maxDate = today(),
   helper,
   legacyValue,
+  onError,
 }) => {
   const { colors, radius } = useTheme();
   const copy = useCopy();
   const c = copy.dateField;
+
+  const dayInputRef = useRef<React.ElementRef<typeof TextInput>>(null);
+  const monthInputRef = useRef<React.ElementRef<typeof TextInput>>(null);
+  const yearInputRef = useRef<React.ElementRef<typeof TextInput>>(null);
 
   const todayStr = today();
   const yesterdayStr = addDays(todayStr, -1);
@@ -61,6 +67,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   const handleChip = (chip: 'today' | 'yesterday' | 'week' | 'custom') => {
     setActiveChip(chip);
     setInlineError(null);
+    onError?.(false);
     if (chip === 'today') onChange(todayStr);
     else if (chip === 'yesterday') onChange(yesterdayStr);
     else if (chip === 'week') onChange(weekAgoStr);
@@ -73,28 +80,50 @@ export const DateField: React.FC<DateFieldProps> = ({
 
     if (!dStr || !mStr || !yStr) {
       setInlineError(null);
+      onError?.(false);
       return;
     }
 
     const dNum = parseInt(dStr, 10);
     const mNum = parseInt(mStr, 10);
     const yNum = parseInt(yStr, 10);
-
     if (!isValidParts(dNum, mNum, yNum)) {
       setInlineError(c.invalidError);
+      onError?.(true);
       return;
     }
 
     const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
     const iso = `${yNum}-${pad(mNum)}-${pad(dNum)}`;
-
     if (maxDate && iso > maxDate) {
       setInlineError(c.invalidError);
+      onError?.(true);
       return;
     }
-
     setInlineError(null);
+    onError?.(false);
     onChange(iso);
+  };
+
+  const handleDayChange = (txt: string) => {
+    const clean = txt.replace(/[^0-9]/g, '');
+    handlePart(clean, month, year);
+    if (clean.length === 2) {
+      monthInputRef.current?.focus();
+    }
+  };
+
+  const handleMonthChange = (txt: string) => {
+    const clean = txt.replace(/[^0-9]/g, '');
+    handlePart(day, clean, year);
+    if (clean.length === 2) {
+      yearInputRef.current?.focus();
+    }
+  };
+
+  const handleYearChange = (txt: string) => {
+    const clean = txt.replace(/[^0-9]/g, '');
+    handlePart(day, month, clean);
   };
 
   const chips = [
@@ -102,6 +131,16 @@ export const DateField: React.FC<DateFieldProps> = ({
     { id: 'yesterday' as const, label: c.yesterday },
     { id: 'week' as const, label: c.weekAgo },
     { id: 'custom' as const, label: c.pickDate },
+  ];
+
+  const boxInputStyle = [
+    styles.input,
+    {
+      color: colors.ink,
+      backgroundColor: colors.surface,
+      borderColor: inlineError ? colors.danger : colors.border,
+      borderRadius: radius.button,
+    },
   ];
 
   return (
@@ -144,66 +183,57 @@ export const DateField: React.FC<DateFieldProps> = ({
 
       {activeChip === 'custom' && (
         <View style={styles.inputsRow}>
-          <TextInput
-            style={[
-              styles.input,
-              styles.partInput,
-              {
-                color: colors.ink,
-                backgroundColor: colors.surface,
-                borderColor: inlineError ? colors.danger : colors.border,
-                borderRadius: radius.button,
-              },
-            ]}
-            placeholder={c.dayPlaceholder}
-            placeholderTextColor={colors.muted}
-            value={day}
-            maxLength={2}
-            keyboardType="number-pad"
-            onChangeText={(txt) => handlePart(txt, month, year)}
-          />
+          <View style={styles.partBox}>
+            <Text size="caption" color="muted" style={styles.boxLabel}>
+              {c.dayLabel}
+            </Text>
+            <TextInput
+              ref={dayInputRef}
+              style={boxInputStyle}
+              placeholder={c.dayPlaceholder}
+              placeholderTextColor={colors.muted}
+              value={day}
+              maxLength={2}
+              keyboardType="number-pad"
+              onChangeText={handleDayChange}
+            />
+          </View>
           <Text size="body" color="muted" style={styles.slash}>
             {'/'}
           </Text>
-          <TextInput
-            style={[
-              styles.input,
-              styles.partInput,
-              {
-                color: colors.ink,
-                backgroundColor: colors.surface,
-                borderColor: inlineError ? colors.danger : colors.border,
-                borderRadius: radius.button,
-              },
-            ]}
-            placeholder={c.monthPlaceholder}
-            placeholderTextColor={colors.muted}
-            value={month}
-            maxLength={2}
-            keyboardType="number-pad"
-            onChangeText={(txt) => handlePart(day, txt, year)}
-          />
+          <View style={styles.partBox}>
+            <Text size="caption" color="muted" style={styles.boxLabel}>
+              {c.monthLabel}
+            </Text>
+            <TextInput
+              ref={monthInputRef}
+              style={boxInputStyle}
+              placeholder={c.monthPlaceholder}
+              placeholderTextColor={colors.muted}
+              value={month}
+              maxLength={2}
+              keyboardType="number-pad"
+              onChangeText={handleMonthChange}
+            />
+          </View>
           <Text size="body" color="muted" style={styles.slash}>
             {'/'}
           </Text>
-          <TextInput
-            style={[
-              styles.input,
-              styles.yearInput,
-              {
-                color: colors.ink,
-                backgroundColor: colors.surface,
-                borderColor: inlineError ? colors.danger : colors.border,
-                borderRadius: radius.button,
-              },
-            ]}
-            placeholder={c.yearPlaceholder}
-            placeholderTextColor={colors.muted}
-            value={year}
-            maxLength={4}
-            keyboardType="number-pad"
-            onChangeText={(txt) => handlePart(day, month, txt)}
-          />
+          <View style={styles.yearBox}>
+            <Text size="caption" color="muted" style={styles.boxLabel}>
+              {c.yearLabel}
+            </Text>
+            <TextInput
+              ref={yearInputRef}
+              style={boxInputStyle}
+              placeholder={c.yearPlaceholder}
+              placeholderTextColor={colors.muted}
+              value={year}
+              maxLength={4}
+              keyboardType="number-pad"
+              onChangeText={handleYearChange}
+            />
+          </View>
         </View>
       )}
 
@@ -227,11 +257,18 @@ const styles = StyleSheet.create({
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
   chip: { minHeight: 48, paddingHorizontal: 12, justifyContent: 'center', alignItems: 'center' },
   chipText: { fontWeight: '500' },
-  inputsRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
-  partInput: { width: 60 },
-  yearInput: { width: 84 },
-  input: { height: 48, borderWidth: 1, paddingHorizontal: 12, fontSize: 16, textAlign: 'center' },
-  slash: { fontWeight: 'bold' },
+  inputsRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, marginTop: 4 },
+  partBox: { flex: 2 },
+  yearBox: { flex: 3 },
+  boxLabel: { marginBottom: 4, fontWeight: '500', textAlign: 'center' },
+  input: {
+    minHeight: 48,
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  slash: { fontWeight: 'bold', marginBottom: 14 },
   errorText: { marginTop: 4 },
   helperText: { marginTop: 4 },
 });

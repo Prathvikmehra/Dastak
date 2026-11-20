@@ -55,6 +55,7 @@ export const hiUiFind: UiFindCopy = {
   },
 
   placeDetail: {
+    title: 'दावा मार्गदर्शिका',
     whatThisCovers: 'इसमें क्या शामिल है',
     whatToKeepReady: 'क्या तैयार रखना है',
     howToSearch: 'खोज कैसे करें',
@@ -80,8 +81,8 @@ export const hiUiFind: UiFindCopy = {
     notesHelper: 'संदर्भ संख्या या शाखा संपर्क का रिकॉर्ड रखें',
   },
 
-  addPersonModal: {
-    title: 'जांच के लिए व्यक्ति जोड़ें',
+  personForm: {
+    title: 'व्यक्ति जोड़ें',
     subtitle: 'अपने या परिवार के सदस्य के रिकॉर्ड और दावों का हिसाब रखें।',
     nameLabel: 'व्यक्ति का नाम',
     namePlaceholder: 'जैसे रमेश कुमार',
@@ -89,8 +90,11 @@ export const hiUiFind: UiFindCopy = {
     relLabel: 'संबंध',
     deceasedNotice:
       'दावा करने के लिए आम तौर पर मृत्यु प्रमाण पत्र और नॉमिनी होने का सबूत चाहिए होता है; प्रत्येक स्थान के नियम देखें।',
-    saveButton: 'व्यक्ति सुरक्षित करें',
+    saveButton: 'व्यक्ति सहेजें',
     cancelButton: 'रद्द करें',
+    errors: {
+      nameRequired: 'कृपया नाम दर्ज करें',
+    },
   },
 
   medicineSaver: {
@@ -131,9 +135,11 @@ export const hiUiFind: UiFindCopy = {
     saveMonthlyAmount: (amt: string) => `अंतर: बचत ${amt} / महीना`,
   },
 
-  addMedicineModal: {
-    titleAdd: 'दवा जोड़ें',
-    titleEdit: 'दवा संपादित करें',
+  medicineForm: {
+    addTitle: 'दवा जोड़ें',
+    editTitle: 'दवा संपादित करें',
+    safetyNotice:
+      'जेनेरिक और ब्रांडेड दवाओं में एक ही साल्ट हो सकता है, लेकिन डॉक्टर या फार्मासिस्ट से पूछे बिना दवा कभी न बदलें या बंद करें।',
     nameLabel: 'दवा का नाम और मात्रा',
     namePlaceholder: 'जैसे Telmisartan 40mg',
     brandPriceLabel: 'आपके द्वारा खरीदे जाने वाले ब्रांड की कीमत (₹)',
@@ -149,12 +155,19 @@ export const hiUiFind: UiFindCopy = {
     lastRefillHelper: 'अगली रिफिल तारीख की गणना के लिए उपयोग की जाती है',
     noteLabel: 'नोट (वैकल्पिक)',
     notePlaceholder: 'जैसे नाश्ते के बाद, या डॉक्टर की सलाह',
-    saveButton: 'दवा सुरक्षित करें',
+    saveButtonAdd: 'दवा सहेजें',
+    saveButtonEdit: 'दवा सहेजें',
     cancelButton: 'रद्द करें',
+    errors: {
+      nameRequired: 'कृपया दवा का नाम दर्ज करें',
+      priceRequired: 'कृपया वह कीमत दर्ज करें जो आप चुकाते हैं',
+      invalidDate: 'यह तारीख सही नहीं लग रही है',
+    },
   },
 
   settings: {
     title: 'सेटिंग्स और मदद',
+    backToApp: 'ऐप पर वापस जाएं',
     languageTitle: 'ऐप की भाषा',
     languageSubtitle: 'शिकायत पत्र और मार्गदर्शन के लिए अपनी पसंदीदा भाषा चुनें।',
     remindersTitle: 'शिकायत रिमाइंडर',

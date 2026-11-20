@@ -2,7 +2,7 @@ import React from 'react';
 import { Stack } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
-import { LanguageProvider } from '../src/copy/context';
+import { LanguageProvider, useCopy } from '../src/copy/context';
 import { CasesProvider } from '../src/features/cases/store';
 import { MoneyProvider } from '../src/features/money/store';
 import { MedicineProvider } from '../src/features/medicine/store';
@@ -19,6 +19,7 @@ Notifications.setNotificationHandler({
 
 function RootLayoutContent() {
   const { colors } = useTheme();
+  const copy = useCopy();
 
   return (
     <Stack
@@ -42,14 +43,16 @@ function RootLayoutContent() {
         name="settings-and-help"
         options={{
           presentation: 'modal',
-          title: 'Settings and help',
+          title: copy.settings.title,
+          headerBackTitle: copy.common.back,
         }}
       />
       <Stack.Screen
         name="notification-prompt"
         options={{
           presentation: 'modal',
-          title: 'Reminders',
+          title: copy.notificationPrompt.title,
+          headerBackTitle: copy.common.back,
         }}
       />
     </Stack>

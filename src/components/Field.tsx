@@ -11,61 +11,58 @@ export interface FieldProps extends Omit<TextInputProps, 'style'> {
   inputStyle?: TextStyle;
 }
 
-export const Field: React.FC<FieldProps> = ({
-  label,
-  helper,
-  error,
-  containerStyle,
-  inputStyle,
-  ...inputProps
-}) => {
-  const { colors, radius, minTouchTarget } = useTheme();
+export const Field = React.forwardRef<React.ElementRef<typeof TextInput>, FieldProps>(
+  ({ label, helper, error, containerStyle, inputStyle, ...inputProps }, ref) => {
+    const { colors, radius, minTouchTarget } = useTheme();
 
-  const borderColor = error ? colors.danger : colors.border;
+    const borderColor = error ? colors.danger : colors.border;
 
-  return (
-    <View style={[styles.container, containerStyle]}>
-      <Text size="subtitle" color="ink" style={styles.label}>
-        {label}
-      </Text>
+    return (
+      <View style={[styles.container, containerStyle]}>
+        <Text size="subtitle" color="ink" style={styles.label}>
+          {label}
+        </Text>
 
-      <View
-        style={[
-          styles.inputContainer,
-          {
-            minHeight: minTouchTarget,
-            borderRadius: radius.field,
-            borderColor,
-            backgroundColor: colors.surface,
-          },
-        ]}
-      >
-        <TextInput
-          placeholderTextColor={colors.muted}
+        <View
           style={[
-            styles.input,
+            styles.inputContainer,
             {
-              color: colors.ink,
-              fontSize: 16, // Body text 16sp or larger
+              minHeight: minTouchTarget,
+              borderRadius: radius.field,
+              borderColor,
+              backgroundColor: colors.surface,
             },
-            inputStyle,
           ]}
-          {...inputProps}
-        />
-      </View>
+        >
+          <TextInput
+            ref={ref}
+            placeholderTextColor={colors.muted}
+            style={[
+              styles.input,
+              {
+                color: colors.ink,
+                fontSize: 16, // Body text 16sp or larger
+              },
+              inputStyle,
+            ]}
+            {...inputProps}
+          />
+        </View>
 
-      {error ? (
-        <Text size="caption" color="danger" style={styles.hint}>
-          {error}
-        </Text>
-      ) : helper ? (
-        <Text size="caption" color="muted" style={styles.hint}>
-          {helper}
-        </Text>
-      ) : null}
-    </View>
-  );
-};
+        {error ? (
+          <Text size="caption" color="danger" style={styles.hint}>
+            {error}
+          </Text>
+        ) : helper ? (
+          <Text size="caption" color="muted" style={styles.hint}>
+            {helper}
+          </Text>
+        ) : null}
+      </View>
+    );
+  }
+);
+Field.displayName = 'Field';
 
 const styles = StyleSheet.create({
   container: {

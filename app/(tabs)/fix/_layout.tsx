@@ -1,10 +1,12 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import { useTheme } from '../../../src/theme/ThemeContext';
+import { useCopy } from '../../../src/copy/context';
 import { HeaderHelpButton } from '../../../src/components/HeaderActions';
 
 export default function FixStackLayout() {
   const { colors } = useTheme();
+  const copy = useCopy();
 
   return (
     <Stack
@@ -25,29 +27,29 @@ export default function FixStackLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Fix',
+          title: copy.tabs.fix,
           headerRight: () => <HeaderHelpButton />,
         }}
       />
       <Stack.Screen
         name="new-case"
         options={{
-          title: 'New case',
-          headerBackTitle: 'Back',
+          title: copy.newCase.title,
+          headerBackTitle: copy.common.back,
         }}
       />
       <Stack.Screen
         name="case-detail"
         options={{
-          title: 'Case detail',
-          headerBackTitle: 'Back',
+          title: copy.caseDetail.title,
+          headerBackTitle: copy.common.back,
         }}
       />
       <Stack.Screen
         name="my-cases"
         options={{
-          title: 'My cases',
-          headerBackTitle: 'Back',
+          title: copy.myCases.title,
+          headerBackTitle: copy.common.back,
         }}
       />
     </Stack>

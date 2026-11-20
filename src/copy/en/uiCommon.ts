@@ -29,11 +29,21 @@ export const enUiCommon: UiCommonCopy = {
     share: 'Share',
   },
 
+  unsavedChanges: {
+    title: 'Leave without saving?',
+    message: 'Any information you entered will not be saved.',
+    keepEditing: 'Keep editing',
+    leave: 'Leave',
+  },
+
   dateField: {
     today: 'Today',
     yesterday: 'Yesterday',
     weekAgo: 'A week ago',
     pickDate: 'Pick a date',
+    dayLabel: 'DD',
+    monthLabel: 'MM',
+    yearLabel: 'YYYY',
     dayPlaceholder: 'DD',
     monthPlaceholder: 'MM',
     yearPlaceholder: 'YYYY',

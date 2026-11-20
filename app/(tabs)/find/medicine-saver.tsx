@@ -1,44 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Screen, Text, Card, Button, EmptyState } from '../../../src/components';
 import { useTheme } from '../../../src/theme/ThemeContext';
 import { useMoney } from '../../../src/features/money/store';
 import { useMedicines } from '../../../src/features/medicine/store';
-import { Medicine } from '../../../src/features/medicine/types';
 import { PersonSwitcher } from '../../../src/features/money/components/PersonSwitcher';
-import { AddPersonModal } from '../../../src/features/money/components/AddPersonModal';
 import { MedicineCard } from '../../../src/features/medicine/components/MedicineCard';
-import { AddMedicineModal } from '../../../src/features/medicine/components/AddMedicineModal';
 import { formatRupees } from '../../../src/lib/formatters';
 import { openWeb } from '../../../src/lib/links';
 import { useCopy } from '../../../src/copy/context';
 
 export default function MedicineSaverScreen() {
+  const router = useRouter();
   const { colors, radius } = useTheme();
   const copy = useCopy();
-  const { people, activePersonId, setActivePersonId, activePerson, addPerson } = useMoney();
+  const { people, activePersonId, setActivePersonId, activePerson } = useMoney();
 
-  const { personMedicines, personTotals, addMedicine, updateMedicine, deleteMedicine } =
-    useMedicines();
-
-  const [addPersonModalVisible, setAddPersonModalVisible] = useState(false);
-  const [addMedModalVisible, setAddMedModalVisible] = useState(false);
-  const [editingMed, setEditingMed] = useState<Medicine | null>(null);
+  const { personMedicines, personTotals, deleteMedicine } = useMedicines();
 
   const list = personMedicines(activePersonId);
   const totals = personTotals(activePersonId);
 
   const handleOpenJanAushadhi = async () => {
     await openWeb('https://janaushadhi.gov.in');
-  };
-
-  const handleSaveMed = async (input: Omit<Medicine, 'id'>) => {
-    if (editingMed) {
-      await updateMedicine(editingMed.id, input);
-      setEditingMed(null);
-    } else {
-      await addMedicine(input);
-    }
   };
 
   return (
@@ -48,7 +33,7 @@ export default function MedicineSaverScreen() {
         people={people}
         activePersonId={activePersonId}
         onSelectPerson={setActivePersonId}
-        onAddPersonPress={() => setAddPersonModalVisible(true)}
+        onAddPersonPress={() => router.push('/(tabs)/find/person-form')}
       />
 
       {/* Safety notice disclaimer */}
@@ -113,8 +98,10 @@ export default function MedicineSaverScreen() {
               key={m.id}
               medicine={m}
               onEdit={(med) => {
-                setEditingMed(med);
-                setAddMedModalVisible(true);
+                router.push({
+                  pathname: '/(tabs)/find/medicine-form',
+                  params: { personId: activePersonId, medicineId: med.id },
+                });
               }}
               onDelete={deleteMedicine}
             />
@@ -127,30 +114,13 @@ export default function MedicineSaverScreen() {
         <Button
           label={copy.medicineSaver.addMedicine}
           onPress={() => {
-            setEditingMed(null);
-            setAddMedModalVisible(true);
+            router.push({
+              pathname: '/(tabs)/find/medicine-form',
+              params: { personId: activePersonId },
+            });
           }}
         />
       </View>
-
-      <AddPersonModal
-        visible={addPersonModalVisible}
-        onClose={() => setAddPersonModalVisible(false)}
-        onAdd={async (name, rel) => {
-          await addPerson(name, rel);
-        }}
-      />
-
-      <AddMedicineModal
-        visible={addMedModalVisible}
-        personId={activePersonId}
-        initialMedicine={editingMed}
-        onClose={() => {
-          setAddMedModalVisible(false);
-          setEditingMed(null);
-        }}
-        onSave={handleSaveMed}
-      />
     </Screen>
   );
 }

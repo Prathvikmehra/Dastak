@@ -54,6 +54,7 @@ export const guUiFind: UiFindCopy = {
   },
 
   placeDetail: {
+    title: 'ક્લેમ માર્ગદર્શિકા',
     whatThisCovers: 'આમાં શું આવરી લેવાય છે',
     whatToKeepReady: 'શું તૈયાર રાખવું',
     howToSearch: 'શોધ કેવી રીતે કરવી',
@@ -79,8 +80,8 @@ export const guUiFind: UiFindCopy = {
     notesHelper: 'સંદર્ભ નંબર અથવા શાખા સંપર્કનો રેકોર્ડ રાખો',
   },
 
-  addPersonModal: {
-    title: 'તપાસ માટે વ્યક્તિ ઉમેરો',
+  personForm: {
+    title: 'વ્યક્તિ ઉમેરો',
     subtitle: 'તમારા અથવા કુટુંબના સભ્યના રેકોર્ડ અને ક્લેમનો હિસાબ રાખો.',
     nameLabel: 'વ્યક્તિનું નામ',
     namePlaceholder: 'જેમ કે રમેશ કુમાર',
@@ -90,6 +91,9 @@ export const guUiFind: UiFindCopy = {
       'ક્લેમ કરવા માટે સામાન્ય રીતે મૃત્યુ પ્રમાણપત્ર અને નોમિની હોવાના પુરાવાની જરૂર પડે છે; દરેક સ્થળના નિયમો તપાસો.',
     saveButton: 'વ્યક્તિ સાચવો',
     cancelButton: 'રદ કરો',
+    errors: {
+      nameRequired: 'કૃપા કરીને નામ દાખલ કરો',
+    },
   },
 
   medicineSaver: {
@@ -130,9 +134,11 @@ export const guUiFind: UiFindCopy = {
     saveMonthlyAmount: (amt: string) => `તફાવત: બચત ${amt} / મહિને`,
   },
 
-  addMedicineModal: {
-    titleAdd: 'દવા ઉમેરો',
-    titleEdit: 'દવામાં ફેરફાર કરો',
+  medicineForm: {
+    addTitle: 'દવા ઉમેરો',
+    editTitle: 'દવામાં ફેરફાર કરો',
+    safetyNotice:
+      'જેનેરિક અને બ્રાન્ડેડ દવાઓમાં એક જ સોલ્ટ હોઈ શકે છે, પરંતુ ડૉક્ટર કે ફાર્માસિસ્ટની સલાહ વગર ક્યારેય દવા બદલવી કે બંધ કરવી નહીં.',
     nameLabel: 'દવાનું નામ અને માત્રા (ડોઝ)',
     namePlaceholder: 'જેમ કે Telmisartan 40mg',
     brandPriceLabel: 'તમે ખરીદો છો તે બ્રાન્ડની કિંમત (₹)',
@@ -148,12 +154,19 @@ export const guUiFind: UiFindCopy = {
     lastRefillHelper: 'આગળની રિફિલ તારીખની ગણતરી માટે વપરાય છે',
     noteLabel: 'નોંધ (વૈકલ્પિક)',
     notePlaceholder: 'જેમ કે નાસ્તા પછી, અથવા ડૉક્ટરની સલાહ મુજબ',
-    saveButton: 'દવા સાચવો',
+    saveButtonAdd: 'દવા સાચવો',
+    saveButtonEdit: 'દવા સાચવો',
     cancelButton: 'રદ કરો',
+    errors: {
+      nameRequired: 'કૃપા કરીને દવાનું નામ દાખલ કરો',
+      priceRequired: 'કૃપા કરીને તમે ચૂકવો છો તે કિંમત દાખલ કરો',
+      invalidDate: 'આ તારીખ યોગ્ય લાગતી નથી',
+    },
   },
 
   settings: {
     title: 'સેટિંગ્સ અને મદદ',
+    backToApp: 'એપ પર પાછા જાઓ',
     languageTitle: 'એપની ભાષા',
     languageSubtitle: 'ફરિયાદ પત્રો અને માર્ગદર્શન માટે તમારી પસંદગીની ભાષા પસંદ કરો.',
     remindersTitle: 'ફરિયાદ રિમાઇન્ડર',

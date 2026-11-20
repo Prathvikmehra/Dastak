@@ -17,11 +17,20 @@ export interface UiCommonCopy {
     website: string;
     share: string;
   };
+  unsavedChanges: {
+    title: string;
+    message: string;
+    keepEditing: string;
+    leave: string;
+  };
   dateField: {
     today: string;
     yesterday: string;
     weekAgo: string;
     pickDate: string;
+    dayLabel: string;
+    monthLabel: string;
+    yearLabel: string;
     dayPlaceholder: string;
     monthPlaceholder: string;
     yearPlaceholder: string;

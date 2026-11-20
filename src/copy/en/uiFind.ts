@@ -56,6 +56,7 @@ export const enUiFind: UiFindCopy = {
   },
 
   placeDetail: {
+    title: 'Claim guide',
     whatThisCovers: 'What this covers',
     whatToKeepReady: 'What to keep ready',
     howToSearch: 'How to search',
@@ -81,8 +82,8 @@ export const enUiFind: UiFindCopy = {
     notesHelper: 'Keep record of reference numbers or branch contacts',
   },
 
-  addPersonModal: {
-    title: 'Add a person to check',
+  personForm: {
+    title: 'Add person',
     subtitle: 'Keep track of records and claims for yourself or a family member.',
     nameLabel: 'Person name',
     namePlaceholder: 'e.g. Ramesh Kumar',
@@ -92,6 +93,9 @@ export const enUiFind: UiFindCopy = {
       'Claiming usually needs a death certificate and proof that you are the nominee or legal heir; check each place’s rules.',
     saveButton: 'Save person',
     cancelButton: 'Cancel',
+    errors: {
+      nameRequired: 'Please enter a name',
+    },
   },
 
   medicineSaver: {
@@ -135,9 +139,11 @@ export const enUiFind: UiFindCopy = {
     saveMonthlyAmount: (amt: string) => `Difference: save ${amt} / month`,
   },
 
-  addMedicineModal: {
-    titleAdd: 'Add medicine',
-    titleEdit: 'Edit medicine',
+  medicineForm: {
+    addTitle: 'Add medicine',
+    editTitle: 'Edit medicine',
+    safetyNotice:
+      'Generic and brand medicines can contain the same salt, but never change or stop a medicine without asking your doctor or pharmacist first.',
     nameLabel: 'Medicine name and dosage',
     namePlaceholder: 'e.g. Telmisartan 40mg',
     brandPriceLabel: 'Price per strip of brand you buy (₹)',
@@ -153,12 +159,19 @@ export const enUiFind: UiFindCopy = {
     lastRefillHelper: 'Used to calculate your next refill date',
     noteLabel: 'Note (optional)',
     notePlaceholder: 'e.g. After breakfast, or doctor instructions',
-    saveButton: 'Save medicine',
+    saveButtonAdd: 'Save medicine',
+    saveButtonEdit: 'Save medicine',
     cancelButton: 'Cancel',
+    errors: {
+      nameRequired: 'Please enter a medicine name',
+      priceRequired: 'Please enter the price you pay',
+      invalidDate: 'That date does not look right',
+    },
   },
 
   settings: {
     title: 'Settings and help',
+    backToApp: 'Back to app',
     languageTitle: 'App language',
     languageSubtitle: 'Choose the language you prefer for complaint letters and guidance.',
     remindersTitle: 'Escalation reminders',

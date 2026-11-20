@@ -39,6 +39,8 @@ export interface UiCasesCopy {
     userNameLabel: string;
     userNamePlaceholder: string;
     saveButton: string;
+    savingButton: string;
+    referenceHelper: string;
     issueRequired: string;
     fraudWhenLabel: string;
     fraudWhenHour: string;
@@ -118,10 +120,12 @@ export interface UiCasesCopy {
       cardTitle: string;
       cardSubtitle: string;
       amountLabel: string;
+      helper: string;
       markResolved: string;
       recoveredAmountLabel: string;
       recoveredAmountPlaceholder: string;
       confirmButton: string;
+      resolvingButton: string;
       cancelButton: string;
       resolvedBanner: (date: string, amount?: string) => string;
     };

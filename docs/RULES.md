@@ -65,6 +65,8 @@ dastak/
    - Settings, language selection, and help live behind a single small icon (`help-circle-outline`) in the header.
 3. **Back Traps are Forbidden**:
    - The user must never be trapped on any screen. Back buttons, back titles, hardware back buttons, and swipe-to-back must always work predictably.
+4. **Form Presentation**:
+   - Forms with more than three fields are full screens, never pop-ups. Modals are only for short confirmations.
 
 ---
 

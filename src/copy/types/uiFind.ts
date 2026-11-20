@@ -43,6 +43,7 @@ export interface UiFindCopy {
     udgamCaveat: string;
   };
   placeDetail: {
+    title: string;
     whatThisCovers: string;
     whatToKeepReady: string;
     howToSearch: string;
@@ -66,7 +67,7 @@ export interface UiFindCopy {
     amountHelper: string;
     notesHelper: string;
   };
-  addPersonModal: {
+  personForm: {
     title: string;
     subtitle: string;
     nameLabel: string;
@@ -76,6 +77,9 @@ export interface UiFindCopy {
     deceasedNotice: string;
     saveButton: string;
     cancelButton: string;
+    errors: {
+      nameRequired: string;
+    };
   };
   medicineSaver: {
     title: string;
@@ -112,9 +116,10 @@ export interface UiFindCopy {
     priceFoundPerStrip: (amt: string) => string;
     saveMonthlyAmount: (amt: string) => string;
   };
-  addMedicineModal: {
-    titleAdd: string;
-    titleEdit: string;
+  medicineForm: {
+    addTitle: string;
+    editTitle: string;
+    safetyNotice: string;
     nameLabel: string;
     namePlaceholder: string;
     brandPriceLabel: string;
@@ -130,11 +135,18 @@ export interface UiFindCopy {
     lastRefillHelper: string;
     noteLabel: string;
     notePlaceholder: string;
-    saveButton: string;
+    saveButtonAdd: string;
+    saveButtonEdit: string;
     cancelButton: string;
+    errors: {
+      nameRequired: string;
+      priceRequired: string;
+      invalidDate: string;
+    };
   };
   settings: {
     title: string;
+    backToApp: string;
     languageTitle: string;
     languageSubtitle: string;
     remindersTitle: string;

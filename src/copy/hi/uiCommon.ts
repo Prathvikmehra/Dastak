@@ -29,11 +29,21 @@ export const hiUiCommon: UiCommonCopy = {
     share: 'शेयर करें',
   },
 
+  unsavedChanges: {
+    title: 'बिना सहेजे वापस जाएं?',
+    message: 'आपके द्वारा दर्ज की गई जानकारी सहेजी नहीं जाएगी।',
+    keepEditing: 'संपादन जारी रखें',
+    leave: 'छोड़ें',
+  },
+
   dateField: {
     today: 'आज',
     yesterday: 'कल',
     weekAgo: 'एक हफ़्ता पहले',
     pickDate: 'तारीख चुनें',
+    dayLabel: 'दिन',
+    monthLabel: 'माह',
+    yearLabel: 'वर्ष',
     dayPlaceholder: 'DD',
     monthPlaceholder: 'MM',
     yearPlaceholder: 'YYYY',
