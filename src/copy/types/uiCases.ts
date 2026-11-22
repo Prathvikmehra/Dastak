@@ -20,6 +20,15 @@ export interface UiCasesCopy {
     summaryTitle: (count: number) => string;
     viewMyCases: string;
     recoveredBanner: (amount: string) => string;
+    urgentActionNeeded: (who: string) => string;
+    urgentToday: (who: string) => string;
+    urgentNextInDays: (who: string, days: number) => string;
+    urgentNext: (who: string) => string;
+    fraudShortcut: {
+      prompt: string;
+      callButton: string;
+      saveLink: string;
+    };
     doors: Record<IssueType, { title: string; subtitle: string }>;
   };
   newCase: {
@@ -30,6 +39,7 @@ export interface UiCasesCopy {
     companyPlaceholder: string;
     amountLabel: string;
     amountPlaceholder: string;
+    amountHelper: string;
     referenceLabel: string;
     referencePlaceholder: string;
     incidentDateLabel: string;
@@ -53,6 +63,10 @@ export interface UiCasesCopy {
     fieldHelperFraudRef: string;
     fieldHelperBankRef: string;
     fieldHelperInsuranceRef: string;
+    amountPreview: (formatted: string) => string;
+    routedGuess: (issue: string) => string;
+    changeChoice: string;
+    noGuessPickBest: string;
     fieldLabels: Record<
       IssueType,
       {
@@ -86,6 +100,7 @@ export interface UiCasesCopy {
     evidenceDoneCount: (done: number, total: number) => string;
     noticeDialFailed: (phone: string) => string;
     noticeLinkFailed: (url: string) => string;
+    refLabel: (ref: string) => string;
     fraudUrgent: {
       bannerTitle: string;
       bannerBodyRecent: string;
@@ -147,5 +162,15 @@ export interface UiCasesCopy {
     recoveredTotal: (amount: string) => string;
     activeCount: (count: number) => string;
     resolvedCount: (count: number) => string;
+  };
+  caseCard: {
+    resolvedAccessibility: (company: string) => string;
+    activeStep: (who: string) => string;
+    caseAccessibility: (company: string, amount: string) => string;
+    unknownCompany: string;
+  };
+  reminders: {
+    notificationTitle: (who: string) => string;
+    bodyMovesToday: (company: string, who: string) => string;
   };
 }

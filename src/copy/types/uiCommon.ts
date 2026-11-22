@@ -16,6 +16,9 @@ export interface UiCommonCopy {
     call: string;
     website: string;
     share: string;
+    grievanceCase: string;
+    couldNotOpenDialer: (phone: string) => string;
+    couldNotOpenBrowser: (url: string) => string;
   };
   unsavedChanges: {
     title: string;

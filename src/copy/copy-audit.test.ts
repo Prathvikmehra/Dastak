@@ -25,13 +25,36 @@ function walk(dir: string): string[] {
 
 export interface CopyViolation {
   file: string;
-  type: 'jsx-text' | 'alert-string' | 'jsx-prop' | 'navigation-option';
+  type:
+    | 'jsx-text'
+    | 'alert-string'
+    | 'jsx-prop'
+    | 'navigation-option'
+    | 'template-string'
+    | 'string-concat';
   detail: string;
 }
 
 export function findCopyViolationsInSource(content: string, filePath: string): CopyViolation[] {
   const sf = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
   const violations: CopyViolation[] = [];
+  const englishWordPattern = /[a-zA-Z]+[: ]/;
+
+  function isDevLoggingOrError(node: ts.Node): boolean {
+    let curr = node.parent;
+    while (curr) {
+      if (ts.isCallExpression(curr)) {
+        const text = curr.expression.getText(sf);
+        if (text.startsWith('console.') || text.startsWith('logger.')) return true;
+      }
+      if (ts.isNewExpression(curr)) {
+        const text = curr.expression.getText(sf);
+        if (text.endsWith('Error')) return true;
+      }
+      curr = curr.parent;
+    }
+    return false;
+  }
 
   function visit(node: ts.Node) {
     // 1. Literal text between JSX tags
@@ -142,6 +165,49 @@ export function findCopyViolationsInSource(content: string, filePath: string): C
       }
     }
 
+    // 5. Template literals containing English words
+    if (ts.isTemplateExpression(node) && !isDevLoggingOrError(node)) {
+      const literals = [node.head.text, ...node.templateSpans.map((s) => s.literal.text)];
+      const hasEnglish = literals.some(
+        (lit) => englishWordPattern.test(lit) && !lit.match(/^(tel|https?|mailto):/)
+      );
+      if (hasEnglish) {
+        violations.push({ file: filePath, type: 'template-string', detail: node.getText(sf) });
+      }
+    }
+
+    // 6. String concatenations with + containing English words
+    if (
+      ts.isBinaryExpression(node) &&
+      node.operatorToken.kind === ts.SyntaxKind.PlusToken &&
+      !isDevLoggingOrError(node)
+    ) {
+      const left = node.left;
+      const right = node.right;
+      let isMatch = false;
+      if (
+        ts.isStringLiteral(left) &&
+        englishWordPattern.test(left.text) &&
+        !left.text.match(/^(tel|https?|mailto):/)
+      ) {
+        isMatch = true;
+      }
+      if (
+        ts.isStringLiteral(right) &&
+        englishWordPattern.test(right.text) &&
+        !right.text.match(/^(tel|https?|mailto):/)
+      ) {
+        isMatch = true;
+      }
+      if (
+        isMatch &&
+        (!ts.isBinaryExpression(node.parent) ||
+          node.parent.operatorToken.kind !== ts.SyntaxKind.PlusToken)
+      ) {
+        violations.push({ file: filePath, type: 'string-concat', detail: node.getText(sf) });
+      }
+    }
+
     ts.forEachChild(node, visit);
   }
 
@@ -175,6 +241,9 @@ describe('Copy audit: no hardcoded strings in app/ and src/ components', () => {
   it('proves the audit fails on deliberate violations across all checked categories', () => {
     const deliberateBadCode = `
       export default function BadComponent() {
+        const step = { who: 'Bank' };
+        const a = \`Action needed: \${step.who}\`;
+        const b = 'Hello ' + step.who;
         return (
           <>
             <Stack.Screen options={{ title: 'Hardcoded Title', headerBackTitle: 'Back' }} />
@@ -190,37 +259,20 @@ describe('Copy audit: no hardcoded strings in app/ and src/ components', () => {
       }
     `;
     const violations = findCopyViolationsInSource(deliberateBadCode, 'test-dummy.tsx');
-    expect(violations.length).toBeGreaterThanOrEqual(6);
-    expect(violations).toContainEqual({
-      file: 'test-dummy.tsx',
-      type: 'navigation-option',
-      detail: 'title: "Hardcoded Title"',
-    });
-    expect(violations).toContainEqual({
-      file: 'test-dummy.tsx',
-      type: 'navigation-option',
-      detail: 'headerBackTitle: "Back"',
-    });
-    expect(violations).toContainEqual({
-      file: 'test-dummy.tsx',
-      type: 'navigation-option',
-      detail: 'tabBarLabel: "Bad Tab"',
-    });
-    expect(violations).toContainEqual({
-      file: 'test-dummy.tsx',
-      type: 'navigation-option',
-      detail: 'headerTitle: "Bad Header"',
-    });
-    expect(violations).toContainEqual({
-      file: 'test-dummy.tsx',
-      type: 'jsx-text',
-      detail: 'Literal text',
-    });
-    expect(violations).toContainEqual({
-      file: 'test-dummy.tsx',
-      type: 'alert-string',
-      detail: 'Alert title: Hardcoded Alert Title',
-    });
+    expect(violations.length).toBeGreaterThanOrEqual(8);
+    const expected = [
+      { type: 'navigation-option', detail: 'title: "Hardcoded Title"' },
+      { type: 'navigation-option', detail: 'headerBackTitle: "Back"' },
+      { type: 'navigation-option', detail: 'tabBarLabel: "Bad Tab"' },
+      { type: 'navigation-option', detail: 'headerTitle: "Bad Header"' },
+      { type: 'jsx-text', detail: 'Literal text' },
+      { type: 'alert-string', detail: 'Alert title: Hardcoded Alert Title' },
+    ];
+    for (const exp of expected) {
+      expect(violations).toContainEqual({ file: 'test-dummy.tsx', ...exp });
+    }
+    expect(violations.some((v) => v.type === 'template-string')).toBe(true);
+    expect(violations.some((v) => v.type === 'string-concat')).toBe(true);
   });
 
   it('ensures banned words (alternative, replace, switch, substitute, cheaper) never appear in user-facing copy', () => {

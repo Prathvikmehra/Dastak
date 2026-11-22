@@ -111,7 +111,7 @@ export default function MoneyRadarScreen() {
                 })
               }
               style={styles.placeCard}
-              accessibilityLabel={`Open guide for ${place.title}`}
+              accessibilityLabel={copy.moneyRadar.openGuideAccessibility(place.title)}
             >
               <View style={styles.placeHeader}>
                 <View style={styles.placeTitleBox}>

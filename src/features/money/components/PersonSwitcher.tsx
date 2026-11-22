@@ -36,7 +36,7 @@ export const PersonSwitcher: React.FC<PersonSwitcherProps> = ({
               key={p.id}
               accessibilityRole="button"
               accessibilityState={{ selected: isSelected }}
-              accessibilityLabel={`View radar for ${p.name}`}
+              accessibilityLabel={copy.moneyRadar.viewRadarForPerson(p.name)}
               onPress={() => onSelectPerson(p.id)}
               style={[
                 styles.chip,

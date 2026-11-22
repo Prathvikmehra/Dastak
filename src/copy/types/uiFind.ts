@@ -41,9 +41,12 @@ export interface UiFindCopy {
     foundSoFar: (amount: string) => string;
     receivedAmount: (amount: string) => string;
     udgamCaveat: string;
+    openGuideAccessibility: (title: string) => string;
+    viewRadarForPerson: (name: string) => string;
   };
   placeDetail: {
     title: string;
+    checkTitle: (title: string) => string;
     whatThisCovers: string;
     whatToKeepReady: string;
     howToSearch: string;
@@ -54,6 +57,8 @@ export interface UiFindCopy {
     remind7Days: string;
     remindScheduledTitle: string;
     remindScheduledMessage: (placeName: string) => string;
+    reminderBody: (portalName: string) => string;
+    reminderSetSuccess: (date: string) => string;
     saveUpdate: string;
     foundAmountLabel: string;
     foundAmountPlaceholder: string;

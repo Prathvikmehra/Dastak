@@ -22,13 +22,21 @@ export interface PersonFormProps {
   onCancel?: () => void;
 }
 
+interface NavigationGuard {
+  addListener: (
+    event: 'beforeRemove',
+    listener: (e: { preventDefault: () => void; data: { action: unknown } }) => void
+  ) => () => void;
+  dispatch: (action: unknown) => void;
+}
+
 const RELATIONSHIPS: Relationship[] = ['Parent', 'Spouse', 'Someone who has passed away', 'Other'];
 
 export const PersonForm: React.FC<PersonFormProps> = ({ onSuccess, onCancel }) => {
   const { colors, radius, minTouchTarget } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationGuard>();
   const copy = useCopy();
   const { addPerson } = useMoney();
 
@@ -45,7 +53,7 @@ export const PersonForm: React.FC<PersonFormProps> = ({ onSuccess, onCancel }) =
 
   useEffect(() => {
     if (!navigation?.addListener) return;
-    const unsubscribe = (navigation as any).addListener('beforeRemove', (e: any) => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       if (!isDirty || isSubmitting || hasSaved.current) {
         return;
       }

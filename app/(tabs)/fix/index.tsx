@@ -67,14 +67,16 @@ export default function FixHomeScreen() {
       const remaining = daysUntilNext(c, now);
 
       if (isOverdue) {
-        urgentNextText = `Action needed: ${step.who}`;
+        urgentNextText = copy.fixHome.urgentActionNeeded(step.who);
         break;
       } else if (remaining !== null && remaining < minDays) {
         minDays = remaining;
         urgentNextText =
-          remaining === 0 ? `Today: ${step.who}` : `Next: ${step.who} in ${remaining}d`;
+          remaining === 0
+            ? copy.fixHome.urgentToday(step.who)
+            : copy.fixHome.urgentNextInDays(step.who, remaining);
       } else if (!urgentNextText) {
-        urgentNextText = `Next: ${step.who}`;
+        urgentNextText = copy.fixHome.urgentNext(step.who);
       }
     }
   }

@@ -1,5 +1,5 @@
 import { UiCopy } from './types/ui';
-import { LadderCopy, PlaceCopy, CallScriptCopy } from './types/domain';
+import { LadderCopy, PlaceCopy, CallScriptCopy, DraftsCopy } from './types/domain';
 
 export type AppLanguage = 'en' | 'hi' | 'gu';
 
@@ -14,6 +14,7 @@ export interface Copy extends UiCopy {
   followOfficialSite: string;
   otpSafetyTip: string;
   callScript: CallScriptCopy;
+  drafts: DraftsCopy;
 }
 
 export * from './types/ui';

@@ -20,6 +20,15 @@ export const hiUiCases: UiCasesCopy = {
     summaryTitle: (count: number) => `आपके पास ${count} चालू ${count === 1 ? 'मामला' : 'मामले'} हैं`,
     viewMyCases: 'मेरे मामले देखें',
     recoveredBanner: (amount: string) => `अब तक वापस मिले: ${amount}`,
+    urgentActionNeeded: (who: string) => `कार्रवाई आवश्यक: ${who}`,
+    urgentToday: (who: string) => `आज: ${who}`,
+    urgentNextInDays: (who: string, days: number) => `अगला कदम: ${who} (${days} दिनों में)`,
+    urgentNext: (who: string) => `अगला कदम: ${who}`,
+    fraudShortcut: {
+      prompt: 'क्या आपके खाते से अभी पैसे कट गए हैं? तुरंत साइबर क्राइम हेल्पलाइन 1930 पर कॉल करें।',
+      callButton: '1930 पर कॉल करें',
+      saveLink: 'विवरण सुरक्षित करें',
+    },
     doors: {
       refund: {
         title: 'रिफंड नहीं मिला',
@@ -48,6 +57,7 @@ export const hiUiCases: UiCasesCopy = {
     companyPlaceholder: 'जैसे Flipkart, Amazon, SBI, HDFC',
     amountLabel: 'विवादित राशि',
     amountPlaceholder: 'जैसे 1999',
+    amountHelper: 'केवल अंक। यदि कोई धन हानि नहीं हुई तो खाली छोड़ दें',
     referenceLabel: 'ऑर्डर ID या संदर्भ संख्या',
     referencePlaceholder: 'जैसे OD123456789 या UTR नंबर',
     incidentDateLabel: 'यह कब हुआ था?',
@@ -71,6 +81,10 @@ export const hiUiCases: UiCasesCopy = {
     fieldHelperFraudRef: 'UTR या लेन-देन संदर्भ संख्या',
     fieldHelperBankRef: 'लेन-देन संदर्भ या खाता संख्या',
     fieldHelperInsuranceRef: 'पॉलिसी नंबर या क्लेम संदर्भ संख्या',
+    amountPreview: (formatted: string) => `पूर्वावलोकन: ${formatted}`,
+    routedGuess: (issue: string) => `यह ऐसा लगता है: ${issue}। सही नहीं है?`,
+    changeChoice: 'इसे बदलें',
+    noGuessPickBest: 'जो सबसे उपयुक्त लगे उसे चुनें।',
     fieldLabels: {
       refund: {
         company: 'विक्रेता या ऐप',
@@ -122,6 +136,7 @@ export const hiUiCases: UiCasesCopy = {
     evidenceDoneCount: (done: number, total: number) => `${done}/${total} प्रमाण तैयार`,
     noticeDialFailed: (phone: string) => `कॉल अपने-आप नहीं लग सकी। कृपया मैन्युअल रूप से ${phone} डायल करें।`,
     noticeLinkFailed: (url: string) => `ब्राउज़र नहीं खुल सका। कृपया मैन्युअल रूप से ${url} पर जाएं।`,
+    refLabel: (ref: string) => `संदर्भ: ${ref}`,
     fraudUrgent: {
       bannerTitle: 'अभी 1930 पर कॉल करें',
       bannerBodyRecent: 'अभी 1930 पर कॉल करें। पहले कुछ घंटे सबसे ज़रूरी हैं।',
@@ -186,5 +201,16 @@ export const hiUiCases: UiCasesCopy = {
     recoveredTotal: (amount: string) => `अब तक वापस मिले: ${amount}`,
     activeCount: (count: number) => `${count} सक्रिय`,
     resolvedCount: (count: number) => `${count} हल हुए`,
+  },
+  caseCard: {
+    resolvedAccessibility: (company: string) => `${company} के लिए सुलझाया गया मामला`,
+    activeStep: (who: string) => `सक्रिय: ${who}`,
+    caseAccessibility: (company: string, amount: string) => `${company} के लिए मामला, ${amount}`,
+    unknownCompany: 'अज्ञात कंपनी',
+  },
+  reminders: {
+    notificationTitle: (who: string) => `दस्तक: ${who}`,
+    bodyMovesToday: (company: string, who: string) =>
+      `${company} के साथ आपका मामला आज ${who} के पास जाता है।`,
   },
 };

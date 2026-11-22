@@ -22,6 +22,16 @@ export const enUiCases: UiCasesCopy = {
     summaryTitle: (count: number) => `You have ${count} open case${count === 1 ? '' : 's'}`,
     viewMyCases: 'View my cases',
     recoveredBanner: (amount: string) => `Recovered so far: ${amount}`,
+    urgentActionNeeded: (who: string) => `Action needed: ${who}`,
+    urgentToday: (who: string) => `Today: ${who}`,
+    urgentNextInDays: (who: string, days: number) => `Next: ${who} in ${days} days`,
+    urgentNext: (who: string) => `Next: ${who}`,
+    fraudShortcut: {
+      prompt:
+        'Money was just taken from your account? Call the cybercrime helpline 1930 right away.',
+      callButton: 'Call 1930',
+      saveLink: 'Save the details',
+    },
     doors: {
       refund: {
         title: 'Failed refund',
@@ -50,6 +60,7 @@ export const enUiCases: UiCasesCopy = {
     companyPlaceholder: 'e.g. Flipkart, Amazon, SBI, HDFC',
     amountLabel: 'Amount in dispute',
     amountPlaceholder: 'e.g. 1999',
+    amountHelper: 'Numbers only. Leave blank if no money was lost',
     referenceLabel: 'Order ID or reference number',
     referencePlaceholder: 'e.g. OD123456789 or UTR number',
     incidentDateLabel: 'When did this happen?',
@@ -73,6 +84,10 @@ export const enUiCases: UiCasesCopy = {
     fieldHelperFraudRef: 'UTR or transaction reference number',
     fieldHelperBankRef: 'Transaction reference or account number',
     fieldHelperInsuranceRef: 'Policy number or claim reference',
+    amountPreview: (formatted: string) => `Preview: ${formatted}`,
+    routedGuess: (issue: string) => `This sounds like: ${issue}. Not right?`,
+    changeChoice: 'Change it',
+    noGuessPickBest: 'Pick the one that fits best.',
     fieldLabels: {
       refund: {
         company: 'Seller or app',
@@ -125,6 +140,7 @@ export const enUiCases: UiCasesCopy = {
     noticeDialFailed: (phone: string) =>
       `Could not dial automatically. Please dial ${phone} manually.`,
     noticeLinkFailed: (url: string) => `Could not open browser. Please visit ${url} manually.`,
+    refLabel: (ref: string) => `Ref: ${ref}`,
     fraudUrgent: {
       bannerTitle: 'Call 1930 now',
       bannerBodyRecent: 'Call 1930 now. The first hours matter most.',
@@ -190,5 +206,16 @@ export const enUiCases: UiCasesCopy = {
     recoveredTotal: (amount: string) => `Recovered so far: ${amount}`,
     activeCount: (count: number) => `${count} active`,
     resolvedCount: (count: number) => `${count} resolved`,
+  },
+  caseCard: {
+    resolvedAccessibility: (company: string) => `Resolved case for ${company}`,
+    activeStep: (who: string) => `Active: ${who}`,
+    caseAccessibility: (company: string, amount: string) => `Case for ${company}, ${amount}`,
+    unknownCompany: 'unknown company',
+  },
+  reminders: {
+    notificationTitle: (who: string) => `Dastak: ${who}`,
+    bodyMovesToday: (company: string, who: string) =>
+      `Your case with ${company} moves to the ${who} today.`,
   },
 };

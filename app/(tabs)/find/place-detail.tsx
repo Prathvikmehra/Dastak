@@ -56,12 +56,12 @@ export default function PlaceDetailScreen() {
     });
     const res = await defaultReminders.scheduleFollowUp(
       place.id,
-      `Check ${place.title}`,
-      `Follow up on your unclaimed records search with ${place.portalName}.`,
+      copy.placeDetail.checkTitle(place.title),
+      copy.placeDetail.reminderBody(place.portalName),
       targetDate
     );
     if (res.scheduled) {
-      setReminderMessage(`Reminder set for 9:00 AM on ${dateFormatted}.`);
+      setReminderMessage(copy.placeDetail.reminderSetSuccess(dateFormatted));
     } else {
       Alert.alert(copy.settings.remindersOffTitle, copy.settings.remindersOffTip);
     }

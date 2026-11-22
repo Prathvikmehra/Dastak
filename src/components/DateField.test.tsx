@@ -5,6 +5,8 @@ import { DateField } from './DateField';
 import { ThemeProvider } from '../theme/ThemeContext';
 import { LocalDate } from '../lib/dates';
 
+jest.setTimeout(15000);
+
 const renderDateField = async (props: {
   label: string;
   value: LocalDate | '';

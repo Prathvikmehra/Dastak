@@ -9,7 +9,6 @@ const ALLOWED_IDENTICAL_STRINGS = new Set([
   'UDGAM',
   '1930',
   '1915',
-  '155255',
   '8800001915',
   '.',
   '₹',

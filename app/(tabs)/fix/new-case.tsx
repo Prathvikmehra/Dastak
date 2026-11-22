@@ -128,8 +128,8 @@ export default function NewCaseScreen() {
           keyboardType="numeric"
           helper={
             parsedAmount !== null
-              ? `Preview: ${formatRupees(parsedAmount)}`
-              : 'Numbers only. Leave blank if no money was lost'
+              ? copy.newCase.amountPreview(formatRupees(parsedAmount))
+              : copy.newCase.amountHelper
           }
         />
 

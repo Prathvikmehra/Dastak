@@ -38,3 +38,26 @@ export interface CallScriptCopy {
     general: string;
   };
 }
+
+export interface DraftsCopy {
+  to: (who: string) => string;
+  subjectRefund: (company?: string) => string;
+  subjectFraud: (company?: string) => string;
+  subjectBank: (company?: string) => string;
+  subjectInsurance: (company?: string) => string;
+  salutation: string;
+  introRefund: (company?: string, amount?: string) => string;
+  introFraud: (company?: string, amount?: string) => string;
+  introBank: (company?: string, amount?: string) => string;
+  introInsurance: (company?: string, amount?: string) => string;
+  incidentDate: (date: string) => string;
+  counterparty: (company: string) => string;
+  referencePolicy: (ref: string) => string;
+  referenceAccount: (ref: string) => string;
+  referenceOrder: (ref: string) => string;
+  referenceTransaction: (ref: string) => string;
+  detailsHeading: string;
+  requestedActionHeading: string;
+  thankYou: string;
+  sincerely: string;
+}

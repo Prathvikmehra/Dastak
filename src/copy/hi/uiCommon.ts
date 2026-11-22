@@ -27,6 +27,9 @@ export const hiUiCommon: UiCommonCopy = {
     call: 'कॉल करें',
     website: 'वेबसाइट',
     share: 'शेयर करें',
+    grievanceCase: 'शिकायत मामला',
+    couldNotOpenDialer: (phone: string) => `फ़ोन डायलर नहीं खुल सका। आप सीधे कॉल कर सकते हैं: ${phone}`,
+    couldNotOpenBrowser: (url: string) => `ब्राउज़र नहीं खुल सका। आप सीधे यहां जा सकते हैं: ${url}`,
   },
 
   unsavedChanges: {

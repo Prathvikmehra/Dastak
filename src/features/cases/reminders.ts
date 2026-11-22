@@ -8,6 +8,7 @@ import {
 import { PreferencesStore, defaultPreferencesStore } from '../settings/preferences';
 import { logger } from '../../lib/logger';
 import { parseIsoDate } from '../../lib/dates';
+import { en } from '../../copy/en';
 
 export interface PlannedReminder {
   stepId: string;
@@ -60,7 +61,7 @@ export function planReminders(caseItem: Case, now: Date): PlannedReminder[] {
     }
 
     const title = 'Case update reminder';
-    const body = `Your case with ${company} moves to the ${step.who} today.`;
+    const body = en.reminders.bodyMovesToday(company, step.who);
 
     results.push({
       stepId: step.id,
@@ -170,7 +171,7 @@ export class RemindersService implements Reminders {
 
       const identifier = `dastak_${caseItem.id}_${step.id}`;
       const title = 'Case update reminder';
-      const body = `Your case with ${company} moves to the ${step.who} today.`;
+      const body = en.reminders.bodyMovesToday(company, step.who);
 
       try {
         await this.port.scheduleNotification({

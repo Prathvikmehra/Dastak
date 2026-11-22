@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Pressable, TextInput } from 'react-native';
+import { View, StyleSheet, Pressable, TextInput, LayoutChangeEvent } from 'react-native';
 import { Text } from './Text';
 import { Card } from './Card';
 import { useTheme } from '../theme/ThemeContext';
@@ -14,6 +14,7 @@ export interface DateFieldProps {
   helper?: string;
   legacyValue?: string;
   onError?: (hasError: boolean) => void;
+  onLayout?: (e: LayoutChangeEvent) => void;
 }
 
 export const DateField: React.FC<DateFieldProps> = ({
@@ -24,6 +25,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   helper,
   legacyValue,
   onError,
+  onLayout,
 }) => {
   const { colors, radius } = useTheme();
   const copy = useCopy();
@@ -144,7 +146,7 @@ export const DateField: React.FC<DateFieldProps> = ({
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onLayout={onLayout}>
       <Text size="caption" color="ink" style={styles.label}>
         {label}
       </Text>

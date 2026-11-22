@@ -12,13 +12,13 @@ export interface FieldProps extends Omit<TextInputProps, 'style'> {
 }
 
 export const Field = React.forwardRef<React.ElementRef<typeof TextInput>, FieldProps>(
-  ({ label, helper, error, containerStyle, inputStyle, ...inputProps }, ref) => {
+  ({ label, helper, error, containerStyle, inputStyle, onLayout, ...inputProps }, ref) => {
     const { colors, radius, minTouchTarget } = useTheme();
 
     const borderColor = error ? colors.danger : colors.border;
 
     return (
-      <View style={[styles.container, containerStyle]}>
+      <View style={[styles.container, containerStyle]} onLayout={onLayout}>
         <Text size="subtitle" color="ink" style={styles.label}>
           {label}
         </Text>

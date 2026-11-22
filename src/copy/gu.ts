@@ -13,6 +13,7 @@ import { guUiCases } from './gu/uiCases';
 import { guUiFind } from './gu/uiFind';
 import { guLadders, guCallScript } from './gu/ladders';
 import { guPlaces, guFollowOfficialSite, guOtpSafetyTip } from './gu/places';
+import { guDrafts } from './gu/drafts';
 
 export const gu: Copy = {
   ...guUiCommon,
@@ -23,4 +24,5 @@ export const gu: Copy = {
   followOfficialSite: guFollowOfficialSite,
   otpSafetyTip: guOtpSafetyTip,
   callScript: guCallScript,
+  drafts: guDrafts,
 };

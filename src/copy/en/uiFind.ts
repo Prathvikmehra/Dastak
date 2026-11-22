@@ -53,10 +53,13 @@ export const enUiFind: UiFindCopy = {
     receivedAmount: (amount: string) => `Received: ${amount}`,
     udgamCaveat:
       'UDGAM covers participating banks only; it does not cover post office savings, PF, or insurance. We do not promise any recovered money.',
+    openGuideAccessibility: (title: string) => `Open guide for ${title}`,
+    viewRadarForPerson: (name: string) => `View radar for ${name}`,
   },
 
   placeDetail: {
     title: 'Claim guide',
+    checkTitle: (title: string) => `Check ${title}`,
     whatThisCovers: 'What this covers',
     whatToKeepReady: 'What to keep ready',
     howToSearch: 'How to search',
@@ -68,6 +71,9 @@ export const enUiFind: UiFindCopy = {
     remindScheduledTitle: 'Reminder scheduled',
     remindScheduledMessage: (placeName: string) =>
       `We will remind you in 7 days to follow up on ${placeName}.`,
+    reminderBody: (portalName: string) =>
+      `Follow up on your unclaimed records search with ${portalName}.`,
+    reminderSetSuccess: (date: string) => `Reminder set for 9:00 AM on ${date}.`,
     saveUpdate: 'Save update',
     foundAmountLabel: 'Amount (if known)',
     foundAmountPlaceholder: 'e.g. 15000',

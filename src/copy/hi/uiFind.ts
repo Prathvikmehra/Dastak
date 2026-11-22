@@ -52,10 +52,13 @@ export const hiUiFind: UiFindCopy = {
     receivedAmount: (amount: string) => `प्राप्त राशि: ${amount}`,
     udgamCaveat:
       'UDGAM केवल भागीदार बैंकों को कवर करता है; डाकघर बचत, PF या बीमा को नहीं। हम किसी राशि की गारंटी नहीं देते।',
+    openGuideAccessibility: (title: string) => `${title} के लिए मार्गदर्शिका खोलें`,
+    viewRadarForPerson: (name: string) => `${name} के लिए रडार देखें`,
   },
 
   placeDetail: {
     title: 'दावा मार्गदर्शिका',
+    checkTitle: (title: string) => `${title} जांचें`,
     whatThisCovers: 'इसमें क्या शामिल है',
     whatToKeepReady: 'क्या तैयार रखना है',
     howToSearch: 'खोज कैसे करें',
@@ -67,6 +70,9 @@ export const hiUiFind: UiFindCopy = {
     remindScheduledTitle: 'रिमाइंडर सेट किया गया',
     remindScheduledMessage: (placeName: string) =>
       `हम आपको ${placeName} पर आगे की कार्रवाई के लिए 7 दिनों में याद दिलाएंगे।`,
+    reminderBody: (portalName: string) =>
+      `${portalName} के साथ अपने लावारिस रिकॉर्ड की खोज पर कार्रवाई करें।`,
+    reminderSetSuccess: (date: string) => `${date} को सुबह 9:00 बजे का रिमाइंडर सेट किया गया।`,
     saveUpdate: 'अपडेट सुरक्षित करें',
     foundAmountLabel: 'राशि (यदि ज्ञात हो)',
     foundAmountPlaceholder: 'जैसे 15000',

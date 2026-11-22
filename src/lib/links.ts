@@ -1,4 +1,5 @@
 import { Linking } from 'react-native';
+import { en } from '../copy/en';
 
 export type UrlOpener = (url: string) => Promise<boolean | void>;
 
@@ -24,7 +25,7 @@ export async function openPhone(
     await opener(url);
     return { success: true, url };
   } catch {
-    const fallbackMessage = `Could not open phone dialer. You can call directly: ${phoneNumber}`;
+    const fallbackMessage = en.common.couldNotOpenDialer(phoneNumber);
     if (onFail) {
       onFail(fallbackMessage);
     }
@@ -46,7 +47,7 @@ export async function openWeb(
     await opener(webUrl);
     return { success: true, url: webUrl };
   } catch {
-    const fallbackMessage = `Could not open browser. You can visit directly: ${webUrl}`;
+    const fallbackMessage = en.common.couldNotOpenBrowser(webUrl);
     if (onFail) {
       onFail(fallbackMessage);
     }

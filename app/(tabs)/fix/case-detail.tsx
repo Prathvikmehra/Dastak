@@ -108,7 +108,7 @@ export default function CaseDetailScreen() {
         </View>
 
         <Text size="title" color="ink" style={styles.companyName}>
-          {caseItem.company || 'Grievance Case'}
+          {caseItem.company || copy.common.grievanceCase}
         </Text>
 
         {displayAmount ? (
@@ -117,9 +117,11 @@ export default function CaseDetailScreen() {
           </Text>
         ) : null}
 
-        {caseItem.reference ? (
+        {caseItem.reference &&
+        caseItem.reference.trim() &&
+        caseItem.reference.trim().toLowerCase() !== 'none' ? (
           <Text size="caption" color="muted" style={styles.referenceText}>
-            {`Ref: ${caseItem.reference}`}
+            {copy.caseDetail.refLabel(caseItem.reference.trim())}
           </Text>
         ) : null}
 

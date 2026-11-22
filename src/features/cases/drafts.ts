@@ -1,7 +1,7 @@
 import { Case, LadderStep } from './types';
 import { formatRupees, parseAmount } from '../../lib/formatters';
 import { toDisplay } from '../../lib/dates';
-import { CallScriptCopy } from '../../copy/types/domain';
+import { CallScriptCopy, DraftsCopy } from '../../copy/types/domain';
 import { en } from '../../copy/en';
 
 /**
@@ -15,41 +15,29 @@ import { en } from '../../copy/en';
  * - If user has no name on file, ends with "Thank you." and no placeholder signature.
  * - Never prints "undefined", "null", empty brackets, or "Aggrieved Consumer".
  */
-export function buildDraft(caseItem: Case, step: LadderStep): string {
+export function buildDraft(
+  caseItem: Case,
+  step: LadderStep,
+  draftsCopy: DraftsCopy = en.drafts
+): string {
   const parts: string[] = [];
 
-  parts.push(`To: ${step.who}`);
+  parts.push(draftsCopy.to(step.who));
 
   const company = caseItem.company?.trim() || '';
 
   if (caseItem.issueType === 'refund') {
-    parts.push(
-      company
-        ? `Subject: Formal grievance regarding order with ${company}`
-        : 'Subject: Formal grievance regarding order'
-    );
+    parts.push(draftsCopy.subjectRefund(company || undefined));
   } else if (caseItem.issueType === 'fraud') {
-    parts.push(
-      company
-        ? `Subject: Formal complaint regarding online payment fraud involving ${company}`
-        : 'Subject: Formal complaint regarding online payment fraud'
-    );
+    parts.push(draftsCopy.subjectFraud(company || undefined));
   } else if (caseItem.issueType === 'bank') {
-    parts.push(
-      company
-        ? `Subject: Formal grievance regarding account or card with ${company}`
-        : 'Subject: Formal grievance regarding bank account or card'
-    );
+    parts.push(draftsCopy.subjectBank(company || undefined));
   } else {
-    parts.push(
-      company
-        ? `Subject: Formal grievance regarding insurance claim with ${company}`
-        : 'Subject: Formal grievance regarding insurance claim'
-    );
+    parts.push(draftsCopy.subjectInsurance(company || undefined));
   }
 
   parts.push('');
-  parts.push('Respected Sir/Madam,');
+  parts.push(draftsCopy.salutation);
   parts.push('');
 
   const sentences: string[] = [];
@@ -60,109 +48,58 @@ export function buildDraft(caseItem: Case, step: LadderStep): string {
     : caseItem.legacyIncidentDate?.trim() || '';
 
   if (caseItem.issueType === 'refund') {
-    if (company && amountStr) {
-      sentences.push(
-        `I am submitting this grievance regarding my order with ${company} for an amount of ${amountStr}.`
-      );
-    } else if (company) {
-      sentences.push(`I am submitting this grievance regarding my order with ${company}.`);
-    } else if (amountStr) {
-      sentences.push(
-        `I am submitting this grievance regarding an order for an amount of ${amountStr}.`
-      );
-    } else {
-      sentences.push('I am submitting this formal grievance regarding my order.');
-    }
+    sentences.push(draftsCopy.introRefund(company || undefined, amountStr || undefined));
   } else if (caseItem.issueType === 'fraud') {
-    if (company && amountStr) {
-      sentences.push(
-        `I am reporting an online payment fraud involving ${company} for an amount of ${amountStr}.`
-      );
-    } else if (company) {
-      sentences.push(`I am reporting an online payment fraud involving ${company}.`);
-    } else if (amountStr) {
-      sentences.push(`I am reporting an online payment fraud for an amount of ${amountStr}.`);
-    } else {
-      sentences.push('I am reporting an online payment fraud.');
-    }
+    sentences.push(draftsCopy.introFraud(company || undefined, amountStr || undefined));
   } else if (caseItem.issueType === 'bank') {
-    if (company && amountStr) {
-      sentences.push(
-        `I am submitting this grievance regarding my account or card with ${company} involving an amount of ${amountStr}.`
-      );
-    } else if (company) {
-      sentences.push(
-        `I am submitting this grievance regarding my account or card with ${company}.`
-      );
-    } else if (amountStr) {
-      sentences.push(
-        `I am submitting this grievance regarding an account or card issue involving an amount of ${amountStr}.`
-      );
-    } else {
-      sentences.push('I am submitting this formal grievance regarding my account or card.');
-    }
+    sentences.push(draftsCopy.introBank(company || undefined, amountStr || undefined));
   } else {
-    // insurance - never use the word transaction
-    if (company && amountStr) {
-      sentences.push(
-        `I am submitting this grievance regarding my claim or policy with ${company} for an amount of ${amountStr}.`
-      );
-    } else if (company) {
-      sentences.push(
-        `I am submitting this grievance regarding my claim or policy with ${company}.`
-      );
-    } else if (amountStr) {
-      sentences.push(
-        `I am submitting this grievance regarding my claim or policy for an amount of ${amountStr}.`
-      );
-    } else {
-      sentences.push('I am submitting this formal grievance regarding my claim or policy.');
-    }
+    sentences.push(draftsCopy.introInsurance(company || undefined, amountStr || undefined));
   }
 
   if (incidentDate) {
-    sentences.push(`The incident occurred on ${incidentDate}.`);
+    sentences.push(draftsCopy.incidentDate(incidentDate));
   }
 
   parts.push(sentences.join(' '));
 
   if (caseItem.issueType === 'fraud' && company) {
     parts.push('');
-    parts.push(`Reported counterparty or recipient: ${company}`);
+    parts.push(draftsCopy.counterparty(company));
   }
 
   const reference = caseItem.reference?.trim() || '';
   if (reference) {
     parts.push('');
     if (caseItem.issueType === 'insurance') {
-      parts.push(`Policy or claim reference: ${reference}`);
+      parts.push(draftsCopy.referencePolicy(reference));
     } else if (caseItem.issueType === 'bank') {
-      parts.push(`Account or dispute reference: ${reference}`);
+      parts.push(draftsCopy.referenceAccount(reference));
     } else if (caseItem.issueType === 'refund') {
-      parts.push(`Order reference ID: ${reference}`);
+      parts.push(draftsCopy.referenceOrder(reference));
     } else {
-      parts.push(`Transaction ID: ${reference}`);
+      parts.push(draftsCopy.referenceTransaction(reference));
     }
   }
 
   const note = caseItem.note?.trim() || '';
   if (note) {
     parts.push('');
-    parts.push('Details:');
+    parts.push(draftsCopy.detailsHeading);
     parts.push(note);
   }
 
   parts.push('');
-  parts.push('Requested action:');
+  parts.push(draftsCopy.requestedActionHeading);
   parts.push(step.request);
 
   parts.push('');
   const userName = caseItem.userName?.trim() || '';
   if (userName) {
-    parts.push('Yours sincerely,');
+    parts.push(draftsCopy.sincerely);
     parts.push(userName);
   } else {
-    parts.push('Thank you.');
+    parts.push(draftsCopy.thankYou);
   }
 
   return parts.join('\n');

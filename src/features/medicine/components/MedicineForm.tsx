@@ -25,6 +25,14 @@ export interface MedicineFormProps {
   onCancel?: () => void;
 }
 
+interface NavigationGuard {
+  addListener: (
+    event: 'beforeRemove',
+    listener: (e: { preventDefault: () => void; data: { action: unknown } }) => void
+  ) => () => void;
+  dispatch: (action: unknown) => void;
+}
+
 export const MedicineForm: React.FC<MedicineFormProps> = ({
   personId,
   medicineId,
@@ -35,9 +43,10 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
   const { colors, radius } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationGuard>();
   const copy = useCopy();
   const { medicines, addMedicine, updateMedicine } = useMedicines();
+  const fieldY = useRef<Record<string, number>>({});
 
   const existing =
     initialMedicine !== undefined
@@ -74,18 +83,19 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
     note: existing?.note || '',
   }));
 
-  const isDirty =
-    name !== initial.name ||
-    brandPrice !== initial.brandPrice ||
-    genericPrice !== initial.genericPrice ||
-    strips !== initial.strips ||
-    lastRefill !== initial.lastRefill ||
-    refillDays !== initial.refillDays ||
-    note !== initial.note;
+  const isDirty = [
+    name !== initial.name,
+    brandPrice !== initial.brandPrice,
+    genericPrice !== initial.genericPrice,
+    strips !== initial.strips,
+    lastRefill !== initial.lastRefill,
+    refillDays !== initial.refillDays,
+    note !== initial.note,
+  ].some(Boolean);
 
   useEffect(() => {
     if (!navigation?.addListener) return;
-    return (navigation as any).addListener('beforeRemove', (e: any) => {
+    return navigation.addListener('beforeRemove', (e) => {
       if (!isDirty || isSubmitting || hasSaved.current) return;
       e.preventDefault();
       Alert.alert(copy.unsavedChanges.title, copy.unsavedChanges.message, [
@@ -104,21 +114,19 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
     if (!name.trim()) {
       setNameError(copy.medicineForm.errors.nameRequired);
       nameInputRef.current?.focus();
-      scrollRef.current?.scrollTo({ y: 0, animated: true });
+      scrollRef.current?.scrollTo({ y: fieldY.current.name ?? 0, animated: true });
       hasError = true;
     }
     if (!brandPrice.trim()) {
       setBrandPriceError(copy.medicineForm.errors.priceRequired);
       if (!hasError) {
         brandPriceInputRef.current?.focus();
-        scrollRef.current?.scrollTo({ y: 80, animated: true });
+        scrollRef.current?.scrollTo({ y: fieldY.current.brandPrice ?? 0, animated: true });
       }
       hasError = true;
     }
     if (hasDateError) {
-      if (!hasError) {
-        scrollRef.current?.scrollToEnd({ animated: true });
-      }
+      if (!hasError) scrollRef.current?.scrollTo({ y: fieldY.current.date ?? 0, animated: true });
       hasError = true;
     }
     if (hasError) return;
@@ -127,18 +135,17 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
     setBrandPriceError(null);
     setIsSubmitting(true);
 
-    const payload = {
-      personId,
-      name: name.trim(),
-      brandPricePerStrip: brandPrice.trim(),
-      genericPricePerStrip: genericPrice.trim() || undefined,
-      stripsPerMonth: Math.max(1, Number(strips) || 1),
-      lastRefillDate: lastRefill.trim() ? (lastRefill as LocalDate) : undefined,
-      refillEveryDays: Math.max(1, Number(refillDays) || 30),
-      note: note.trim() || undefined,
-    };
-
     try {
+      const payload = {
+        personId,
+        name: name.trim(),
+        brandPricePerStrip: brandPrice.trim(),
+        genericPricePerStrip: genericPrice.trim() || undefined,
+        stripsPerMonth: Math.max(1, Number(strips) || 1),
+        lastRefillDate: lastRefill.trim() ? (lastRefill as LocalDate) : undefined,
+        refillEveryDays: Math.max(1, Number(refillDays) || 30),
+        note: note.trim() || undefined,
+      };
       if (existing) await updateMedicine(existing.id, payload);
       else await addMedicine(payload);
       hasSaved.current = true;
@@ -182,6 +189,9 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
               if (nameError) setNameError(null);
             }}
             error={nameError || undefined}
+            onLayout={(e) => {
+              fieldY.current.name = e.nativeEvent.layout.y;
+            }}
           />
           <Field
             ref={brandPriceInputRef}
@@ -194,6 +204,9 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
             }}
             keyboardType="numeric"
             error={brandPriceError || undefined}
+            onLayout={(e) => {
+              fieldY.current.brandPrice = e.nativeEvent.layout.y;
+            }}
           />
           <Field
             label={m.genericPriceLabel}
@@ -230,6 +243,9 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
             onError={setHasDateError}
             helper={m.lastRefillHelper}
             legacyValue={existing?.legacyLastRefillDate}
+            onLayout={(e) => {
+              fieldY.current.date = e.nativeEvent.layout.y;
+            }}
           />
           <Field
             label={m.noteLabel}

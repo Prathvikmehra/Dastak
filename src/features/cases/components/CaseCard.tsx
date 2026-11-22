@@ -38,7 +38,9 @@ export const CaseCard: React.FC<CaseCardProps> = ({ caseItem, onPress, now = new
       <Card
         onPress={onPress}
         style={styles.card}
-        accessibilityLabel={`Resolved case for ${caseItem.company}`}
+        accessibilityLabel={copy.caseCard.resolvedAccessibility(
+          caseItem.company || copy.caseCard.unknownCompany
+        )}
       >
         <View style={styles.cardHeaderRow}>
           <View
@@ -72,7 +74,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({ caseItem, onPress, now = new
         </View>
 
         <Text size="subtitle" color="ink" style={styles.cardCompany}>
-          {caseItem.company || 'Grievance Case'}
+          {caseItem.company || copy.common.grievanceCase}
         </Text>
 
         {recoveredAmount ? (
@@ -101,14 +103,17 @@ export const CaseCard: React.FC<CaseCardProps> = ({ caseItem, onPress, now = new
   } else if (next && remaining !== null) {
     nextStepText = copy.myCases.nextStep(next.who, remaining);
   } else {
-    nextStepText = `Active: ${step.who}`;
+    nextStepText = copy.caseCard.activeStep(step.who);
   }
 
   return (
     <Card
       onPress={onPress}
       style={styles.card}
-      accessibilityLabel={`Case for ${caseItem.company || 'unknown'}, ${amountText}`}
+      accessibilityLabel={copy.caseCard.caseAccessibility(
+        caseItem.company || copy.caseCard.unknownCompany,
+        amountText
+      )}
     >
       <View style={styles.cardHeaderRow}>
         <View

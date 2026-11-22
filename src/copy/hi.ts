@@ -13,6 +13,7 @@ import { hiUiCases } from './hi/uiCases';
 import { hiUiFind } from './hi/uiFind';
 import { hiLadders, hiCallScript } from './hi/ladders';
 import { hiPlaces, hiFollowOfficialSite, hiOtpSafetyTip } from './hi/places';
+import { hiDrafts } from './hi/drafts';
 
 export const hi: Copy = {
   ...hiUiCommon,
@@ -23,4 +24,5 @@ export const hi: Copy = {
   followOfficialSite: hiFollowOfficialSite,
   otpSafetyTip: hiOtpSafetyTip,
   callScript: hiCallScript,
+  drafts: hiDrafts,
 };

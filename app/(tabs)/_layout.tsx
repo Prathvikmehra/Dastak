@@ -4,16 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { useCopy } from '../../src/copy/context';
-
-export function getTabBarBottomPadding(bottomInset: number): number {
-  return Math.max(bottomInset, 8);
-}
+import { getTabBarStyle } from '../../src/lib/tab-bar';
 
 export default function TabsLayout() {
   const { colors } = useTheme();
   const copy = useCopy();
   const insets = useSafeAreaInsets();
-  const bottomInset = getTabBarBottomPadding(insets.bottom);
+  const tabGeometry = getTabBarStyle(insets.bottom);
 
   return (
     <Tabs
@@ -25,13 +22,14 @@ export default function TabsLayout() {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          paddingTop: 8,
-          paddingBottom: bottomInset,
-          minHeight: 48 + bottomInset,
+          height: tabGeometry.height,
+          paddingTop: tabGeometry.paddingTop,
+          paddingBottom: tabGeometry.paddingBottom,
         },
         tabBarLabelStyle: {
           fontSize: 14,
           fontWeight: '600',
+          marginBottom: 4,
         },
         tabBarItemStyle: {
           minHeight: 48, // 48dp minimum touch target

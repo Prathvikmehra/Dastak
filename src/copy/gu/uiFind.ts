@@ -51,10 +51,13 @@ export const guUiFind: UiFindCopy = {
     receivedAmount: (amount: string) => `પ્રાપ્ત રકમ: ${amount}`,
     udgamCaveat:
       'UDGAM માત્ર ભાગીદાર બેંકોને આવરી લે છે; પોસ્ટ ઓફિસ બચત, PF કે વીમાને નહીં. અમે કોઈ રકમ મળવાની બાંયધરી આપતા નથી.',
+    openGuideAccessibility: (title: string) => `${title} માટે માર્ગદર્શિકા ખોલો`,
+    viewRadarForPerson: (name: string) => `${name} માટે રડાર જુઓ`,
   },
 
   placeDetail: {
     title: 'ક્લેમ માર્ગદર્શિકા',
+    checkTitle: (title: string) => `${title} તપાસો`,
     whatThisCovers: 'આમાં શું આવરી લેવાય છે',
     whatToKeepReady: 'શું તૈયાર રાખવું',
     howToSearch: 'શોધ કેવી રીતે કરવી',
@@ -66,6 +69,9 @@ export const guUiFind: UiFindCopy = {
     remindScheduledTitle: 'રિમાઇન્ડર સેટ થયું',
     remindScheduledMessage: (placeName: string) =>
       `અમે તમને ${placeName} પર આગળની કાર્યવાહી માટે 7 દિવસમાં યાદ કરાવીશું.`,
+    reminderBody: (portalName: string) =>
+      `${portalName} સાથે તમારા બિન-દાવાવાળા રેકોર્ડ્સની તપાસ પર ફોલો-અપ કરો.`,
+    reminderSetSuccess: (date: string) => `${date} ના રોજ સવારે 9:00 વાગ્યે રિમાઇન્ડર સેટ થયું.`,
     saveUpdate: 'અપડેટ સાચવો',
     foundAmountLabel: 'રકમ (જો ખબર હોય તો)',
     foundAmountPlaceholder: 'જેમ કે 15000',

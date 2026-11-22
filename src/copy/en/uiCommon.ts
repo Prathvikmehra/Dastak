@@ -27,6 +27,10 @@ export const enUiCommon: UiCommonCopy = {
     call: 'Call',
     website: 'Website',
     share: 'Share',
+    grievanceCase: 'Grievance Case',
+    couldNotOpenDialer: (phone: string) =>
+      `Could not open phone dialer. You can call directly: ${phone}`,
+    couldNotOpenBrowser: (url: string) => `Could not open browser. You can visit directly: ${url}`,
   },
 
   unsavedChanges: {

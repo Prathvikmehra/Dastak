@@ -27,6 +27,10 @@ export const guUiCommon: UiCommonCopy = {
     call: 'કૉલ કરો',
     website: 'વેબસાઇટ',
     share: 'શેર કરો',
+    grievanceCase: 'ફરિયાદ કેસ',
+    couldNotOpenDialer: (phone: string) =>
+      `ફોન ડાયલર ખોલી શકાયું નથી. તમે સીધો કૉલ કરી શકો છો: ${phone}`,
+    couldNotOpenBrowser: (url: string) => `બ્રાઉઝર ખોલી શકાયું નથી. તમે સીધી મુલાકાત લઈ શકો છો: ${url}`,
   },
 
   unsavedChanges: {
