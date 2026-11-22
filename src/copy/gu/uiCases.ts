@@ -20,6 +20,7 @@ export const guUiCases: UiCasesCopy = {
     summaryTitle: (count: number) => `તમારી પાસે ${count} ચાલુ ${count === 1 ? 'કેસ' : 'કેસ'} છે`,
     viewMyCases: 'મારા કેસ જુઓ',
     recoveredBanner: (amount: string) => `અત્યાર સુધી પાછા મળ્યા: ${amount}`,
+    findDoorButton: 'યોગ્ય વિકલ્પ શોધો',
     urgentActionNeeded: (who: string) => `પગલું જરૂરી: ${who}`,
     urgentToday: (who: string) => `આજે: ${who}`,
     urgentNextInDays: (who: string, days: number) => `આગળનું પગલું: ${who} (${days} દિવસમાં)`,

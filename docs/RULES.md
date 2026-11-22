@@ -125,3 +125,4 @@ dastak/
 - **Pure Functions Only**: All escalation calculation, timeline progression, and draft generation logic in `src/features/cases/engine.ts` must be pure functions with zero side-effects.
 - **Injected Clock**: Never call `Date.now()`, `new Date()`, or hidden system clocks inside engine functions. All time calculations accept an explicit `now: Date` parameter to guarantee deterministic testing across timezones and midnight boundaries.
 - **No Network Dependency**: Escalation ladders and draft builders run completely offline on-device with zero network requests. Contacts are sourced strictly from vetted local data.
+- **Evidence of Intent / Smart Routing**: Routing is local keyword matching, always confirmed by the person. Pure function `guessIssue` runs offline on-device without fuzzy AI or network requests; it never auto-creates cases.

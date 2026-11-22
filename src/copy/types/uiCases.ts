@@ -20,6 +20,7 @@ export interface UiCasesCopy {
     summaryTitle: (count: number) => string;
     viewMyCases: string;
     recoveredBanner: (amount: string) => string;
+    findDoorButton: string;
     urgentActionNeeded: (who: string) => string;
     urgentToday: (who: string) => string;
     urgentNextInDays: (who: string, days: number) => string;

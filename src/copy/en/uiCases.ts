@@ -22,6 +22,7 @@ export const enUiCases: UiCasesCopy = {
     summaryTitle: (count: number) => `You have ${count} open case${count === 1 ? '' : 's'}`,
     viewMyCases: 'View my cases',
     recoveredBanner: (amount: string) => `Recovered so far: ${amount}`,
+    findDoorButton: 'Find the right door',
     urgentActionNeeded: (who: string) => `Action needed: ${who}`,
     urgentToday: (who: string) => `Today: ${who}`,
     urgentNextInDays: (who: string, days: number) => `Next: ${who} in ${days} days`,

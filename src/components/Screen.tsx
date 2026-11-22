@@ -16,6 +16,7 @@ export interface ScreenProps {
   scrollable?: boolean;
   style?: ViewStyle;
   contentContainerStyle?: ViewStyle;
+  scrollRef?: React.Ref<React.ElementRef<typeof ScrollView>>;
 }
 
 export const Screen: React.FC<ScreenProps> = ({
@@ -23,6 +24,7 @@ export const Screen: React.FC<ScreenProps> = ({
   scrollable = false,
   style,
   contentContainerStyle,
+  scrollRef,
 }) => {
   const { colors, isDark, spacing } = useTheme();
   const insets = useSafeAreaInsets();
@@ -41,6 +43,7 @@ export const Screen: React.FC<ScreenProps> = ({
       >
         {scrollable ? (
           <ScrollView
+            ref={scrollRef}
             style={styles.fill}
             contentContainerStyle={[
               {

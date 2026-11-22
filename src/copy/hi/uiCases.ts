@@ -20,6 +20,7 @@ export const hiUiCases: UiCasesCopy = {
     summaryTitle: (count: number) => `आपके पास ${count} चालू ${count === 1 ? 'मामला' : 'मामले'} हैं`,
     viewMyCases: 'मेरे मामले देखें',
     recoveredBanner: (amount: string) => `अब तक वापस मिले: ${amount}`,
+    findDoorButton: 'सही विकल्प ढूंढें',
     urgentActionNeeded: (who: string) => `कार्रवाई आवश्यक: ${who}`,
     urgentToday: (who: string) => `आज: ${who}`,
     urgentNextInDays: (who: string, days: number) => `अगला कदम: ${who} (${days} दिनों में)`,
