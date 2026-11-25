@@ -6,6 +6,7 @@ import { LanguageProvider, useCopy } from '../src/copy/context';
 import { CasesProvider } from '../src/features/cases/store';
 import { MoneyProvider } from '../src/features/money/store';
 import { MedicineProvider } from '../src/features/medicine/store';
+import { ErrorBoundary } from '../src/components';
 
 // Set notification handler once at app start with current SDK 58 types
 Notifications.setNotificationHandler({
@@ -63,13 +64,15 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <CasesProvider>
-          <MoneyProvider>
-            <MedicineProvider>
-              <RootLayoutContent />
-            </MedicineProvider>
-          </MoneyProvider>
-        </CasesProvider>
+        <ErrorBoundary>
+          <CasesProvider>
+            <MoneyProvider>
+              <MedicineProvider>
+                <RootLayoutContent />
+              </MedicineProvider>
+            </MoneyProvider>
+          </CasesProvider>
+        </ErrorBoundary>
       </LanguageProvider>
     </ThemeProvider>
   );

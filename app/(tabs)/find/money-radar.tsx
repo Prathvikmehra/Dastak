@@ -19,6 +19,16 @@ export default function MoneyRadarScreen() {
   const places = getLocalizedPlaces(copy);
   const { people, activePersonId, setActivePersonId, activePerson, records, summary } = useMoney();
 
+  const handleOpenPlace = React.useCallback(
+    (placeId: string) => {
+      router.push({
+        pathname: '/(tabs)/find/place-detail',
+        params: { placeId, personId: activePersonId },
+      });
+    },
+    [router, activePersonId]
+  );
+
   return (
     <Screen scrollable>
       {/* Person switcher row */}
@@ -104,12 +114,7 @@ export default function MoneyRadarScreen() {
           return (
             <Card
               key={place.id}
-              onPress={() =>
-                router.push({
-                  pathname: '/find/place-detail',
-                  params: { placeId: place.id, personId: activePersonId },
-                })
-              }
+              onPress={() => handleOpenPlace(place.id)}
               style={styles.placeCard}
               accessibilityLabel={copy.moneyRadar.openGuideAccessibility(place.title)}
             >

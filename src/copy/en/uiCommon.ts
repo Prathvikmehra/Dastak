@@ -54,4 +54,9 @@ export const enUiCommon: UiCommonCopy = {
     invalidError: 'That date does not look right',
     legacySaved: 'Saved date from earlier:',
   },
+
+  errorBoundary: {
+    message: 'Something went wrong. Your saved cases are safe on this phone.',
+    tryAgain: 'Try again',
+  },
 };

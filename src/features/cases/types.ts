@@ -37,6 +37,7 @@ export interface CaseStore {
   create(input: CaseInput, now?: Date): Promise<Case>;
   update(id: string, updates: Partial<Omit<Case, 'id' | 'createdAt'>>): Promise<Case>;
   resolve(id: string, recoveredAmount?: number, now?: Date): Promise<Case>;
+  clear?(): Promise<void>;
 }
 
 export interface LadderStep {

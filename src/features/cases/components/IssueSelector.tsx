@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Text } from '../../../components';
+import { Text } from '../../../components/Text';
 import { useTheme } from '../../../theme/ThemeContext';
 import { IssueType } from '../types';
 import { useCopy } from '../../../copy/context';

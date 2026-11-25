@@ -25,7 +25,7 @@ export const EvidenceChecklist: React.FC<EvidenceChecklistProps> = ({
   return (
     <Card style={styles.card}>
       <View style={styles.headerRow}>
-        <Text size="subtitle" color="ink">
+        <Text size="subtitle" color="ink" accessibilityRole="header">
           {copy.caseDetail.evidence.title}
         </Text>
         <Text size="caption" color="primary" style={styles.progressText}>
@@ -33,7 +33,11 @@ export const EvidenceChecklist: React.FC<EvidenceChecklistProps> = ({
         </Text>
       </View>
 
-      <View style={[styles.progressBarTrack, { backgroundColor: colors.border }]}>
+      <View
+        accessibilityRole="progressbar"
+        accessibilityValue={{ min: 0, max: progress.total, now: progress.done }}
+        style={[styles.progressBarTrack, { backgroundColor: colors.border }]}
+      >
         <View
           style={[
             styles.progressBarFill,
@@ -58,7 +62,7 @@ export const EvidenceChecklist: React.FC<EvidenceChecklistProps> = ({
               onPress={() => onToggleItem(item)}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: isChecked }}
-              accessibilityLabel={`${item}, ${isChecked ? 'ready' : 'not ready'}`}
+              accessibilityLabel={item}
               style={[
                 styles.checklistItem,
                 {

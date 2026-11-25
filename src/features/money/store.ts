@@ -53,6 +53,7 @@ export interface MoneyContextValue {
       note?: string;
     }
   ) => Promise<PlaceRecord>;
+  clearMoney: () => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -148,6 +149,13 @@ export function MoneyProvider({
     [store, activePersonId]
   );
 
+  const clearMoney = useCallback(async (): Promise<void> => {
+    await store.clear();
+    setPeople([{ ...DEFAULT_PERSON }]);
+    setActivePersonIdState('me');
+    setRecords({});
+  }, [store]);
+
   const activePerson = people.find((p) => p.id === activePersonId) || people[0] || DEFAULT_PERSON;
   const summary = summarize(records);
 
@@ -167,6 +175,7 @@ export function MoneyProvider({
     removePerson,
     updatePlace,
     updateRecord: updatePlace,
+    clearMoney,
     refresh: loadData,
   };
 

@@ -2,9 +2,12 @@ import { KeyValueStorage, asyncStorageAdapter, backupCorruptData } from '../case
 import { logger } from '../../lib/logger';
 import { detectDeviceLanguage } from '../../lib/locale';
 
+export type ThemePreference = 'system' | 'light' | 'dark';
+
 export interface UserPreferences {
   remindersEnabled: boolean;
   language: string;
+  theme?: ThemePreference;
 }
 
 export const PREFERENCES_STORAGE_KEY = 'dastak_prefs_v1';
@@ -13,6 +16,7 @@ export const CURRENT_PREFS_VERSION = 1;
 export const DEFAULT_PREFERENCES: UserPreferences = {
   remindersEnabled: false,
   language: detectDeviceLanguage(),
+  theme: 'system',
 };
 
 export interface StoredPreferencesDocument {
@@ -34,16 +38,22 @@ export function migratePreferences(raw: unknown): UserPreferences {
       ? (obj.preferences as Record<string, unknown>)
       : obj;
 
+  const rawTheme = prefsSource.theme;
+  const theme: ThemePreference =
+    rawTheme === 'light' || rawTheme === 'dark' || rawTheme === 'system' ? rawTheme : 'system';
+
   return {
     remindersEnabled: Boolean(prefsSource.remindersEnabled),
     language:
       typeof prefsSource.language === 'string' ? prefsSource.language : detectDeviceLanguage(),
+    theme,
   };
 }
 
 export interface PreferencesStore {
   get(): Promise<UserPreferences>;
   set(updates: Partial<UserPreferences>): Promise<UserPreferences>;
+  reset?(preserveLanguage?: boolean): Promise<UserPreferences>;
   hadCorruptedData: boolean;
 }
 
@@ -119,6 +129,17 @@ export class PersistentPreferencesStore implements PreferencesStore {
     this.prefs = {
       ...this.prefs,
       ...updates,
+    };
+    await this.persist();
+    return { ...this.prefs };
+  }
+
+  async reset(preserveLanguage = true): Promise<UserPreferences> {
+    await this.ensureInitialized();
+    const currentLang = this.prefs.language;
+    this.prefs = {
+      ...DEFAULT_PREFERENCES,
+      language: preserveLanguage ? currentLang : DEFAULT_PREFERENCES.language,
     };
     await this.persist();
     return { ...this.prefs };

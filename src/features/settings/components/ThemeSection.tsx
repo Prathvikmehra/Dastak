@@ -21,6 +21,34 @@ export const ThemeSection: React.FC = () => {
       <View style={styles.row}>
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel={copy.settings.themeSystem}
+          onPress={() => setMode('system')}
+          style={[
+            styles.button,
+            {
+              borderRadius: radius.button,
+              borderColor: mode === 'system' ? colors.primary : colors.border,
+              backgroundColor: mode === 'system' ? colors.surfaceAlt : colors.surface,
+            },
+          ]}
+        >
+          <Ionicons
+            name="phone-portrait-outline"
+            size={18}
+            color={mode === 'system' ? colors.primary : colors.ink}
+          />
+          <Text
+            size="caption"
+            color={mode === 'system' ? 'primary' : 'ink'}
+            style={{ fontWeight: mode === 'system' ? '600' : '400' }}
+          >
+            {copy.settings.themeSystem}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={copy.settings.themeLight}
           onPress={() => setMode('light')}
           style={[
             styles.button,
@@ -33,11 +61,11 @@ export const ThemeSection: React.FC = () => {
         >
           <Ionicons
             name="sunny-outline"
-            size={20}
+            size={18}
             color={mode === 'light' ? colors.primary : colors.ink}
           />
           <Text
-            size="body"
+            size="caption"
             color={mode === 'light' ? 'primary' : 'ink'}
             style={{ fontWeight: mode === 'light' ? '600' : '400' }}
           >
@@ -47,6 +75,7 @@ export const ThemeSection: React.FC = () => {
 
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel={copy.settings.themeDark}
           onPress={() => setMode('dark')}
           style={[
             styles.button,
@@ -59,11 +88,11 @@ export const ThemeSection: React.FC = () => {
         >
           <Ionicons
             name="moon-outline"
-            size={20}
+            size={18}
             color={mode === 'dark' ? colors.primary : colors.ink}
           />
           <Text
-            size="body"
+            size="caption"
             color={mode === 'dark' ? 'primary' : 'ink'}
             style={{ fontWeight: mode === 'dark' ? '600' : '400' }}
           >

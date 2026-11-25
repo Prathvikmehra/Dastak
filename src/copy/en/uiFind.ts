@@ -190,12 +190,21 @@ export const enUiFind: UiFindCopy = {
     openSettingsAccessibility: 'Open phone settings',
     themeTitle: 'Display mode',
     themeSubtitle: 'Light mode is recommended for reading outdoors and in direct sunlight.',
+    themeSystem: 'System',
     themeLight: 'Light',
     themeDark: 'Dark',
     privacyTitle: 'Privacy guarantee',
     privacySubtitle:
       'No data leaves your device unless you choose to share a complaint letter. Your complaint drafts, case numbers, and name stay safely on your phone.',
     corruptBanner: 'We could not read your saved cases. A backup was kept.',
+    storageErrorBanner: 'Could not save changes to your phone. Please check available storage.',
+    deleteAllTitle: 'Delete all my data',
+    deleteAllSubtitle: 'Wipes all cases, medicines, people, and reminders from this phone.',
+    deleteAllConfirmTitle: 'Delete all data?',
+    deleteAllConfirmMessage:
+      'This cannot be undone. All your saved complaints, notes, and records will be permanently removed.',
+    deleteAllConfirmButton: 'Delete everything',
+    deleteAllSuccessMessage: 'All data has been deleted.',
     reminderNotificationTitle: 'Case update reminder',
     reminderNotificationBody: (company: string, who: string) =>
       `Your case with ${company} moves to the ${who} today.`,

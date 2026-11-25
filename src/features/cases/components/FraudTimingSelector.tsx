@@ -37,6 +37,7 @@ export const FraudTimingSelector: React.FC<FraudTimingSelectorProps> = ({ select
               onPress={() => onSelect(item.id)}
               accessibilityRole="radio"
               accessibilityState={{ selected: isSelected }}
+              accessibilityLabel={item.label}
               style={[
                 styles.timingCard,
                 {

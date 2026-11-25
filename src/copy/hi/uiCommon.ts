@@ -53,4 +53,9 @@ export const hiUiCommon: UiCommonCopy = {
     invalidError: 'यह तारीख सही नहीं लग रही है',
     legacySaved: 'पहले से सहेजी गई तारीख:',
   },
+
+  errorBoundary: {
+    message: 'कुछ गलत हो गया। आपके सहेजे गए मामले इस फोन पर सुरक्षित हैं।',
+    tryAgain: 'पुनः प्रयास करें',
+  },
 };

@@ -185,12 +185,21 @@ export const guUiFind: UiFindCopy = {
     openSettingsAccessibility: 'ફોન સેટિંગ્સ ખોલો',
     themeTitle: 'ડિસ્પ્લે મોડ',
     themeSubtitle: 'તડકામાં અને બહાર વાંચવા માટે લાઇટ મોડની ભલામણ કરવામાં આવે છે.',
+    themeSystem: 'સિસ્ટમ',
     themeLight: 'લાઇટ',
     themeDark: 'ડાર્ક',
     privacyTitle: 'ગોપનીયતાની ખાતરી',
     privacySubtitle:
       'જ્યાં સુધી તમે ફરિયાદ પત્ર શેર કરવાનું પસંદ ન કરો, ત્યાં સુધી કોઈ ડેટા તમારા ફોનમાંથી બહાર જતો નથી. તમારા ડ્રાફ્ટ, કેસ નંબર અને નામ તમારા ફોનમાં સુરક્ષિત રહે છે.',
     corruptBanner: 'અમે તમારા સંગ્રહિત કેસ વાંચી શક્યા નથી. બેકઅપ સુરક્ષિત રાખવામાં આવ્યો છે.',
+    storageErrorBanner: 'ફોન પર ફેરફારો સાચવી શકાયા નથી. કૃપા કરીને તપાસો કે સ્ટોરેજ ઉપલબ્ધ છે કે નહીં.',
+    deleteAllTitle: 'મારો બધો ડેટા કાઢી નાખો',
+    deleteAllSubtitle: 'આ ફોનમાંથી બધા કેસ, દવાઓ, લોકો અને રિમાઇન્ડર્સ ભૂંસી નાખે છે.',
+    deleteAllConfirmTitle: 'બધો ડેટા કાઢી નાખવો છે?',
+    deleteAllConfirmMessage:
+      'આ પાછું ખેંચી શકાશે નહીં. તમારી બધી સાચવેલી ફરિયાદો, નોંધો અને રેકોર્ડ કાયમ માટે કાઢી નાખવામાં આવશે.',
+    deleteAllConfirmButton: 'બધું કાઢી નાખો',
+    deleteAllSuccessMessage: 'બધો ડેટા કાઢી નાખવામાં આવ્યો છે.',
     reminderNotificationTitle: 'કેસ અપડેટ રિમાઇન્ડર',
     reminderNotificationBody: (company: string, who: string) =>
       `${company} સાથેનો તમારો કેસ આજે ${who} પાસે જાય છે.`,

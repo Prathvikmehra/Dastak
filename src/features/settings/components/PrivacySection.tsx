@@ -1,13 +1,45 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Card, Text } from '../../../components';
+import { Card, Text, Button } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { useCopy } from '../../../copy/context';
+import { useCases } from '../../cases/store';
+import { useMoney } from '../../money/store';
+import { useMedicines } from '../../medicine/store';
+import { deleteAllUserData } from '../delete-all';
 
 export const PrivacySection: React.FC = () => {
   const { colors } = useTheme();
   const copy = useCopy();
+  const { clearCases } = useCases();
+  const { clearMoney } = useMoney();
+  const { clearMedicines } = useMedicines();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAll = () => {
+    Alert.alert(copy.settings.deleteAllConfirmTitle, copy.settings.deleteAllConfirmMessage, [
+      { text: copy.common.cancel, style: 'cancel' },
+      {
+        text: copy.settings.deleteAllConfirmButton,
+        style: 'destructive',
+        onPress: async () => {
+          setIsDeleting(true);
+          try {
+            await clearCases();
+            await clearMoney();
+            await clearMedicines();
+            await deleteAllUserData();
+            Alert.alert(copy.common.done, copy.settings.deleteAllSuccessMessage);
+          } catch {
+            // Ignore failure or let UI state show
+          } finally {
+            setIsDeleting(false);
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <Card style={styles.card}>
@@ -20,6 +52,25 @@ export const PrivacySection: React.FC = () => {
       <Text size="body" color="ink" style={styles.description}>
         {copy.settings.privacySubtitle}
       </Text>
+
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+      <Text size="subtitle" color="danger" style={styles.dangerTitle}>
+        {copy.settings.deleteAllTitle}
+      </Text>
+      <Text size="body" color="muted" style={styles.dangerSubtitle}>
+        {copy.settings.deleteAllSubtitle}
+      </Text>
+
+      <Button
+        label={copy.settings.deleteAllConfirmButton}
+        variant="quiet"
+        onPress={handleDeleteAll}
+        loading={isDeleting}
+        accessibilityRole="button"
+        accessibilityLabel={copy.settings.deleteAllTitle}
+        style={styles.deleteButton}
+      />
     </Card>
   );
 };
@@ -39,5 +90,20 @@ const styles = StyleSheet.create({
   },
   description: {
     lineHeight: 22,
+  },
+  divider: {
+    height: 1,
+    marginVertical: 16,
+  },
+  dangerTitle: {
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  dangerSubtitle: {
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  deleteButton: {
+    marginTop: 4,
   },
 });

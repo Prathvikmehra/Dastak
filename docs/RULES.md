@@ -117,10 +117,30 @@ dastak/
 - **Local Escalation Reminders**: Future ladder milestones are planned via pure function `planReminders` firing at 9:00 AM local time on that step's day. Local notifications are managed with `expo-notifications`. Permission is requested with a one-screen explanation only after the first case is saved, never nags if declined, and can be toggled in Settings.
 - **Type Safety**: TypeScript strict mode must pass with zero errors (`npx tsc --noEmit`).
 - **Health Checks**: `npx expo-doctor` must always pass with zero failures.
+- **File Length Policy**: Every file must not exceed 270 lines (with modular split targets $\le 250$ lines), strictly verified by `src/lib/file-length.test.ts`.
 
 ---
 
-## 8. Case Engine
+## 8. Accessibility Rules (WCAG 2.1 AA & TalkBack)
+
+1. **Semantic Roles & Labels**:
+   - Every interactive element (Pressable, Button, chip, checklist row) must have explicit `accessibilityRole` and localized `accessibilityLabel` from copy.
+   - Checklist rows use `accessibilityRole="checkbox"` with `accessibilityState={{ checked: isChecked }}`.
+   - Progress bars expose `accessibilityRole="progressbar"` with `accessibilityValue={{ min, max, now }}`.
+   - Section and screen headers use `accessibilityRole="header"`.
+   - Urgent banners use `accessibilityRole="alert"` with `accessibilityLiveRegion="polite"` for TalkBack announcements.
+2. **Font Scaling**:
+   - Never set `allowFontScaling={false}`. Dynamic Type and large system font scaling must be fully supported across all components.
+3. **Touch Targets & Dimensions**:
+   - Interactive elements must maintain a minimum touch target of `48dp` (`minHeight >= 48`, `minWidth >= 48`).
+   - Fixed numeric heights on containers, cards, or text wrappers are strictly forbidden. Fixed heights are permitted only for line separators ($\le 6$dp), symmetrical icon circles, and dynamic tab bars.
+4. **Motion & Contrast**:
+   - Respect system `reduce-motion` preferences.
+   - Maintain $\ge 4.5:1$ contrast ratio for all text and background combinations in both light and dark modes.
+
+---
+
+## 9. Case Engine
 
 - **Pure Functions Only**: All escalation calculation, timeline progression, and draft generation logic in `src/features/cases/engine.ts` must be pure functions with zero side-effects.
 - **Injected Clock**: Never call `Date.now()`, `new Date()`, or hidden system clocks inside engine functions. All time calculations accept an explicit `now: Date` parameter to guarantee deterministic testing across timezones and midnight boundaries.

@@ -7,6 +7,7 @@ import { useMoney } from '../../../src/features/money/store';
 import { useMedicines } from '../../../src/features/medicine/store';
 import { PersonSwitcher } from '../../../src/features/money/components/PersonSwitcher';
 import { MedicineCard } from '../../../src/features/medicine/components/MedicineCard';
+import { Medicine } from '../../../src/features/medicine/types';
 import { formatRupees } from '../../../src/lib/formatters';
 import { openWeb } from '../../../src/lib/links';
 import { useCopy } from '../../../src/copy/context';
@@ -25,6 +26,16 @@ export default function MedicineSaverScreen() {
   const handleOpenJanAushadhi = async () => {
     await openWeb('https://janaushadhi.gov.in');
   };
+
+  const handleEdit = React.useCallback(
+    (med: Medicine) => {
+      router.push({
+        pathname: '/(tabs)/find/medicine-form',
+        params: { personId: activePersonId, medicineId: med.id },
+      });
+    },
+    [router, activePersonId]
+  );
 
   return (
     <Screen scrollable>
@@ -94,17 +105,7 @@ export default function MedicineSaverScreen() {
       ) : (
         <View style={styles.medsList}>
           {list.map((m) => (
-            <MedicineCard
-              key={m.id}
-              medicine={m}
-              onEdit={(med) => {
-                router.push({
-                  pathname: '/(tabs)/find/medicine-form',
-                  params: { personId: activePersonId, medicineId: med.id },
-                });
-              }}
-              onDelete={deleteMedicine}
-            />
+            <MedicineCard key={m.id} medicine={m} onEdit={handleEdit} onDelete={deleteMedicine} />
           ))}
         </View>
       )}

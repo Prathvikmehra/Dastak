@@ -6,3 +6,5 @@ export * from './EmptyState';
 export * from './Screen';
 export * from './HeaderActions';
 export * from './DateField';
+export * from './ErrorBoundary';
+export * from './StorageErrorBanner';

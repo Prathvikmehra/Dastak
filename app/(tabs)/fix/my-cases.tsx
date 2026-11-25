@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Screen, Text, Card, EmptyState, Button } from '../../../src/components';
@@ -12,16 +12,19 @@ export default function MyCasesScreen() {
   const { openCases, resolvedCases, cases } = useCases();
   const copy = useCopy();
 
-  const handleOpenDetail = (caseItem: Case) => {
-    router.push({
-      pathname: '/fix/case-detail',
-      params: { id: caseItem.id },
-    });
-  };
+  const handleOpenDetail = useCallback(
+    (caseItem: Case) => {
+      router.push({
+        pathname: '/fix/case-detail',
+        params: { id: caseItem.id },
+      });
+    },
+    [router]
+  );
 
-  const handleStartNew = () => {
+  const handleStartNew = useCallback(() => {
     router.push('/fix/new-case');
-  };
+  }, [router]);
 
   const now = new Date();
 

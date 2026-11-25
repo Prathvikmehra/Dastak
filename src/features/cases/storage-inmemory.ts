@@ -69,4 +69,8 @@ export class InMemoryCaseStore implements CaseStore {
     this.cases.set(id, updated);
     return updated;
   }
+
+  async clear(): Promise<void> {
+    this.cases.clear();
+  }
 }

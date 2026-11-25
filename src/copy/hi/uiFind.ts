@@ -186,12 +186,21 @@ export const hiUiFind: UiFindCopy = {
     openSettingsAccessibility: 'फोन सेटिंग्स खोलें',
     themeTitle: 'डिस्प्ले मोड',
     themeSubtitle: 'धूप में और बाहर पढ़ने के लिए लाइट मोड की सलाह दी जाती है।',
+    themeSystem: 'सिस्टम',
     themeLight: 'लाइट',
     themeDark: 'डार्क',
     privacyTitle: 'गोपनीयता की गारंटी',
     privacySubtitle:
       'जब तक आप शिकायत पत्र साझा करने का विकल्प नहीं चुनते, कोई भी डेटा आपके फोन से बाहर नहीं जाता। आपके ड्राफ्ट, केस नंबर और नाम सुरक्षित रूप से आपके फोन पर रहते हैं।',
     corruptBanner: 'हम आपके सहेजे गए मामलों को नहीं पढ़ सके। बैकअप सुरक्षित रखा गया है।',
+    storageErrorBanner: 'फोन पर बदलाव सहेजे नहीं जा सके। कृपया देखें कि स्टोरेज खाली है या नहीं।',
+    deleteAllTitle: 'मेरा सारा डेटा हटाएं',
+    deleteAllSubtitle: 'इस फोन से सभी मामले, दवाएं, लोग और रिमाइंडर हटा देता है।',
+    deleteAllConfirmTitle: 'सारा डेटा हटाएं?',
+    deleteAllConfirmMessage:
+      'यह वापस नहीं किया जा सकता। आपकी सभी सहेजी गई शिकायतें, नोट्स और रिकॉर्ड हमेशा के लिए हटा दिए जाएंगे।',
+    deleteAllConfirmButton: 'सब कुछ हटाएं',
+    deleteAllSuccessMessage: 'सारा डेटा हटा दिया गया है।',
     reminderNotificationTitle: 'मामला अपडेट रिमाइंडर',
     reminderNotificationBody: (company: string, who: string) =>
       `${company} के साथ आपका मामला आज ${who} के पास जाता है।`,

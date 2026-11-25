@@ -40,4 +40,8 @@ export interface UiCommonCopy {
     invalidError: string;
     legacySaved: string;
   };
+  errorBoundary: {
+    message: string;
+    tryAgain: string;
+  };
 }

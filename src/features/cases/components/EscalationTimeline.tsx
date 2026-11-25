@@ -24,11 +24,19 @@ export const EscalationTimeline: React.FC<EscalationTimelineProps> = ({
 
   return (
     <Card style={styles.card}>
-      <Text size="subtitle" color="ink" style={styles.title}>
+      <Text size="subtitle" color="ink" accessibilityRole="header" style={styles.title}>
         {copy.caseDetail.timeline.title}
       </Text>
 
-      <View style={styles.timelineList}>
+      <View
+        accessibilityRole="progressbar"
+        accessibilityValue={{
+          min: 1,
+          max: steps.length,
+          now: Math.max(1, steps.findIndex((s) => s.id === activeStepId) + 1),
+        }}
+        style={styles.timelineList}
+      >
         {steps.map((s, index) => {
           const isCurrent = s.id === activeStepId;
           const isPast = s.dayOffset < activeDayOffset;

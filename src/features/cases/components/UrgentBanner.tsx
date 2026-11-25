@@ -21,32 +21,39 @@ export const UrgentBanner: React.FC<UrgentBannerProps> = ({ caseItem, onCall1930
       : copy.caseDetail.fraudUrgent.bannerBodyRecent;
 
   return (
-    <Card
-      style={[
-        styles.fraudBanner,
-        {
-          backgroundColor: colors.dangerSurface,
-          borderColor: colors.danger,
-          borderRadius: radius.card,
-        },
-      ]}
-    >
-      <View style={styles.fraudBannerHeader}>
-        <Ionicons name="warning" size={24} color={colors.danger} />
-        <Text size="subtitle" color="danger" style={styles.fraudBannerTitle}>
-          {copy.caseDetail.fraudUrgent.bannerTitle}
+    <View accessibilityRole="alert" accessibilityLiveRegion="polite">
+      <Card
+        style={[
+          styles.fraudBanner,
+          {
+            backgroundColor: colors.dangerSurface,
+            borderColor: colors.danger,
+            borderRadius: radius.card,
+          },
+        ]}
+      >
+        <View style={styles.fraudBannerHeader}>
+          <Ionicons name="warning" size={24} color={colors.danger} />
+          <Text
+            size="subtitle"
+            color="danger"
+            accessibilityRole="header"
+            style={styles.fraudBannerTitle}
+          >
+            {copy.caseDetail.fraudUrgent.bannerTitle}
+          </Text>
+        </View>
+        <Text size="body" color="ink" style={styles.fraudBannerBody}>
+          {bodyText}
         </Text>
-      </View>
-      <Text size="body" color="ink" style={styles.fraudBannerBody}>
-        {bodyText}
-      </Text>
-      <Button
-        label={copy.caseDetail.fraudUrgent.callButton}
-        onPress={onCall1930}
-        icon={<Ionicons name="call" size={20} color={colors.onAction} />}
-        style={styles.call1930Button}
-      />
-    </Card>
+        <Button
+          label={copy.caseDetail.fraudUrgent.callButton}
+          onPress={onCall1930}
+          icon={<Ionicons name="call" size={20} color={colors.onAction} />}
+          style={styles.call1930Button}
+        />
+      </Card>
+    </View>
   );
 };
 

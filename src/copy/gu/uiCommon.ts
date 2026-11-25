@@ -54,4 +54,9 @@ export const guUiCommon: UiCommonCopy = {
     invalidError: 'આ તારીખ યોગ્ય લાગતી નથી',
     legacySaved: 'પહેલાથી સંગ્રહિત તારીખ:',
   },
+
+  errorBoundary: {
+    message: 'કંઈક ખોટું થયું. તમારા સાચવેલા કેસ આ ફોન પર સુરક્ષિત છે.',
+    tryAgain: 'ફરી પ્રયાસ કરો',
+  },
 };

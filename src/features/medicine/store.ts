@@ -35,6 +35,7 @@ export interface MedicinesContextValue {
   personMedicines: (personId: string) => Medicine[];
   getTotalsForPerson: (personId: string) => MedicineTotals;
   personTotals: (personId: string) => MedicineTotals;
+  clearMedicines: () => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -113,6 +114,11 @@ export const MedicinesProvider: React.FC<{
     [store, refresh]
   );
 
+  const clearMedicines = useCallback(async (): Promise<void> => {
+    await store.clear();
+    setMedicines([]);
+  }, [store]);
+
   const getMedicinesForPerson = useCallback(
     (personId: string): Medicine[] => {
       return medicines.filter((m) => m.personId === personId);
@@ -148,6 +154,7 @@ export const MedicinesProvider: React.FC<{
         personMedicines: getMedicinesForPerson,
         getTotalsForPerson,
         personTotals: getTotalsForPerson,
+        clearMedicines,
         refresh,
       },
     },

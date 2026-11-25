@@ -21,25 +21,99 @@ export interface CaseCardProps {
   now?: Date;
 }
 
-export const CaseCard: React.FC<CaseCardProps> = ({ caseItem, onPress, now = new Date() }) => {
-  const { colors, radius } = useTheme();
-  const copy = useCopy();
-  const ladder = getLocalizedLadder(caseItem.issueType, copy);
-  const isResolved = Boolean(caseItem.resolvedAt);
+export const CaseCard: React.FC<CaseCardProps> = React.memo(
+  ({ caseItem, onPress, now = new Date() }) => {
+    const { colors, radius } = useTheme();
+    const copy = useCopy();
+    const ladder = getLocalizedLadder(caseItem.issueType, copy);
+    const isResolved = Boolean(caseItem.resolvedAt);
 
-  const parsed = parseAmount(caseItem.amount);
-  const amountText = parsed !== null ? formatRupees(parsed) : caseItem.amount;
+    const parsed = parseAmount(caseItem.amount);
+    const amountText = parsed !== null ? formatRupees(parsed) : caseItem.amount;
 
-  if (isResolved) {
-    const recoveredAmount =
-      caseItem.recoveredAmount !== undefined ? formatRupees(caseItem.recoveredAmount) : undefined;
+    if (isResolved) {
+      const recoveredAmount =
+        caseItem.recoveredAmount !== undefined ? formatRupees(caseItem.recoveredAmount) : undefined;
+
+      return (
+        <Card
+          onPress={onPress}
+          style={styles.card}
+          accessibilityLabel={copy.caseCard.resolvedAccessibility(
+            caseItem.company || copy.caseCard.unknownCompany
+          )}
+        >
+          <View style={styles.cardHeaderRow}>
+            <View
+              style={[
+                styles.issueChip,
+                {
+                  backgroundColor: colors.surfaceAlt,
+                  borderRadius: radius.button,
+                },
+              ]}
+            >
+              <Text size="caption" color="muted" style={styles.chipText}>
+                {ladder.title}
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.resolvedBadge,
+                {
+                  backgroundColor: colors.surfaceAlt,
+                  borderColor: colors.success,
+                  borderRadius: radius.button,
+                },
+              ]}
+            >
+              <Ionicons name="checkmark-circle" size={14} color={colors.success} />
+              <Text size="caption" color="success" style={styles.resolvedBadgeText}>
+                {copy.myCases.resolvedBadge}
+              </Text>
+            </View>
+          </View>
+
+          <Text size="subtitle" color="ink" style={styles.cardCompany}>
+            {caseItem.company || copy.common.grievanceCase}
+          </Text>
+
+          {recoveredAmount ? (
+            <Text size="body" color="success" style={styles.cardAmount}>
+              {copy.myCases.recoveredBadge(recoveredAmount)}
+            </Text>
+          ) : amountText ? (
+            <Text size="body" color="muted" style={styles.cardAmount}>
+              {amountText}
+            </Text>
+          ) : null}
+        </Card>
+      );
+    }
+
+    // Open case
+    const elapsed = daysElapsed(caseItem, now);
+    const step = currentStep(caseItem, now, ladder);
+    const next = nextStep(caseItem, now, ladder);
+    const remaining = daysUntilNext(caseItem, now);
+    const isOverdue = hasEscalatedPastFirstStep(caseItem, now);
+
+    let nextStepText = '';
+    if (isOverdue) {
+      nextStepText = copy.myCases.overdueStep(step.who);
+    } else if (next && remaining !== null) {
+      nextStepText = copy.myCases.nextStep(next.who, remaining);
+    } else {
+      nextStepText = copy.caseCard.activeStep(step.who);
+    }
 
     return (
       <Card
         onPress={onPress}
         style={styles.card}
-        accessibilityLabel={copy.caseCard.resolvedAccessibility(
-          caseItem.company || copy.caseCard.unknownCompany
+        accessibilityLabel={copy.caseCard.caseAccessibility(
+          caseItem.company || copy.caseCard.unknownCompany,
+          amountText
         )}
       >
         <View style={styles.cardHeaderRow}>
@@ -52,116 +126,46 @@ export const CaseCard: React.FC<CaseCardProps> = ({ caseItem, onPress, now = new
               },
             ]}
           >
-            <Text size="caption" color="muted" style={styles.chipText}>
+            <Text size="caption" color="primary" style={styles.chipText}>
               {ladder.title}
             </Text>
           </View>
-          <View
-            style={[
-              styles.resolvedBadge,
-              {
-                backgroundColor: colors.surfaceAlt,
-                borderColor: colors.success,
-                borderRadius: radius.button,
-              },
-            ]}
-          >
-            <Ionicons name="checkmark-circle" size={14} color={colors.success} />
-            <Text size="caption" color="success" style={styles.resolvedBadgeText}>
-              {copy.myCases.resolvedBadge}
-            </Text>
-          </View>
+          <Text size="caption" color="muted">
+            {copy.myCases.daysOpen(elapsed)}
+          </Text>
         </View>
 
         <Text size="subtitle" color="ink" style={styles.cardCompany}>
-          {caseItem.company || copy.common.grievanceCase}
+          {caseItem.company || 'Grievance Case'}
         </Text>
 
-        {recoveredAmount ? (
-          <Text size="body" color="success" style={styles.cardAmount}>
-            {copy.myCases.recoveredBadge(recoveredAmount)}
-          </Text>
-        ) : amountText ? (
-          <Text size="body" color="muted" style={styles.cardAmount}>
+        {amountText ? (
+          <Text size="body" color="action" style={styles.cardAmount}>
             {amountText}
           </Text>
         ) : null}
+
+        <View style={styles.nextStepRow}>
+          <Ionicons
+            name={isOverdue ? 'alert-circle' : 'arrow-forward-circle'}
+            size={16}
+            color={isOverdue ? colors.danger : colors.primary}
+          />
+          <Text
+            size="caption"
+            color={isOverdue ? 'danger' : 'muted'}
+            style={styles.nextStepText}
+            numberOfLines={1}
+          >
+            {nextStepText}
+          </Text>
+        </View>
       </Card>
     );
   }
+);
 
-  // Open case
-  const elapsed = daysElapsed(caseItem, now);
-  const step = currentStep(caseItem, now, ladder);
-  const next = nextStep(caseItem, now, ladder);
-  const remaining = daysUntilNext(caseItem, now);
-  const isOverdue = hasEscalatedPastFirstStep(caseItem, now);
-
-  let nextStepText = '';
-  if (isOverdue) {
-    nextStepText = copy.myCases.overdueStep(step.who);
-  } else if (next && remaining !== null) {
-    nextStepText = copy.myCases.nextStep(next.who, remaining);
-  } else {
-    nextStepText = copy.caseCard.activeStep(step.who);
-  }
-
-  return (
-    <Card
-      onPress={onPress}
-      style={styles.card}
-      accessibilityLabel={copy.caseCard.caseAccessibility(
-        caseItem.company || copy.caseCard.unknownCompany,
-        amountText
-      )}
-    >
-      <View style={styles.cardHeaderRow}>
-        <View
-          style={[
-            styles.issueChip,
-            {
-              backgroundColor: colors.surfaceAlt,
-              borderRadius: radius.button,
-            },
-          ]}
-        >
-          <Text size="caption" color="primary" style={styles.chipText}>
-            {ladder.title}
-          </Text>
-        </View>
-        <Text size="caption" color="muted">
-          {copy.myCases.daysOpen(elapsed)}
-        </Text>
-      </View>
-
-      <Text size="subtitle" color="ink" style={styles.cardCompany}>
-        {caseItem.company || 'Grievance Case'}
-      </Text>
-
-      {amountText ? (
-        <Text size="body" color="action" style={styles.cardAmount}>
-          {amountText}
-        </Text>
-      ) : null}
-
-      <View style={styles.nextStepRow}>
-        <Ionicons
-          name={isOverdue ? 'alert-circle' : 'arrow-forward-circle'}
-          size={16}
-          color={isOverdue ? colors.danger : colors.primary}
-        />
-        <Text
-          size="caption"
-          color={isOverdue ? 'danger' : 'muted'}
-          style={styles.nextStepText}
-          numberOfLines={1}
-        >
-          {nextStepText}
-        </Text>
-      </View>
-    </Card>
-  );
-};
+CaseCard.displayName = 'CaseCard';
 
 const styles = StyleSheet.create({
   card: {
