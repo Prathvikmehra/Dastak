@@ -118,6 +118,7 @@ dastak/
 - **Type Safety**: TypeScript strict mode must pass with zero errors (`npx tsc --noEmit`).
 - **Health Checks**: `npx expo-doctor` must always pass with zero failures.
 - **File Length Policy**: Every file must not exceed 270 lines (with modular split targets $\le 250$ lines), strictly verified by `src/lib/file-length.test.ts`.
+- **Test Suite Integrity**: Never delete or weaken a test to make a change pass. If a test is removed or merged, the commit message and report must say which and why.
 
 ---
 
