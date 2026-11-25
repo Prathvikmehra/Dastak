@@ -1,5 +1,5 @@
 import React, { Component, ReactNode, ErrorInfo } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from './Text';
 import { Button } from './Button';
@@ -7,6 +7,7 @@ import { logger } from '../lib/logger';
 import { en } from '../copy/en';
 import { useLanguage } from '../copy/context';
 import { useTheme } from '../theme/ThemeContext';
+import { lightColors, darkColors, ColorTokens } from '../theme/colors';
 
 interface Props {
   children: ReactNode;
@@ -19,14 +20,18 @@ interface State {
 }
 
 const ErrorFallback: React.FC<{ onReset: () => void }> = ({ onReset }) => {
-  let colors = { background: '#F8FAFC', ink: '#0F172A' };
+  // ErrorBoundary may sit outside ThemeProvider. We check system color scheme
+  // via useColorScheme() to select darkColors or lightColors from the static palette.
+  const systemScheme = useColorScheme();
+  const staticPalette: ColorTokens = systemScheme === 'dark' ? darkColors : lightColors;
+  let colors: ColorTokens = staticPalette;
   try {
     const theme = useTheme();
     if (theme?.colors) {
       colors = theme.colors;
     }
   } catch {
-    // fallback colors
+    // When ErrorBoundary wraps ThemeProvider, useTheme throws; use static palette
   }
 
   let copy = en;

@@ -53,7 +53,7 @@ export function migratePreferences(raw: unknown): UserPreferences {
 export interface PreferencesStore {
   get(): Promise<UserPreferences>;
   set(updates: Partial<UserPreferences>): Promise<UserPreferences>;
-  reset?(preserveLanguage?: boolean): Promise<UserPreferences>;
+  reset(preserveLanguage?: boolean): Promise<UserPreferences>;
   hadCorruptedData: boolean;
 }
 

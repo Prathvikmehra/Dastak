@@ -104,7 +104,7 @@ export const RemindersSection: React.FC = () => {
 
       {/* Calm fallback line when reminders are off or permission denied */}
       {showRemindersOffNotice && (
-        <View style={styles.noticeContainer}>
+        <View style={[styles.noticeContainer, { borderTopColor: colors.border }]}>
           <Text size="body" color="muted" style={styles.noticeText}>
             {copy.settings.remindersOffNotice}
           </Text>
@@ -144,7 +144,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
   },
   noticeText: {
     lineHeight: 22,

@@ -195,7 +195,7 @@ export const enUiFind: UiFindCopy = {
     themeDark: 'Dark',
     privacyTitle: 'Privacy guarantee',
     privacySubtitle:
-      'No data leaves your device unless you choose to share a complaint letter. Your complaint drafts, case numbers, and name stay safely on your phone.',
+      'No data leaves your device unless you choose to share a complaint letter. Your cases stay only on this phone. If you change phones, they will not move automatically.',
     corruptBanner: 'We could not read your saved cases. A backup was kept.',
     storageErrorBanner: 'Could not save changes to your phone. Please check available storage.',
     deleteAllTitle: 'Delete all my data',
@@ -205,6 +205,7 @@ export const enUiFind: UiFindCopy = {
       'This cannot be undone. All your saved complaints, notes, and records will be permanently removed.',
     deleteAllConfirmButton: 'Delete everything',
     deleteAllSuccessMessage: 'All data has been deleted.',
+    deleteAllFailedMessage: 'We could not delete everything. Please try again.',
     reminderNotificationTitle: 'Case update reminder',
     reminderNotificationBody: (company: string, who: string) =>
       `Your case with ${company} moves to the ${who} today.`,

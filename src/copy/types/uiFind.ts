@@ -177,6 +177,7 @@ export interface UiFindCopy {
     deleteAllConfirmMessage: string;
     deleteAllConfirmButton: string;
     deleteAllSuccessMessage: string;
+    deleteAllFailedMessage: string;
     reminderNotificationTitle: string;
     reminderNotificationBody: (company: string, who: string) => string;
   };

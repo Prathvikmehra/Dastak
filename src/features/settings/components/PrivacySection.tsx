@@ -29,10 +29,14 @@ export const PrivacySection: React.FC = () => {
             await clearCases();
             await clearMoney();
             await clearMedicines();
-            await deleteAllUserData();
-            Alert.alert(copy.common.done, copy.settings.deleteAllSuccessMessage);
+            const result = await deleteAllUserData();
+            if (result.ok) {
+              Alert.alert(copy.common.done, copy.settings.deleteAllSuccessMessage);
+            } else {
+              Alert.alert(copy.common.ok, copy.settings.deleteAllFailedMessage);
+            }
           } catch {
-            // Ignore failure or let UI state show
+            Alert.alert(copy.common.ok, copy.settings.deleteAllFailedMessage);
           } finally {
             setIsDeleting(false);
           }

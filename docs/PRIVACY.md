@@ -9,6 +9,7 @@ Dastak is designed to protect your privacy completely:
 - **Zero Remote Storage**: All your cases, notes, medicine records, and people profiles are stored exclusively on your device using local storage (`AsyncStorage`).
 - **No Remote Servers**: Dastak runs completely offline. We do not operate any backend server to receive, process, or store your personal data.
 - **Zero Analytics or Trackers**: We do not include any tracking SDKs, analytics packages, advertising IDs, or telemetry code. No event logging leaves your phone.
+- **No Cloud Backup**: Cloud backup is disabled (`android:allowBackup="false"`). Your cases stay only on this phone. If you change phones, they will not move automatically.
 
 ## 2. Information You Enter
 

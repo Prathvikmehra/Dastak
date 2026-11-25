@@ -34,6 +34,14 @@ class FakePreferencesStore implements PreferencesStore {
     this.prefs = { ...this.prefs, ...updates };
     return { ...this.prefs };
   }
+
+  async reset(preserveLanguage = true): Promise<UserPreferences> {
+    this.prefs = {
+      remindersEnabled: false,
+      language: preserveLanguage ? this.prefs.language : 'en',
+    };
+    return { ...this.prefs };
+  }
 }
 
 describe('planReminders pure function', () => {
