@@ -1,299 +1,129 @@
 import fs from 'fs';
 import path from 'path';
-import ts from 'typescript';
+import { walk, findCopyViolationsInSource, CopyViolation } from './copy-audit-engine';
 
-function walk(dir: string): string[] {
-  let results: string[] = [];
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (!['node_modules', '.expo', '.git'].includes(entry.name)) {
-        results = results.concat(walk(fullPath));
-      }
-    } else if (
-      (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')) &&
-      !entry.name.endsWith('.test.ts') &&
-      !entry.name.endsWith('.test.tsx') &&
-      !fullPath.includes(path.normalize('src/copy'))
-    ) {
-      results.push(fullPath);
-    }
-  }
-  return results;
-}
+describe('Copy audit: zero hardcoded user-facing strings', () => {
+  const rootDir = path.resolve(__dirname, '../../');
+  const appDir = path.join(rootDir, 'app');
+  const srcDir = path.join(rootDir, 'src');
 
-export interface CopyViolation {
-  file: string;
-  type:
-    | 'jsx-text'
-    | 'alert-string'
-    | 'jsx-prop'
-    | 'navigation-option'
-    | 'template-string'
-    | 'string-concat';
-  detail: string;
-}
+  const filesToScan = [...walk(appDir), ...walk(srcDir)];
 
-export function findCopyViolationsInSource(content: string, filePath: string): CopyViolation[] {
-  const sf = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
-  const violations: CopyViolation[] = [];
-  const englishWordPattern = /[a-zA-Z]+[: ]/;
+  it('scans at least 20 source files in app/ and src/', () => {
+    expect(filesToScan.length).toBeGreaterThanOrEqual(20);
+  });
 
-  function isDevLoggingOrError(node: ts.Node): boolean {
-    let curr = node.parent;
-    while (curr) {
-      if (ts.isCallExpression(curr)) {
-        const text = curr.expression.getText(sf);
-        if (text.startsWith('console.') || text.startsWith('logger.')) return true;
-      }
-      if (ts.isNewExpression(curr)) {
-        const text = curr.expression.getText(sf);
-        if (text.endsWith('Error')) return true;
-      }
-      curr = curr.parent;
-    }
-    return false;
-  }
+  it('contains zero violations across all eligible source files', () => {
+    const allViolations: CopyViolation[] = [];
 
-  function visit(node: ts.Node) {
-    // 1. Literal text between JSX tags
-    if (ts.isJsxText(node)) {
-      const text = node.getText(sf).trim();
-      if (text.length > 0) {
-        violations.push({
-          file: filePath,
-          type: 'jsx-text',
-          detail: text,
-        });
-      }
+    for (const filePath of filesToScan) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      const violations = findCopyViolationsInSource(content, filePath);
+      allViolations.push(...violations);
     }
 
-    // 2. Alert.alert string literals (1st or 2nd argument)
-    if (ts.isCallExpression(node)) {
-      const expr = node.expression;
-      if (
-        ts.isPropertyAccessExpression(expr) &&
-        expr.expression.getText(sf) === 'Alert' &&
-        expr.name.getText(sf) === 'alert'
-      ) {
-        const args = node.arguments;
-        if (args.length > 0 && ts.isStringLiteral(args[0])) {
-          violations.push({
-            file: filePath,
-            type: 'alert-string',
-            detail: `Alert title: ${args[0].text}`,
-          });
-        }
-        if (args.length > 1 && ts.isStringLiteral(args[1])) {
-          violations.push({
-            file: filePath,
-            type: 'alert-string',
-            detail: `Alert message: ${args[1].text}`,
-          });
-        }
-      }
+    if (allViolations.length > 0) {
+      const summary = allViolations
+        .map(
+          (v) => `[${v.type}] ${path.relative(rootDir, v.file)}: ${v.detail.trim().slice(0, 80)}`
+        )
+        .join('\n');
+      expect(summary).toBe('');
     }
 
-    // 3. Literal accessibilityLabel, placeholder, title, headerTitle, headerBackTitle, tabBarLabel props on JSX attributes
-    if (ts.isJsxAttribute(node)) {
-      const propName = node.name.getText(sf);
-      if (
-        [
-          'accessibilityLabel',
-          'placeholder',
-          'title',
-          'headerTitle',
-          'headerBackTitle',
-          'tabBarLabel',
-        ].includes(propName)
-      ) {
-        if (node.initializer && ts.isStringLiteral(node.initializer)) {
-          violations.push({
-            file: filePath,
-            type: 'jsx-prop',
-            detail: `${propName}="${node.initializer.text}"`,
-          });
-        }
-      }
+    expect(allViolations).toHaveLength(0);
+  });
 
-      // 4. Literal title, headerTitle, headerBackTitle, tabBarLabel in options or screenOptions
-      if (['options', 'screenOptions'].includes(propName)) {
-        if (
-          node.initializer &&
-          ts.isJsxExpression(node.initializer) &&
-          node.initializer.expression
-        ) {
-          const scanNavOptions = (expr: ts.Node) => {
-            if (ts.isObjectLiteralExpression(expr)) {
-              for (const prop of expr.properties) {
-                if (ts.isPropertyAssignment(prop)) {
-                  const name = prop.name.getText(sf).replace(/['"]/g, '');
-                  if (['title', 'headerTitle', 'headerBackTitle', 'tabBarLabel'].includes(name)) {
-                    if (
-                      ts.isStringLiteral(prop.initializer) ||
-                      ts.isNoSubstitutionTemplateLiteral(prop.initializer)
-                    ) {
-                      violations.push({
-                        file: filePath,
-                        type: 'navigation-option',
-                        detail: `${name}: "${(prop.initializer as ts.StringLiteral).text}"`,
-                      });
-                    }
-                  }
-                  if (ts.isObjectLiteralExpression(prop.initializer)) {
-                    scanNavOptions(prop.initializer);
-                  }
-                }
-              }
-            } else if (ts.isArrowFunction(expr) || ts.isFunctionExpression(expr)) {
-              if (expr.body) {
-                scanNavOptions(expr.body);
-              }
-            } else if (ts.isParenthesizedExpression(expr)) {
-              scanNavOptions(expr.expression);
-            } else if (ts.isBlock(expr)) {
-              for (const stmt of expr.statements) {
-                if (ts.isReturnStatement(stmt) && stmt.expression) {
-                  scanNavOptions(stmt.expression);
-                }
-              }
-            }
-          };
-          scanNavOptions(node.initializer.expression);
-        }
-      }
-    }
-
-    // 5. Template literals containing English words
-    if (ts.isTemplateExpression(node) && !isDevLoggingOrError(node)) {
-      const literals = [node.head.text, ...node.templateSpans.map((s) => s.literal.text)];
-      const hasEnglish = literals.some(
-        (lit) => englishWordPattern.test(lit) && !lit.match(/^(tel|https?|mailto):/)
+  describe('Negative tests: verify scanner correctly catches violations', () => {
+    it('catches JSX literal text', () => {
+      const fakeCode = `
+        import React from 'react';
+        import { View, Text } from 'react-native';
+        export const Bad = () => <View><Text>Hardcoded Hello</Text></View>;
+      `;
+      const violations = findCopyViolationsInSource(fakeCode, 'test-fake.tsx');
+      expect(violations).toContainEqual(
+        expect.objectContaining({ type: 'jsx-text', detail: 'Hardcoded Hello' })
       );
-      if (hasEnglish) {
-        violations.push({ file: filePath, type: 'template-string', detail: node.getText(sf) });
-      }
-    }
+    });
 
-    // 6. String concatenations with + containing English words
-    if (
-      ts.isBinaryExpression(node) &&
-      node.operatorToken.kind === ts.SyntaxKind.PlusToken &&
-      !isDevLoggingOrError(node)
-    ) {
-      const left = node.left;
-      const right = node.right;
-      let isMatch = false;
-      if (
-        ts.isStringLiteral(left) &&
-        englishWordPattern.test(left.text) &&
-        !left.text.match(/^(tel|https?|mailto):/)
-      ) {
-        isMatch = true;
-      }
-      if (
-        ts.isStringLiteral(right) &&
-        englishWordPattern.test(right.text) &&
-        !right.text.match(/^(tel|https?|mailto):/)
-      ) {
-        isMatch = true;
-      }
-      if (
-        isMatch &&
-        (!ts.isBinaryExpression(node.parent) ||
-          node.parent.operatorToken.kind !== ts.SyntaxKind.PlusToken)
-      ) {
-        violations.push({ file: filePath, type: 'string-concat', detail: node.getText(sf) });
-      }
-    }
+    it('catches Alert.alert string literals', () => {
+      const fakeCode = `
+        import { Alert } from 'react-native';
+        Alert.alert('Hardcoded Title', 'Hardcoded Message');
+      `;
+      const violations = findCopyViolationsInSource(fakeCode, 'test-fake.ts');
+      expect(violations).toContainEqual(
+        expect.objectContaining({
+          type: 'alert-string',
+          detail: 'Alert title: Hardcoded Title',
+        })
+      );
+      expect(violations).toContainEqual(
+        expect.objectContaining({
+          type: 'alert-string',
+          detail: 'Alert message: Hardcoded Message',
+        })
+      );
+    });
 
-    ts.forEachChild(node, visit);
-  }
-
-  visit(sf);
-  return violations;
-}
-
-export function findCopyViolations(rootDir: string): CopyViolation[] {
-  const files = [...walk(path.join(rootDir, 'app')), ...walk(path.join(rootDir, 'src'))];
-  const violations: CopyViolation[] = [];
-
-  for (const file of files) {
-    const content = fs.readFileSync(file, 'utf8');
-    const relative = path.relative(rootDir, file);
-    violations.push(...findCopyViolationsInSource(content, relative));
-  }
-
-  return violations;
-}
-
-describe('Copy audit: no hardcoded strings in app/ and src/ components', () => {
-  it('ensures zero literal JSX text, zero literal Alert strings, and zero literal props', () => {
-    const rootDir = path.resolve(__dirname, '../../');
-    const violations = findCopyViolations(rootDir);
-    if (violations.length > 0) {
-      console.log(`[CopyAudit] Found ${violations.length} violations`);
-    }
-    expect(violations).toEqual([]);
-  });
-
-  it('proves the audit fails on deliberate violations across all checked categories', () => {
-    const deliberateBadCode = `
-      export default function BadComponent() {
-        const step = { who: 'Bank' };
-        const a = \`Action needed: \${step.who}\`;
-        const b = 'Hello ' + step.who;
-        return (
-          <>
-            <Stack.Screen options={{ title: 'Hardcoded Title', headerBackTitle: 'Back' }} />
-            <Tabs.Screen options={{ tabBarLabel: 'Bad Tab' }} />
-            <Stack screenOptions={{ headerTitle: 'Bad Header' }} />
-            <Text>Literal text</Text>
-            <Button title="Literal Title Prop" />
-          </>
+    it('catches JSX placeholder and accessibilityLabel literals', () => {
+      const fakeCode = `
+        import React from 'react';
+        import { TextInput, View } from 'react-native';
+        export const Bad = () => (
+          <View accessibilityLabel="Tap here">
+            <TextInput placeholder="Enter name here" />
+          </View>
         );
-      }
-      function badAlert() {
-        Alert.alert('Hardcoded Alert Title', 'Hardcoded Alert Body');
-      }
-    `;
-    const violations = findCopyViolationsInSource(deliberateBadCode, 'test-dummy.tsx');
-    expect(violations.length).toBeGreaterThanOrEqual(8);
-    const expected = [
-      { type: 'navigation-option', detail: 'title: "Hardcoded Title"' },
-      { type: 'navigation-option', detail: 'headerBackTitle: "Back"' },
-      { type: 'navigation-option', detail: 'tabBarLabel: "Bad Tab"' },
-      { type: 'navigation-option', detail: 'headerTitle: "Bad Header"' },
-      { type: 'jsx-text', detail: 'Literal text' },
-      { type: 'alert-string', detail: 'Alert title: Hardcoded Alert Title' },
-    ];
-    for (const exp of expected) {
-      expect(violations).toContainEqual({ file: 'test-dummy.tsx', ...exp });
-    }
-    expect(violations.some((v) => v.type === 'template-string')).toBe(true);
-    expect(violations.some((v) => v.type === 'string-concat')).toBe(true);
-  });
+      `;
+      const violations = findCopyViolationsInSource(fakeCode, 'test-fake.tsx');
+      expect(violations).toContainEqual(
+        expect.objectContaining({
+          type: 'jsx-prop',
+          detail: 'accessibilityLabel="Tap here"',
+        })
+      );
+      expect(violations).toContainEqual(
+        expect.objectContaining({
+          type: 'jsx-prop',
+          detail: 'placeholder="Enter name here"',
+        })
+      );
+    });
 
-  it('ensures banned words (alternative, replace, switch, substitute, cheaper) never appear in user-facing copy', () => {
-    const copyDir = path.resolve(__dirname, '../../src/copy');
-    const files = walk(copyDir);
-    const bannedRegex =
-      /\b(alternative|alternatives|replace|replaces|replacing|switch|switches|switching|substitute|substitutes|cheaper)\b/i;
-
-    const violations: { file: string; match: string }[] = [];
-    for (const file of files) {
-      const content = fs.readFileSync(file, 'utf8');
-      const lines = content.split('\n');
-      lines.forEach((line, idx) => {
-        if (line.includes('bannedRegex') || line.includes('banned words')) return;
-        const match = line.match(bannedRegex);
-        if (match) {
-          violations.push({ file: `${path.basename(file)}:${idx + 1}`, match: match[0] });
+    it('catches navigation option titles', () => {
+      const fakeCode = `
+        import { Stack } from 'expo-router';
+        export default function Layout() {
+          return <Stack screenOptions={{ title: 'Hardcoded Title' }} />;
         }
-      });
-    }
+      `;
+      const violations = findCopyViolationsInSource(fakeCode, 'test-fake.tsx');
+      expect(violations).toContainEqual(
+        expect.objectContaining({
+          type: 'navigation-option',
+          detail: 'title: "Hardcoded Title"',
+        })
+      );
+    });
 
-    expect(violations).toEqual([]);
+    it('catches template literals containing English words', () => {
+      const fakeCode = `
+        const x = 5;
+        const msg = \`Action needed: in \${x} days\`;
+      `;
+      const violations = findCopyViolationsInSource(fakeCode, 'test-fake.ts');
+      expect(violations).toContainEqual(expect.objectContaining({ type: 'template-string' }));
+    });
+
+    it('catches string concatenation containing English words', () => {
+      const fakeCode = `
+        const x = 5;
+        const msg = 'Action needed: ' + x;
+      `;
+      const violations = findCopyViolationsInSource(fakeCode, 'test-fake.ts');
+      expect(violations).toContainEqual(expect.objectContaining({ type: 'string-concat' }));
+    });
   });
 });

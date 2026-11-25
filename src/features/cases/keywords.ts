@@ -5,63 +5,92 @@ export interface KeywordDictionary {
   words: string[];
 }
 
-export const DICTIONARY: Record<IssueType, KeywordDictionary> = {
-  fraud: {
-    phrases: [
-      'digital arrest',
-      'money debited but i did not do it',
-      'money debited',
-      'unauthorized debit',
-      'unauthorised debit',
-      'fake call',
-      'unknown link',
-      'link clicked',
-      'account debited',
-      'threatening arrest',
-      'threatened arrest',
-      'screen share',
-      'paise kat gaye',
-      'paise kat gye',
-      'rupaye kat gaye',
-      'paise nikal gaye',
-      'fasa diya',
-      'loot liya',
-      'nakli call',
-      'farzi call',
-      'police dhamki',
-      'police arrest',
-      'cbi arrest',
-      'customs arrest',
-      'paisa kapai gaya',
-      'paisa kapana',
-      'khoti link',
-      'chhetra pindi',
-      'पैसे कट गए',
-      'पैसे कट गये',
-      'रुपये कट गए',
-      'डिजिटल अरेस्ट',
-      'फर्जी कॉल',
-      'नकली कॉल',
-      'खाता हैक',
-      'अनधिकृत निकासी',
-      'फंसा दिया',
-      'लूट लिया',
-      'પૈસા કપાઈ ગયા',
-      'પૈસા કપાણા',
-      'ડિજિટલ એરેસ્ટ',
-      'નકલી કૉલ',
-      'ખોટી લિંક',
-      'ખાતું હેક',
-      'છેતરપિંડી',
-      'ફસાવટ',
-    ],
-    words: (
-      'otp scam fraud hacked phishing cybercrime cyber helpline lottery kyc apk chori fasavat ' +
-      'chhetarpindi cheterpindi chhetrapindi unauthorised unauthorized thagi thag dhokha dhokhadhadi ' +
-      'anydesk teamviewer धोखा धोखाधड़ी ठगी ठग ओटीपी स्कैम फ्रॉड लॉटरी केवाईसी साइबर चोरी ' +
-      'છેતરપિંડી ઓટીપી સ્કેમ લોટરી કેવાયસી સાયબર ચોરી'
-    ).split(' '),
-  },
+export const STRONG_FRAUD: KeywordDictionary = {
+  phrases: [
+    'digital arrest',
+    'police arrest',
+    'cbi arrest',
+    'customs arrest',
+    'threatening arrest',
+    'threatened arrest',
+    'threat of arrest',
+    'screen share',
+    'fake call',
+    'farzi call',
+    'nakli call',
+    'police dhamki',
+    'fake link',
+    'unknown link',
+    'link clicked',
+    'i did not do',
+    'did not do it',
+    'didnt do it',
+    'unknown transaction',
+    'unauthorised transaction',
+    'unauthorized transaction',
+    'unauthorised debit',
+    'unauthorized debit',
+    'install an app',
+    'install app',
+    'installed an app',
+    'download app',
+    'download an app',
+    'fasa diya',
+    'loot liya',
+    'paisa kapana',
+    'khoti link',
+    'chhetra pindi',
+    'डिजिटल अरेस्ट',
+    'फर्जी कॉल',
+    'नकली कॉल',
+    'खाता हैक',
+    'अनधिकृत निकासी',
+    'फंसा दिया',
+    'लूट लिया',
+    'मैंने नहीं किया',
+    'अनजान ट्रांजेक्शन',
+    'ऐप इनस्टॉल',
+    'ऐप डाउनलोड',
+    'ડિજિટલ એરેસ્ટ',
+    'નકલી કૉલ',
+    'ખોટી લિંક',
+    'ખાતું હેક',
+    'છેતરપિંડી',
+    'ફસાવટ',
+    'મેં નથી કર્યું',
+    'અજાણ્યો વ્યવહાર',
+    'એપ ઇન્સ્ટોલ',
+  ],
+  words: [
+    'otp scam phishing hacked hack cybercrime cyber helpline lottery kyc apk chori fasavat',
+    'chhetarpindi cheterpindi chhetrapindi unauthorised unauthorized thagi thag dhokha dhokhadhadi',
+    'anydesk teamviewer धोखा धोखाधड़ी ठगी ठग ओटीपी स्कैम फ्रॉड लॉटरी केवाईसी साइबर चोरी',
+    'છેતરપિંડી ઓટીપી સ્કેમ લોટરી કેવાયસી સાયબર ચોરી',
+  ].flatMap((s) => s.split(' ')),
+};
+
+export const WEAK_FRAUD: KeywordDictionary = {
+  phrases: [
+    'money debited',
+    'account debited',
+    'money gone',
+    'paise kat gaye',
+    'paise kat gye',
+    'rupaye kat gaye',
+    'paise nikal gaye',
+    'paisa kapai gaya',
+    'khata debit',
+    'पैसे कट गए',
+    'पैसे कट गये',
+    'रुपये कट गए',
+    'खाते से पैसे कट',
+    'પૈસા કપાઈ ગયા',
+    'પૈસા કપાણા',
+  ],
+  words: ['debited', 'deducted'],
+};
+
+export const NON_FRAUD_DICTIONARY: Record<Exclude<IssueType, 'fraud'>, KeywordDictionary> = {
   refund: {
     phrases: [
       'order not delivered',
@@ -102,11 +131,11 @@ export const DICTIONARY: Record<IssueType, KeywordDictionary> = {
       'પૈસા પાછા નથી મળ્યા',
       'પાછા આપો',
     ],
-    words: (
-      'refund parcel return returned undelivered order delivery cancel courier flipkart amazon ' +
-      'meesho myntra swiggy zomato samaan saman रिफंड वापसी सामान ऑर्डर डिलीवरी कूरियर पार्सल ' +
-      'વાપસ રિફંડ પાર્સલ ઓર્ડર સામાન કુરિયર'
-    ).split(' '),
+    words: [
+      'refund parcel return returned undelivered order delivery cancel courier flipkart amazon',
+      'meesho myntra swiggy zomato samaan saman रिफंड वापसी सामान ऑर्डर डिलीवरी कूरियर पार्सल',
+      'વાપસ રિફંડ પાર્સલ ઓર્ડર સામાન કુરિયર',
+    ].flatMap((s) => s.split(' ')),
   },
   bank: {
     phrases: [
@@ -144,11 +173,11 @@ export const DICTIONARY: Record<IssueType, KeywordDictionary> = {
       'નેટ બેંકિંગ',
       'યુપીઆઈ ફેલ',
     ],
-    words: (
-      'bank atm card loan emi cheque passbook branch deduction charge sbi hdfc icici pnb ' +
-      'बैंक एटीएम कार्ड लोन ईएमआई चेक शाखा पासबुक कटौती चार्ज ' +
-      'બેંક એટીએમ કાર્ડ લોન ઈએમઆઈ ચેક શાખા પાસબુક ચાર્જ'
-    ).split(' '),
+    words: [
+      'bank atm card loan emi cheque passbook branch deduction charge sbi hdfc icici pnb',
+      'बैंक एटीएम कार्ड लोन ईएमआई चेक शाखा पासबुक कटौती चार्ज',
+      'બેંક એટીએમ કાર્ડ લોન ઈએમઆઈ ચેક શાખા પાસબુક ચાર્જ',
+    ].flatMap((s) => s.split(' ')),
   },
   insurance: {
     phrases: [
@@ -178,10 +207,10 @@ export const DICTIONARY: Record<IssueType, KeywordDictionary> = {
       'આરોગ્ય વીમો',
       'જીવન વીમો',
     ],
-    words: (
-      'insurance policy premium mediclaim cashless hospital reimbursement tpa surveyor motor ' +
-      'health accident lic bima vimo vima बीमा पॉलिसी प्रीमियम मेडिक्लेम कैशलेस अस्पताल ' +
-      'सर्वेयर एक्सीडेंट दुर्घटना વીમો વીમા પોલિસી પ્રીમિયમ મેડિક્લેમ કેશલેસ હોસ્પિટલ અકસ્માત'
-    ).split(' '),
+    words: [
+      'insurance policy premium mediclaim cashless hospital reimbursement tpa surveyor motor',
+      'health accident lic bima vimo vima बीमा पॉलिसी प्रीमियम मेडिक्लेम कैशलेस अस्पताल',
+      'सर्वेयर एक्सीडेंट दुर्घटना વીમો વીમા પોલિસી પ્રીમિયમ મેડિક્લેમ કેશલેસ હોસ્પિટલ અકસ્માત',
+    ].flatMap((s) => s.split(' ')),
   },
 };

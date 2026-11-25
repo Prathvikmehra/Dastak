@@ -1,206 +1,62 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { KeyValueStorage, asyncStorageAdapter, backupCorruptData } from '../cases/storage';
 import { Person, PlaceRecord, MoneyPlaceStatus, Relationship, MoneySummary } from './types';
 import { summarize } from './helpers';
-import { logger } from '../../lib/logger';
+import {
+  PersistentMoneyStore,
+  MONEY_STORAGE_KEY,
+  CURRENT_MONEY_VERSION,
+  DEFAULT_PERSON,
+  StoredMoneyDocument,
+  migrateMoneyData,
+} from './storage';
 
-export const MONEY_STORAGE_KEY = 'dastak_money_v1';
-export const CURRENT_MONEY_VERSION = 1;
-
-export const DEFAULT_PERSON: Person = {
-  id: 'me',
-  name: 'Me',
-  isDefault: true,
+export {
+  PersistentMoneyStore,
+  MONEY_STORAGE_KEY,
+  CURRENT_MONEY_VERSION,
+  DEFAULT_PERSON,
+  StoredMoneyDocument,
+  migrateMoneyData,
 };
-
-export interface StoredMoneyDocument {
-  version: number;
-  people: Person[];
-  records: Record<string, Record<string, PlaceRecord>>;
-}
-
-export function migrateMoneyData(raw: unknown): {
-  people: Person[];
-  records: Record<string, Record<string, PlaceRecord>>;
-} {
-  const fallback = {
-    people: [{ ...DEFAULT_PERSON }],
-    records: { me: {} },
-  };
-
-  if (!raw || typeof raw !== 'object') {
-    return fallback;
-  }
-
-  const obj = raw as Record<string, unknown>;
-  const rawPeople = Array.isArray(obj.people) ? obj.people : [];
-  const validPeople: Person[] = rawPeople
-    .filter((p): p is Person =>
-      Boolean(p && typeof p.id === 'string' && typeof p.name === 'string')
-    )
-    .map((p) => ({
-      id: p.id,
-      name: p.name,
-      relationship: p.relationship,
-      isDefault: p.isDefault,
-    }));
-
-  if (!validPeople.some((p) => p.id === 'me')) {
-    validPeople.unshift({ ...DEFAULT_PERSON });
-  }
-
-  const rawRecords =
-    typeof obj.records === 'object' && obj.records !== null
-      ? (obj.records as Record<string, Record<string, PlaceRecord>>)
-      : {};
-
-  return {
-    people: validPeople,
-    records: rawRecords,
-  };
-}
-
-export class PersistentMoneyStore {
-  private storage: KeyValueStorage;
-  private storageKey: string;
-  private people: Person[] = [{ ...DEFAULT_PERSON }];
-  private records: Record<string, Record<string, PlaceRecord>> = { me: {} };
-  private isInitialized = false;
-  private initPromise: Promise<void> | null = null;
-  private writeQueue: Promise<void> = Promise.resolve();
-  public hadCorruptedData = false;
-
-  constructor(storage: KeyValueStorage = asyncStorageAdapter, storageKey = MONEY_STORAGE_KEY) {
-    this.storage = storage;
-    this.storageKey = storageKey;
-  }
-
-  private async ensureInitialized(): Promise<void> {
-    if (this.isInitialized) {
-      return;
-    }
-    if (!this.initPromise) {
-      this.initPromise = this.loadFromStorage();
-    }
-    await this.initPromise;
-  }
-
-  private async loadFromStorage(): Promise<void> {
-    try {
-      const rawStr = await this.storage.getItem(this.storageKey);
-      if (!rawStr) {
-        this.people = [{ ...DEFAULT_PERSON }];
-        this.records = { me: {} };
-        this.isInitialized = true;
-        return;
-      }
-      try {
-        const parsed = JSON.parse(rawStr);
-        const migrated = migrateMoneyData(parsed);
-        this.people = migrated.people;
-        this.records = migrated.records;
-      } catch {
-        await backupCorruptData(this.storage, this.storageKey, rawStr);
-        this.hadCorruptedData = true;
-        this.people = [{ ...DEFAULT_PERSON }];
-        this.records = { me: {} };
-      }
-    } catch (err) {
-      logger.error('Failed reading money records from storage', err);
-      this.people = [{ ...DEFAULT_PERSON }];
-      this.records = { me: {} };
-    } finally {
-      this.isInitialized = true;
-    }
-  }
-
-  private async persist(): Promise<void> {
-    this.writeQueue = this.writeQueue.then(async () => {
-      const doc: StoredMoneyDocument = {
-        version: CURRENT_MONEY_VERSION,
-        people: this.people,
-        records: this.records,
-      };
-      await this.storage.setItem(this.storageKey, JSON.stringify(doc));
-    });
-    return this.writeQueue;
-  }
-
-  async listPeople(): Promise<Person[]> {
-    await this.ensureInitialized();
-    return [...this.people];
-  }
-
-  async addPerson(name: string, relationship?: Relationship): Promise<Person> {
-    await this.ensureInitialized();
-    const id = `person_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-    const newPerson: Person = {
-      id,
-      name: name.trim() || 'Family member',
-      relationship,
-    };
-    this.people.push(newPerson);
-    if (!this.records[id]) {
-      this.records[id] = {};
-    }
-    await this.persist();
-    return newPerson;
-  }
-
-  async getPersonRecords(personId: string): Promise<Record<string, PlaceRecord>> {
-    await this.ensureInitialized();
-    return this.records[personId] ? { ...this.records[personId] } : {};
-  }
-
-  async updatePlaceRecord(
-    personId: string,
-    placeId: string,
-    updates: { status: MoneyPlaceStatus; amount?: string; note?: string }
-  ): Promise<PlaceRecord> {
-    await this.ensureInitialized();
-    if (!this.records[personId]) {
-      this.records[personId] = {};
-    }
-    const existing = this.records[personId][placeId] || {
-      placeId,
-      status: 'not_checked',
-      updatedAt: new Date().toISOString(),
-    };
-    const updated: PlaceRecord = {
-      ...existing,
-      status: updates.status,
-      amount: updates.amount !== undefined ? updates.amount.trim() : existing.amount,
-      note: updates.note !== undefined ? updates.note.trim() : existing.note,
-      updatedAt: new Date().toISOString(),
-    };
-    this.records[personId][placeId] = updated;
-    await this.persist();
-    return updated;
-  }
-
-  async getSummary(personId: string): Promise<MoneySummary> {
-    await this.ensureInitialized();
-    return summarize(this.records[personId]);
-  }
-}
-
-export const defaultMoneyStore = new PersistentMoneyStore();
 
 export interface MoneyContextValue {
   people: Person[];
   activePersonId: string;
   setActivePersonId: (id: string) => void;
   activePerson: Person;
+  selectedPersonId: string;
+  selectedPerson: Person;
   records: Record<string, PlaceRecord>;
   summary: MoneySummary;
+  isLoading: boolean;
+  hadCorruptedData: boolean;
+  selectPerson: (id: string) => void;
   addPerson: (name: string, relationship?: Relationship) => Promise<Person>;
+  removePerson: (id: string) => Promise<void>;
   updatePlace: (
     placeId: string,
-    updates: { status: MoneyPlaceStatus; amount?: string; note?: string }
+    updates: {
+      status: MoneyPlaceStatus;
+      amount?: string;
+      amountFound?: string;
+      reference?: string;
+      note?: string;
+    }
+  ) => Promise<PlaceRecord>;
+  updateRecord: (
+    placeId: string,
+    data: {
+      status: MoneyPlaceStatus;
+      amount?: string;
+      amountFound?: string;
+      reference?: string;
+      note?: string;
+    }
   ) => Promise<PlaceRecord>;
   refresh: () => Promise<void>;
 }
 
+const defaultMoneyStore = new PersistentMoneyStore();
 const MoneyContext = createContext<MoneyContextValue | null>(null);
 
 export function MoneyProvider({
@@ -211,51 +67,85 @@ export function MoneyProvider({
   children: React.ReactNode;
 }) {
   const [people, setPeople] = useState<Person[]>([{ ...DEFAULT_PERSON }]);
-  const [activePersonId, setActivePersonId] = useState<string>('me');
+  const [activePersonId, setActivePersonIdState] = useState<string>('me');
   const [records, setRecords] = useState<Record<string, PlaceRecord>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [hadCorruptedData, setHadCorruptedData] = useState(false);
 
-  const refresh = useCallback(async () => {
-    const pList = await store.listPeople();
-    setPeople(pList);
-    const pRecs = await store.getPersonRecords(activePersonId);
-    setRecords(pRecs);
+  const loadData = useCallback(async () => {
+    const p = await store.listPeople();
+    setPeople(p);
+    const validPersonId = p.some((person) => person.id === activePersonId) ? activePersonId : 'me';
+    setActivePersonIdState(validPersonId);
+    const r = await store.getPersonRecords(validPersonId);
+    setRecords(r);
+    setHadCorruptedData(store.hadCorruptedData);
   }, [store, activePersonId]);
 
   useEffect(() => {
     let isMounted = true;
-    Promise.all([store.listPeople(), store.getPersonRecords(activePersonId)]).then(
-      ([pList, pRecs]) => {
-        if (isMounted) {
-          setPeople(pList);
-          setRecords(pRecs);
-        }
-      }
-    );
+    store.listPeople().then((p) => {
+      if (!isMounted) return;
+      setPeople(p);
+      store.getPersonRecords('me').then((r) => {
+        if (!isMounted) return;
+        setRecords(r);
+        setHadCorruptedData(store.hadCorruptedData);
+        setIsLoading(false);
+      });
+    });
     return () => {
       isMounted = false;
     };
-  }, [store, activePersonId]);
+  }, [store]);
+
+  const setActivePersonId = useCallback(
+    async (id: string) => {
+      setActivePersonIdState(id);
+      const r = await store.getPersonRecords(id);
+      setRecords(r);
+    },
+    [store]
+  );
 
   const addPerson = useCallback(
-    async (name: string, relationship?: Relationship) => {
-      const p = await store.addPerson(name, relationship);
-      await refresh();
-      setActivePersonId(p.id);
-      return p;
+    async (name: string, relationship?: Relationship): Promise<Person> => {
+      const created = await store.addPerson(name, relationship);
+      await loadData();
+      setActivePersonIdState(created.id);
+      return created;
     },
-    [store, refresh]
+    [store, loadData]
+  );
+
+  const removePerson = useCallback(
+    async (id: string): Promise<void> => {
+      await store.removePerson(id);
+      if (activePersonId === id) {
+        setActivePersonIdState('me');
+      }
+      await loadData();
+    },
+    [store, activePersonId, loadData]
   );
 
   const updatePlace = useCallback(
     async (
       placeId: string,
-      updates: { status: MoneyPlaceStatus; amount?: string; note?: string }
-    ) => {
-      const rec = await store.updatePlaceRecord(activePersonId, placeId, updates);
-      await refresh();
-      return rec;
+      updates: {
+        status: MoneyPlaceStatus;
+        amount?: string;
+        amountFound?: string;
+        reference?: string;
+        note?: string;
+      }
+    ): Promise<PlaceRecord> => {
+      const updated = await store.updatePlaceRecord(activePersonId, placeId, updates);
+      const r = await store.getPersonRecords(activePersonId);
+      setRecords(r);
+      return updated;
     },
-    [store, activePersonId, refresh]
+    [store, activePersonId]
   );
 
   const activePerson = people.find((p) => p.id === activePersonId) || people[0] || DEFAULT_PERSON;
@@ -266,11 +156,18 @@ export function MoneyProvider({
     activePersonId,
     setActivePersonId,
     activePerson,
+    selectedPersonId: activePersonId,
+    selectedPerson: activePerson,
     records,
     summary,
+    isLoading,
+    hadCorruptedData,
+    selectPerson: setActivePersonId,
     addPerson,
+    removePerson,
     updatePlace,
-    refresh,
+    updateRecord: updatePlace,
+    refresh: loadData,
   };
 
   return React.createElement(MoneyContext.Provider, { value }, children);

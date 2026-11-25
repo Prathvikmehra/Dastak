@@ -86,6 +86,9 @@ export const guUiCases: UiCasesCopy = {
     routedGuess: (issue: string) => `આ એવું લાગે છે: ${issue}. યોગ્ય નથી?`,
     changeChoice: 'તેને બદલો',
     noGuessPickBest: 'જે સૌથી યોગ્ય લાગે તે પસંદ કરો.',
+    twoCandidatesStrip: (doorA: string, doorB: string) =>
+      `આ ${doorA} અથવા ${doorB} હોઈ શકે છે. જે યોગ્ય લાગે તે પસંદ કરો.`,
+    call1930Advice: 'જો તમે આ ચૂકવણી જાતે નથી કરી, તો પહેલાં 1930 પર કૉલ કરો.',
     fieldLabels: {
       refund: {
         company: 'વિક્રેતા અથવા એપ',

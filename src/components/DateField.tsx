@@ -5,6 +5,7 @@ import { Card } from './Card';
 import { useTheme } from '../theme/ThemeContext';
 import { useCopy } from '../copy/context';
 import { LocalDate, today, addDays, isValidParts } from '../lib/dates';
+import { DateCustomInputs } from './DateCustomInputs';
 
 export interface DateFieldProps {
   label: string;
@@ -135,16 +136,6 @@ export const DateField: React.FC<DateFieldProps> = ({
     { id: 'custom' as const, label: c.pickDate },
   ];
 
-  const boxInputStyle = [
-    styles.input,
-    {
-      color: colors.ink,
-      backgroundColor: colors.surface,
-      borderColor: inlineError ? colors.danger : colors.border,
-      borderRadius: radius.button,
-    },
-  ];
-
   return (
     <View style={styles.container} onLayout={onLayout}>
       <Text size="caption" color="ink" style={styles.label}>
@@ -184,66 +175,21 @@ export const DateField: React.FC<DateFieldProps> = ({
       </View>
 
       {activeChip === 'custom' && (
-        <View style={styles.inputsRow}>
-          <View style={styles.partBox}>
-            <Text size="caption" color="muted" style={styles.boxLabel}>
-              {c.dayLabel}
-            </Text>
-            <TextInput
-              ref={dayInputRef}
-              style={boxInputStyle}
-              placeholder={c.dayPlaceholder}
-              placeholderTextColor={colors.muted}
-              value={day}
-              maxLength={2}
-              keyboardType="number-pad"
-              onChangeText={handleDayChange}
-            />
-          </View>
-          <Text size="body" color="muted" style={styles.slash}>
-            {'/'}
-          </Text>
-          <View style={styles.partBox}>
-            <Text size="caption" color="muted" style={styles.boxLabel}>
-              {c.monthLabel}
-            </Text>
-            <TextInput
-              ref={monthInputRef}
-              style={boxInputStyle}
-              placeholder={c.monthPlaceholder}
-              placeholderTextColor={colors.muted}
-              value={month}
-              maxLength={2}
-              keyboardType="number-pad"
-              onChangeText={handleMonthChange}
-            />
-          </View>
-          <Text size="body" color="muted" style={styles.slash}>
-            {'/'}
-          </Text>
-          <View style={styles.yearBox}>
-            <Text size="caption" color="muted" style={styles.boxLabel}>
-              {c.yearLabel}
-            </Text>
-            <TextInput
-              ref={yearInputRef}
-              style={boxInputStyle}
-              placeholder={c.yearPlaceholder}
-              placeholderTextColor={colors.muted}
-              value={year}
-              maxLength={4}
-              keyboardType="number-pad"
-              onChangeText={handleYearChange}
-            />
-          </View>
-        </View>
+        <DateCustomInputs
+          day={day}
+          month={month}
+          year={year}
+          onDayChange={handleDayChange}
+          onMonthChange={handleMonthChange}
+          onYearChange={handleYearChange}
+          dayInputRef={dayInputRef}
+          monthInputRef={monthInputRef}
+          yearInputRef={yearInputRef}
+          inlineError={inlineError}
+        />
       )}
 
-      {inlineError ? (
-        <Text size="caption" color="danger" style={styles.errorText}>
-          {inlineError}
-        </Text>
-      ) : helper ? (
+      {helper && !inlineError ? (
         <Text size="caption" color="muted" style={styles.helperText}>
           {helper}
         </Text>
@@ -259,18 +205,5 @@ const styles = StyleSheet.create({
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
   chip: { minHeight: 48, paddingHorizontal: 12, justifyContent: 'center', alignItems: 'center' },
   chipText: { fontWeight: '500' },
-  inputsRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, marginTop: 4 },
-  partBox: { flex: 2 },
-  yearBox: { flex: 3 },
-  boxLabel: { marginBottom: 4, fontWeight: '500', textAlign: 'center' },
-  input: {
-    minHeight: 48,
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  slash: { fontWeight: 'bold', marginBottom: 14 },
-  errorText: { marginTop: 4 },
   helperText: { marginTop: 4 },
 });

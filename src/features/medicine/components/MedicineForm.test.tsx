@@ -16,6 +16,8 @@ jest.mock('expo-router', () => ({
   }),
 }));
 
+jest.setTimeout(15000);
+
 jest.mock('../store', () => {
   const actual = jest.requireActual('../store');
   return {

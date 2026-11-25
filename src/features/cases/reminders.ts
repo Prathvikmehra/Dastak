@@ -1,78 +1,13 @@
 import { Case } from './types';
 import { LADDERS } from './ladders';
-import {
-  NotificationsPort,
-  defaultNotificationsPort,
-  PermissionStatus,
-} from '../../lib/notificationsPort';
+import { NotificationsPort, defaultNotificationsPort } from '../../lib/notificationsPort';
 import { PreferencesStore, defaultPreferencesStore } from '../settings/preferences';
 import { logger } from '../../lib/logger';
 import { parseIsoDate } from '../../lib/dates';
 import { en } from '../../copy/en';
+import { PlannedReminder, ScheduleResult, planReminders } from './reminder-planner';
 
-export interface PlannedReminder {
-  stepId: string;
-  fireAt: Date;
-  title: string;
-  body: string;
-}
-
-export interface ScheduleResult {
-  scheduled: number;
-  skipped: number;
-  failed: number;
-  permission: PermissionStatus;
-}
-
-/**
- * Pure function returning planned reminders for future ladder steps.
- * Fires at 9:00 AM local time on that step's day.
- * Returns empty array for resolved cases or past dates.
- */
-export function planReminders(caseItem: Case, now: Date): PlannedReminder[] {
-  if (caseItem.resolvedAt) {
-    return [];
-  }
-
-  const ladder = LADDERS[caseItem.issueType];
-  if (!ladder) {
-    return [];
-  }
-
-  const created = parseIsoDate(caseItem.createdAt);
-  const company = caseItem.company?.trim() || 'the company';
-  const results: PlannedReminder[] = [];
-
-  for (const step of ladder.steps) {
-    // 9:00 AM local time on created's calendar day + dayOffset
-    const fireAt = new Date(
-      created.getFullYear(),
-      created.getMonth(),
-      created.getDate() + step.dayOffset,
-      9,
-      0,
-      0,
-      0
-    );
-
-    // Skip any reminder whose fireAt is not in the future
-    if (fireAt.getTime() <= now.getTime()) {
-      continue;
-    }
-
-    const title = 'Case update reminder';
-    const body = en.reminders.bodyMovesToday(company, step.who);
-
-    results.push({
-      stepId: step.id,
-      fireAt,
-      title,
-      body,
-    });
-  }
-
-  return results;
-}
+export { PlannedReminder, ScheduleResult, planReminders };
 
 export interface Reminders {
   schedule(caseItem: Case, now?: Date): Promise<ScheduleResult>;

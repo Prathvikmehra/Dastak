@@ -6,6 +6,8 @@ import { useTheme } from '../../../theme/ThemeContext';
 import { IssueType } from '../types';
 import { useCopy } from '../../../copy/context';
 
+export * from './FraudTimingSelector';
+
 interface IssueOption {
   id: IssueType;
   label: string;
@@ -17,9 +19,15 @@ export interface IssueSelectorProps {
   selected: IssueType | null;
   onSelect: (type: IssueType) => void;
   error?: string | null;
+  highlighted?: IssueType[];
 }
 
-export const IssueSelector: React.FC<IssueSelectorProps> = ({ selected, onSelect, error }) => {
+export const IssueSelector: React.FC<IssueSelectorProps> = ({
+  selected,
+  onSelect,
+  error,
+  highlighted = [],
+}) => {
   const { colors, radius } = useTheme();
   const copy = useCopy();
 
@@ -59,17 +67,31 @@ export const IssueSelector: React.FC<IssueSelectorProps> = ({ selected, onSelect
       <View style={styles.grid}>
         {issueOptions.map((opt) => {
           const isSelected = selected === opt.id;
+          const isHighlighted = highlighted.includes(opt.id);
+          const borderColor = isSelected
+            ? colors.primary
+            : isHighlighted
+              ? colors.primary
+              : colors.border;
+          const borderWidth = isSelected ? 2 : isHighlighted ? 2 : 1;
+
           return (
             <Pressable
               key={opt.id}
               onPress={() => onSelect(opt.id)}
               accessibilityRole="radio"
               accessibilityState={{ selected: isSelected }}
+              accessibilityLabel={`${opt.label}, ${opt.subtitle}`}
               style={[
                 styles.card,
                 {
-                  backgroundColor: isSelected ? colors.surfaceAlt : colors.surface,
-                  borderColor: isSelected ? colors.primary : colors.border,
+                  backgroundColor: isSelected
+                    ? colors.surfaceAlt
+                    : isHighlighted
+                      ? colors.surfaceAlt
+                      : colors.surface,
+                  borderColor,
+                  borderWidth,
                   borderRadius: radius.card,
                 },
               ]}
@@ -79,7 +101,8 @@ export const IssueSelector: React.FC<IssueSelectorProps> = ({ selected, onSelect
                   style={[
                     styles.iconBox,
                     {
-                      backgroundColor: isSelected ? colors.surface : colors.surfaceAlt,
+                      backgroundColor:
+                        isSelected || isHighlighted ? colors.surface : colors.surfaceAlt,
                       borderRadius: radius.button,
                     },
                   ]}
@@ -87,7 +110,7 @@ export const IssueSelector: React.FC<IssueSelectorProps> = ({ selected, onSelect
                   <Ionicons
                     name={opt.iconName}
                     size={22}
-                    color={isSelected ? colors.primary : colors.muted}
+                    color={isSelected || isHighlighted ? colors.primary : colors.muted}
                   />
                 </View>
                 <View style={styles.textBox}>
@@ -129,63 +152,6 @@ export const IssueSelector: React.FC<IssueSelectorProps> = ({ selected, onSelect
   );
 };
 
-export type FraudWhenOption = 'hour' | 'today' | 'yesterday' | 'earlier';
-
-export interface FraudTimingSelectorProps {
-  selected: FraudWhenOption;
-  onSelect: (val: FraudWhenOption) => void;
-}
-
-export const FraudTimingSelector: React.FC<FraudTimingSelectorProps> = ({ selected, onSelect }) => {
-  const { colors, radius } = useTheme();
-  const copy = useCopy();
-
-  const timingOptions: { id: FraudWhenOption; label: string }[] = [
-    { id: 'hour', label: copy.newCase.fraudTiming.hour },
-    { id: 'today', label: copy.newCase.fraudTiming.today },
-    { id: 'yesterday', label: copy.newCase.fraudTiming.yesterday },
-    { id: 'earlier', label: copy.newCase.fraudTiming.earlier },
-  ];
-
-  return (
-    <View style={styles.section}>
-      <Text size="subtitle" color="ink" style={styles.title}>
-        {copy.newCase.fraudTiming.label}
-      </Text>
-      <View style={styles.timingGrid}>
-        {timingOptions.map((item) => {
-          const isSelected = selected === item.id;
-          return (
-            <Pressable
-              key={item.id}
-              onPress={() => onSelect(item.id)}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: isSelected }}
-              style={[
-                styles.timingCard,
-                {
-                  backgroundColor: isSelected ? colors.surfaceAlt : colors.surface,
-                  borderColor: isSelected ? colors.primary : colors.border,
-                  borderRadius: radius.card,
-                },
-              ]}
-            >
-              <Ionicons
-                name={isSelected ? 'radio-button-on' : 'radio-button-off'}
-                size={20}
-                color={isSelected ? colors.primary : colors.muted}
-              />
-              <Text size="body" color={isSelected ? 'ink' : 'muted'} style={styles.timingLabel}>
-                {item.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
   section: {
     marginBottom: 20,
@@ -199,7 +165,6 @@ const styles = StyleSheet.create({
   card: {
     minHeight: 64,
     padding: 14,
-    borderWidth: 2,
     justifyContent: 'center',
   },
   row: {
@@ -234,20 +199,5 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontWeight: '600',
-  },
-  timingGrid: {
-    gap: 8,
-  },
-  timingCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: 52,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 1.5,
-    gap: 12,
-  },
-  timingLabel: {
-    flex: 1,
   },
 });

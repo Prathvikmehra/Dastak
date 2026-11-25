@@ -19,7 +19,7 @@ function getFilesRecursively(dir: string): string[] {
   return results;
 }
 
-describe('File Length Policy (<= 300 lines)', () => {
+describe('File Length Policy (<= 270 lines)', () => {
   const rootDir = path.resolve(__dirname, '../../');
   const appDir = path.join(rootDir, 'app');
   const srcDir = path.join(rootDir, 'src');
@@ -33,10 +33,10 @@ describe('File Length Policy (<= 300 lines)', () => {
   allFiles.forEach((filePath) => {
     const relativePath = path.relative(rootDir, filePath).replace(/\\/g, '/');
 
-    it(`asserts ${relativePath} does not exceed 300 lines`, () => {
+    it(`asserts ${relativePath} does not exceed 270 lines`, () => {
       const content = fs.readFileSync(filePath, 'utf8');
       const lines = content.split('\n').length;
-      expect(lines).toBeLessThanOrEqual(300);
+      expect(lines).toBeLessThanOrEqual(270);
     });
   });
 });

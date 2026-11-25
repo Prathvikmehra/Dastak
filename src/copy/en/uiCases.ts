@@ -89,6 +89,9 @@ export const enUiCases: UiCasesCopy = {
     routedGuess: (issue: string) => `This sounds like: ${issue}. Not right?`,
     changeChoice: 'Change it',
     noGuessPickBest: 'Pick the one that fits best.',
+    twoCandidatesStrip: (doorA: string, doorB: string) =>
+      `This could be ${doorA} or ${doorB}. Pick the one that fits.`,
+    call1930Advice: 'If you did not make this payment yourself, call 1930 first.',
     fieldLabels: {
       refund: {
         company: 'Seller or app',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Screen, Text, Card, Field, Button } from '../../../src/components';
@@ -11,11 +11,11 @@ import {
   daysUntilNext,
   hasEscalatedPastFirstStep,
 } from '../../../src/features/cases/engine';
-import { formatRupees } from '../../../src/lib/formatters';
 import { useCopy } from '../../../src/copy/context';
 import { OpenCasesSummary } from '../../../src/features/cases/components/OpenCasesSummary';
 import { buildRouteParams, FRAUD_SHORTCUT_PARAMS } from '../../../src/features/cases/router';
-import { openPhone } from '../../../src/lib/links';
+import { FraudShortcutCard } from '../../../src/features/cases/components/FraudShortcutCard';
+import { RecoveredBanner } from '../../../src/features/cases/components/RecoveredBanner';
 
 interface DoorItem {
   id: IssueType;
@@ -90,54 +90,16 @@ export default function FixHomeScreen() {
 
   return (
     <Screen scrollable>
-      {/* Fraud shortcut: compact card at the very top of Fix home */}
-      <Card
-        style={[
-          styles.fraudShortcutCard,
-          { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
-        ]}
-      >
-        <View style={styles.fraudShortcutHeader}>
-          <Ionicons name="shield-checkmark" size={24} color={colors.primary} />
-          <Text size="body" color="ink" style={styles.fraudShortcutText}>
-            {copy.fixHome.fraudShortcut.prompt}
-          </Text>
-        </View>
-        <Button
-          label={copy.fixHome.fraudShortcut.callButton}
-          onPress={() => openPhone('1930', (msg) => Alert.alert(copy.common.call, msg))}
-          icon={<Ionicons name="call" size={18} color={colors.onAction} />}
-          style={styles.fraudCallBtn}
-        />
-        <Button
-          label={copy.fixHome.fraudShortcut.saveLink}
-          variant="quiet"
-          onPress={() =>
-            router.push({
-              pathname: '/fix/new-case',
-              params: FRAUD_SHORTCUT_PARAMS,
-            })
-          }
-        />
-      </Card>
+      <FraudShortcutCard
+        onSaveDetails={() =>
+          router.push({
+            pathname: '/fix/new-case',
+            params: FRAUD_SHORTCUT_PARAMS,
+          })
+        }
+      />
 
-      {totalRecovered > 0 ? (
-        <View
-          style={[
-            styles.recoveredBanner,
-            {
-              backgroundColor: colors.surfaceAlt,
-              borderColor: colors.success,
-              borderRadius: radius.card,
-            },
-          ]}
-        >
-          <Ionicons name="sparkles" size={20} color={colors.success} />
-          <Text size="subtitle" color="success" style={styles.recoveredText}>
-            {copy.fixHome.recoveredBanner(formatRupees(totalRecovered))}
-          </Text>
-        </View>
-      ) : null}
+      <RecoveredBanner totalRecovered={totalRecovered} />
 
       {openCases.length > 0 ? (
         <OpenCasesSummary
@@ -228,24 +190,6 @@ export default function FixHomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  fraudShortcutCard: { marginBottom: 16, padding: 14, borderWidth: 1 },
-  fraudShortcutHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-    marginBottom: 10,
-  },
-  fraudShortcutText: { flex: 1, lineHeight: 20 },
-  fraudCallBtn: { marginBottom: 6 },
-  recoveredBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    padding: 14,
-    borderWidth: 1.5,
-    marginBottom: 16,
-  },
-  recoveredText: { fontWeight: '700' },
   promptCard: { marginBottom: 24 },
   cardHeader: { marginBottom: 6 },
   cardSubtitle: { marginBottom: 16 },

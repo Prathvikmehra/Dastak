@@ -1,21 +1,23 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
   ScrollView,
   Platform,
-  Alert,
   TextInput,
   KeyboardAvoidingView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useNavigation } from 'expo-router';
-import { Card, Text, Field, Button, DateField } from '../../../components';
+import { Card, Text, Field, DateField } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { Medicine } from '../types';
 import { useMedicines } from '../store';
 import { useCopy } from '../../../copy/context';
 import { LocalDate } from '../../../lib/dates';
+import { MedicineFormRefillFields } from './MedicineFormRefillFields';
+import { MedicineFormActionBar } from './MedicineFormActionBar';
+import { useMedicineFormGuard, NavigationGuard } from './useMedicineFormGuard';
 
 export interface MedicineFormProps {
   personId: string;
@@ -23,14 +25,6 @@ export interface MedicineFormProps {
   initialMedicine?: Medicine | null;
   onSuccess?: () => void;
   onCancel?: () => void;
-}
-
-interface NavigationGuard {
-  addListener: (
-    event: 'beforeRemove',
-    listener: (e: { preventDefault: () => void; data: { action: unknown } }) => void
-  ) => () => void;
-  dispatch: (action: unknown) => void;
 }
 
 export const MedicineForm: React.FC<MedicineFormProps> = ({
@@ -93,21 +87,16 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
     note !== initial.note,
   ].some(Boolean);
 
-  useEffect(() => {
-    if (!navigation?.addListener) return;
-    return navigation.addListener('beforeRemove', (e) => {
-      if (!isDirty || isSubmitting || hasSaved.current) return;
-      e.preventDefault();
-      Alert.alert(copy.unsavedChanges.title, copy.unsavedChanges.message, [
-        { text: copy.unsavedChanges.keepEditing, style: 'cancel' },
-        {
-          text: copy.unsavedChanges.leave,
-          style: 'destructive',
-          onPress: () => navigation.dispatch(e.data.action),
-        },
-      ]);
-    });
-  }, [navigation, isDirty, isSubmitting, copy]);
+  useMedicineFormGuard({
+    navigation,
+    isDirty,
+    isSubmitting,
+    hasSavedRef: hasSaved,
+    unsavedTitle: copy.unsavedChanges.title,
+    unsavedMessage: copy.unsavedChanges.message,
+    keepEditingText: copy.unsavedChanges.keepEditing,
+    leaveText: copy.unsavedChanges.leave,
+  });
 
   const handleSubmit = async () => {
     let hasError = false;
@@ -208,34 +197,14 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
               fieldY.current.brandPrice = e.nativeEvent.layout.y;
             }}
           />
-          <Field
-            label={m.genericPriceLabel}
-            placeholder={m.genericPricePlaceholder}
-            value={genericPrice}
-            onChangeText={setGenericPrice}
-            keyboardType="numeric"
-            helper={m.genericHelper}
+          <MedicineFormRefillFields
+            genericPrice={genericPrice}
+            onChangeGenericPrice={setGenericPrice}
+            strips={strips}
+            onChangeStrips={setStrips}
+            refillDays={refillDays}
+            onChangeRefillDays={setRefillDays}
           />
-          <View style={styles.row}>
-            <View style={styles.halfCol}>
-              <Field
-                label={m.stripsLabel}
-                placeholder={m.stripsPlaceholder}
-                value={strips}
-                onChangeText={setStrips}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.halfCol}>
-              <Field
-                label={m.refillDaysLabel}
-                placeholder={m.refillDaysPlaceholder}
-                value={refillDays}
-                onChangeText={setRefillDays}
-                keyboardType="numeric"
-              />
-            </View>
-          </View>
           <DateField
             label={m.lastRefillLabel}
             value={lastRefill}
@@ -257,29 +226,13 @@ export const MedicineForm: React.FC<MedicineFormProps> = ({
             inputStyle={styles.noteInput}
           />
         </ScrollView>
-        <View
-          style={[
-            styles.actionBar,
-            {
-              backgroundColor: colors.surface,
-              borderTopColor: colors.border,
-              paddingBottom: Math.max(insets.bottom, 12),
-            },
-          ]}
-        >
-          <Button
-            label={existing ? m.saveButtonEdit : m.saveButtonAdd}
-            onPress={handleSubmit}
-            disabled={isSubmitting}
-            style={styles.actionBtn}
-          />
-          <Button
-            label={m.cancelButton}
-            variant="quiet"
-            onPress={onCancel || (() => router.back())}
-            disabled={isSubmitting}
-          />
-        </View>
+        <MedicineFormActionBar
+          isEditing={Boolean(existing)}
+          isSubmitting={isSubmitting}
+          onSubmit={handleSubmit}
+          onCancel={onCancel || (() => router.back())}
+          bottomInset={insets.bottom}
+        />
       </KeyboardAvoidingView>
     </View>
   );
@@ -290,9 +243,5 @@ const styles = StyleSheet.create({
   keyboardContainer: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 28 },
   safety: { marginBottom: 16, padding: 12 },
-  row: { flexDirection: 'row', gap: 12 },
-  halfCol: { flex: 1 },
   noteInput: { minHeight: 72, textAlignVertical: 'top' },
-  actionBar: { borderTopWidth: 1, paddingHorizontal: 16, paddingTop: 12 },
-  actionBtn: { marginBottom: 8 },
 });

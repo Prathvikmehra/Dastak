@@ -68,6 +68,8 @@ export interface UiCasesCopy {
     routedGuess: (issue: string) => string;
     changeChoice: string;
     noGuessPickBest: string;
+    twoCandidatesStrip: (doorA: string, doorB: string) => string;
+    call1930Advice: string;
     fieldLabels: Record<
       IssueType,
       {

@@ -1,8 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Screen, Text, Card, Field, Button, DateField } from '../../../src/components';
-import { useTheme } from '../../../src/theme/ThemeContext';
 import { IssueType } from '../../../src/features/cases/types';
 import { useCases } from '../../../src/features/cases/store';
 import { formatRupees, parseAmount } from '../../../src/lib/formatters';
@@ -15,10 +14,10 @@ import {
   FraudTimingSelector,
   FraudWhenOption,
 } from '../../../src/features/cases/components/IssueSelector';
+import { RoutedStrip } from '../../../src/features/cases/components/RoutedStrip';
 
 export default function NewCaseScreen() {
   const router = useRouter();
-  const { colors } = useTheme();
   const copy = useCopy();
   const params = useLocalSearchParams<{
     issueType?: string;
@@ -26,11 +25,16 @@ export default function NewCaseScreen() {
     note?: string;
     fraudWhen?: string;
     routed?: string;
+    candidates?: string;
   }>();
   const { createCase } = useCases();
 
   const scrollRef = useRef<React.ElementRef<typeof ScrollView>>(null);
   const selectorY = useRef(0);
+
+  const candidates: IssueType[] = params.candidates
+    ? (params.candidates.split(',').filter(Boolean) as IssueType[])
+    : [];
 
   const initialIssue =
     params.issueType && ['refund', 'fraud', 'bank', 'insurance'].includes(params.issueType)
@@ -108,43 +112,12 @@ export default function NewCaseScreen() {
         </Text>
       </View>
 
-      {params.routed === 'true' && issueType ? (
-        <Card
-          style={[
-            styles.routedStrip,
-            { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
-          ]}
-        >
-          <View style={styles.routedStripRow}>
-            <Text size="body" color="ink" style={styles.routedText}>
-              {copy.newCase.routedGuess(copy.fixHome.doors[issueType].title)}{' '}
-            </Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={copy.newCase.changeChoice}
-              onPress={() => scrollRef.current?.scrollTo({ y: selectorY.current, animated: true })}
-              style={styles.changeBtn}
-            >
-              <Text size="body" color="primary" style={styles.changeLinkText}>
-                {copy.newCase.changeChoice}
-              </Text>
-            </Pressable>
-          </View>
-        </Card>
-      ) : null}
-
-      {params.routed === 'false' ? (
-        <Card
-          style={[
-            styles.routedStrip,
-            { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
-          ]}
-        >
-          <Text size="body" color="muted">
-            {copy.newCase.noGuessPickBest}
-          </Text>
-        </Card>
-      ) : null}
+      <RoutedStrip
+        routed={params.routed}
+        issueType={issueType}
+        candidates={candidates}
+        onChangeChoice={() => scrollRef.current?.scrollTo({ y: selectorY.current, animated: true })}
+      />
 
       <View
         onLayout={(e) => {
@@ -158,6 +131,7 @@ export default function NewCaseScreen() {
             if (error) setError(null);
           }}
           error={error}
+          highlighted={candidates}
         />
       </View>
 
@@ -231,11 +205,6 @@ export default function NewCaseScreen() {
 const styles = StyleSheet.create({
   header: { marginBottom: 16 },
   title: { marginBottom: 6 },
-  routedStrip: { marginBottom: 16, padding: 12, borderWidth: 1 },
-  routedStripRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
-  routedText: { lineHeight: 22 },
-  changeBtn: { minHeight: 48, minWidth: 48, justifyContent: 'center' },
-  changeLinkText: { fontWeight: '700', textDecorationLine: 'underline' },
   formCard: { marginBottom: 24 },
   multilineInput: { minHeight: 88, textAlignVertical: 'top' },
   saveButton: { marginTop: 8, marginBottom: 10 },
