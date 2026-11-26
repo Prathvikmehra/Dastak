@@ -7,15 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#F7F9FC",
-      "dark": {
-        "image": "./assets/splash-icon.png",
-        "backgroundColor": "#0B1320"
-      }
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -39,7 +30,24 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-router", "expo-status-bar", "expo-font"],
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F7F9FC",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "dark": {
+            "backgroundColor": "#0B1320",
+            "image": "./assets/splash-icon-dark.png"
+          }
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     }

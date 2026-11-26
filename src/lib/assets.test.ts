@@ -38,6 +38,7 @@ describe('Brand assets PNG header validation', () => {
     { file: 'assets/android-icon-background.png', label: 'Adaptive background icon' },
     { file: 'assets/android-icon-monochrome.png', label: 'Adaptive monochrome icon' },
     { file: 'assets/splash-icon.png', label: 'Splash screen icon' },
+    { file: 'assets/splash-icon-dark.png', label: 'Splash screen dark icon' },
   ];
 
   squareAssets.forEach(({ file, label }) => {

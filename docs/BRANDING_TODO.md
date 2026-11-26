@@ -1,21 +1,24 @@
 # Dastak Branding & Visual Asset Status
 
-> **Asset Status**: The 6 core app PNG assets have been supplied into `assets/` (`icon.png`, `android-icon-foreground.png`, `android-icon-background.png`, `android-icon-monochrome.png`, `splash-icon.png`, `favicon.png`).
+> **Asset Status**: The 7 core app PNG assets have been supplied into `assets/` (`icon.png`, `android-icon-foreground.png`, `android-icon-background.png`, `android-icon-monochrome.png`, `splash-icon.png`, `splash-icon-dark.png`, `favicon.png`).
 >
 > **Notice**: These supplied assets are **placeholders** ("simple door-and-knocker design, replace with professional artwork before wide release"). They establish proper dimensions (1024x1024 for icons/splash, 48x48 for favicon) and verify clean builds, but final polished graphic assets from a professional designer should replace them before general public distribution.
+>
+> **Physical Device Verification**: Splash screen appearance (light background `#F7F9FC` with blue door logo; dark background `#0B1320` with white door logo) must be confirmed on a real physical phone in both light and dark mode.
 
 ---
 
 ## 1. Supplied In-App Assets (Placeholders Verified)
 
-| Asset                   | File Destination                     | Dimensions     | Status                                  |
-| :---------------------- | :----------------------------------- | :------------- | :-------------------------------------- |
-| **Main App Icon**       | `assets/icon.png`                    | 1024 × 1024 px | Supplied (Placeholder door-and-knocker) |
-| **Adaptive Foreground** | `assets/android-icon-foreground.png` | 1024 × 1024 px | Supplied (Placeholder door-and-knocker) |
-| **Adaptive Background** | `assets/android-icon-background.png` | 1024 × 1024 px | Supplied (Solid `#F7F9FC`)              |
-| **Adaptive Monochrome** | `assets/android-icon-monochrome.png` | 1024 × 1024 px | Supplied (Themed icon layer)            |
-| **Splash Screen Icon**  | `assets/splash-icon.png`             | 1024 × 1024 px | Supplied (Blue door on transparent)     |
-| **Web Favicon**         | `assets/favicon.png`                 | 48 × 48 px     | Supplied (48px door icon)               |
+| Asset                          | File Destination                     | Dimensions     | Status                                  |
+| :----------------------------- | :----------------------------------- | :------------- | :-------------------------------------- |
+| **Main App Icon**              | `assets/icon.png`                    | 1024 × 1024 px | Supplied (Placeholder door-and-knocker) |
+| **Adaptive Foreground**        | `assets/android-icon-foreground.png` | 1024 × 1024 px | Supplied (Placeholder door-and-knocker) |
+| **Adaptive Background**        | `assets/android-icon-background.png` | 1024 × 1024 px | Supplied (Solid `#F7F9FC`)              |
+| **Adaptive Monochrome**        | `assets/android-icon-monochrome.png` | 1024 × 1024 px | Supplied (Themed icon layer)            |
+| **Splash Screen Icon (Light)** | `assets/splash-icon.png`             | 1024 × 1024 px | Supplied (Blue door on transparent)     |
+| **Splash Screen Icon (Dark)**  | `assets/splash-icon-dark.png`        | 1024 × 1024 px | Supplied (White door on transparent)    |
+| **Web Favicon**                | `assets/favicon.png`                 | 48 × 48 px     | Supplied (48px door icon)               |
 
 ---
 
