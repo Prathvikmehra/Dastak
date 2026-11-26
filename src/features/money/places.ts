@@ -8,6 +8,7 @@ export const PLACE_DEFINITIONS: MoneyPlaceDefinition[] = [
     portalName: 'RBI UDGAM',
     source: 'https://udgam.rbi.org.in',
     verifiedOn: null,
+    verifiedAgainst: null,
     contentStatus: 'checked-against-secondary-sources',
   },
   {
@@ -15,6 +16,7 @@ export const PLACE_DEFINITIONS: MoneyPlaceDefinition[] = [
     portalName: 'IRDAI Bima Bharosa',
     source: 'https://bimabharosa.irdai.gov.in',
     verifiedOn: null,
+    verifiedAgainst: null,
     contentStatus: 'checked-against-secondary-sources',
   },
   {
@@ -22,6 +24,7 @@ export const PLACE_DEFINITIONS: MoneyPlaceDefinition[] = [
     portalName: 'MITRA on MF Central',
     source: 'https://www.mfcentral.com',
     verifiedOn: null,
+    verifiedAgainst: null,
     contentStatus: 'checked-against-secondary-sources',
   },
   {
@@ -29,6 +32,7 @@ export const PLACE_DEFINITIONS: MoneyPlaceDefinition[] = [
     portalName: 'IEPF Authority',
     source: 'https://www.iepf.gov.in',
     verifiedOn: null,
+    verifiedAgainst: null,
     contentStatus: 'checked-against-secondary-sources',
   },
   {
@@ -36,6 +40,7 @@ export const PLACE_DEFINITIONS: MoneyPlaceDefinition[] = [
     portalName: 'EPFO Member Portal',
     source: 'https://unifiedportal-mem.epfindia.gov.in',
     verifiedOn: null,
+    verifiedAgainst: null,
     contentStatus: 'checked-against-secondary-sources',
   },
   {
@@ -43,6 +48,7 @@ export const PLACE_DEFINITIONS: MoneyPlaceDefinition[] = [
     portalName: 'Nearest Post Office',
     source: null,
     verifiedOn: null,
+    verifiedAgainst: null,
     contentStatus: 'general-guidance',
   },
 ];
@@ -63,6 +69,7 @@ export function getLocalizedPlaces(copy: Copy = en): MoneyPlace[] {
       portalName: def.portalName,
       source: def.source,
       verifiedOn: def.verifiedOn,
+      verifiedAgainst: def.verifiedAgainst,
       contentStatus: def.contentStatus,
       covers: pCopy?.covers || '',
       keepReady: pCopy?.keepReady || [],

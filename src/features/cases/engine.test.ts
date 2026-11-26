@@ -10,6 +10,7 @@ import {
   isOverdueForEscalation,
 } from './engine';
 import { LADDERS } from './ladders';
+import { PLACE_DEFINITIONS } from '../money/places';
 import { Case } from './types';
 
 function createMockCase(overrides: Partial<Case> = {}): Case {
@@ -194,6 +195,28 @@ describe('Case Escalation Engine', () => {
         .forEach((step) => {
           expect(step.phone).toMatch(/^\d+$/);
         });
+    });
+
+    it('verifies verifiedOn is either null or an ISO date, and non-null verifiedOn has verifiedAgainst URL starting with https://', () => {
+      const allSteps = Object.values(LADDERS).flatMap((ladder) => ladder.steps);
+      allSteps.forEach((step) => {
+        if (step.verifiedOn !== null && step.verifiedOn !== undefined) {
+          expect(step.verifiedOn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+          expect(step.verifiedAgainst).toMatch(/^https:\/\//);
+        } else {
+          expect(step.verifiedOn === null || step.verifiedOn === undefined).toBe(true);
+        }
+      });
+
+      const allPlaces = PLACE_DEFINITIONS;
+      allPlaces.forEach((place) => {
+        if (place.verifiedOn !== null && place.verifiedOn !== undefined) {
+          expect(place.verifiedOn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+          expect(place.verifiedAgainst).toMatch(/^https:\/\//);
+        } else {
+          expect(place.verifiedOn).toBeNull();
+        }
+      });
     });
   });
 });

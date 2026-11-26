@@ -25,6 +25,7 @@ export interface MoneyPlaceDefinition {
   portalName: string;
   source: string | null;
   verifiedOn: null;
+  verifiedAgainst: string | null;
   contentStatus: ContentStatus;
 }
 
@@ -35,6 +36,7 @@ export interface MoneyPlace {
   portalName: string;
   source: string | null;
   verifiedOn: null;
+  verifiedAgainst: string | null;
   contentStatus: ContentStatus;
   covers: string;
   keepReady: string[];

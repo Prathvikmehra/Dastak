@@ -48,6 +48,8 @@ export interface LadderStep {
   request: string;
   link?: string;
   phone?: string;
+  verifiedOn?: '2026-11-26' | null;
+  verifiedAgainst?: string | null;
 }
 
 export interface IssueLadder {

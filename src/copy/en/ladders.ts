@@ -17,7 +17,7 @@ export const enLadders: Record<'refund' | 'fraud' | 'bank' | 'insurance', Ladder
       },
       'refund-step-7': {
         who: 'National Consumer Helpline',
-        how: 'Call 1915, send a message on WhatsApp to 8800001915, or register your dispute on the National Consumer Helpline portal.',
+        how: 'Call 1915, send a message on WhatsApp to 8800001915, or register your dispute on the National Consumer Helpline portal. You can speak Hindi or Gujarati on 1915.',
         request: 'I request a full refund of the amount within 7 days.',
       },
       'refund-step-30': {
@@ -38,7 +38,7 @@ export const enLadders: Record<'refund' | 'fraud' | 'bank' | 'insurance', Ladder
     steps: {
       'fraud-step-0': {
         who: 'Cybercrime helpline',
-        how: 'Call 1930 immediately today, then tell your bank. Reporting within 24 hours improves the chance of recovery before the scammer withdraws the money.',
+        how: 'Call 1930 immediately today, then tell your bank. Reporting within 24 hours improves the chance of recovery before the scammer withdraws the money. Write down the acknowledgement number you are given. Also tell your bank. Reporting to 1930 does not replace telling your bank.',
         request:
           'I request you to investigate this matter, freeze the receiving account where possible, and reverse the debit.',
       },
@@ -49,8 +49,8 @@ export const enLadders: Record<'refund' | 'fraud' | 'bank' | 'insurance', Ladder
           'I request you to investigate this matter, freeze the receiving account where possible, and reverse the debit.',
       },
       'fraud-step-30': {
-        who: 'RBI complaint portal',
-        how: 'File a complaint with the Reserve Bank of India Ombudsman via CMS portal if your bank failed to reverse the fraudulent debit within 30 days.',
+        who: 'RBI Ombudsman',
+        how: 'Complain to your bank in writing and keep the proof. If they do not reply in 30 days (some fraud and card cases have longer limits), or you are not happy with the reply, you can complain to the RBI Ombudsman for free at cms.rbi.org.in. Do this within 90 days. Not every company is covered. For help, call RBI on 14448.',
         request:
           'I request you to investigate this matter, freeze the receiving account where possible, and reverse the debit.',
       },
@@ -71,8 +71,8 @@ export const enLadders: Record<'refund' | 'fraud' | 'bank' | 'insurance', Ladder
           'I request you to investigate this matter, correct the error, and reply to me in writing.',
       },
       'bank-step-30': {
-        who: 'RBI complaint portal',
-        how: 'Escalate to the Reserve Bank of India Ombudsman on the CMS portal if the bank does not resolve the dispute within 30 days.',
+        who: 'RBI Ombudsman',
+        how: 'Complain to your bank in writing and keep the proof. If they do not reply in 30 days (some fraud and card cases have longer limits), or you are not happy with the reply, you can complain to the RBI Ombudsman for free at cms.rbi.org.in. Do this within 90 days. Not every company is covered. For help, call RBI on 14448.',
         request:
           'I request you to investigate this matter, correct the error, and reply to me in writing.',
       },
@@ -128,7 +128,8 @@ export const enCallScript: CallScriptCopy = {
   generalFallback1: 'I need to register this formal dispute on your helpline.',
   generalFallback2: 'I have my account and transaction records ready to share.',
   closers: {
-    fraud: 'Please help me record this complaint and freeze the recipient account.',
+    fraud:
+      'Please help me record this complaint and freeze the recipient account. Write down the acknowledgement number you are given. Also tell your bank. Reporting to 1930 does not replace telling your bank.',
     nch: 'Please help me register this complaint with the National Consumer Helpline.',
     general: 'Please record my grievance and provide a complaint reference number.',
   },
