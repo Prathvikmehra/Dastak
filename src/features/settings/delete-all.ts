@@ -102,17 +102,20 @@ export async function deleteAllUserData(services?: DeleteAllServices): Promise<D
   }
 
   // Step 2: Delete EVERY AsyncStorage key that starts with "dastak_"
-  try {
-    if (storage.getAllKeys) {
+  if (!storage.getAllKeys) {
+    logger.error('Storage lacks getAllKeys required for delete-all');
+    failed.push('storage:getAllKeysMissing');
+  } else {
+    try {
       const allKeys = await storage.getAllKeys();
       const dastakKeys = allKeys.filter((k) => k.startsWith('dastak_'));
       for (const key of dastakKeys) {
         await storage.removeItem(key);
       }
+    } catch (err) {
+      logger.error('Failed wiping dastak_ keys from storage during delete-all', err);
+      failed.push('storage:clean');
     }
-  } catch (err) {
-    logger.error('Failed wiping dastak_ keys from storage during delete-all', err);
-    failed.push('storage:clean');
   }
 
   // Step 3: Write back only the language preference
@@ -124,8 +127,8 @@ export async function deleteAllUserData(services?: DeleteAllServices): Promise<D
   }
 
   // Step 4: Re-read getAllKeys and verify nothing starting with "dastak_" remains except prefs
-  try {
-    if (storage.getAllKeys) {
+  if (storage.getAllKeys) {
+    try {
       const remainingKeys = await storage.getAllKeys();
       const nonPrefsDastakKeys = remainingKeys.filter(
         (k) => k.startsWith('dastak_') && k !== PREFERENCES_STORAGE_KEY
@@ -137,10 +140,10 @@ export async function deleteAllUserData(services?: DeleteAllServices): Promise<D
         );
         failed.push('storage:remaining');
       }
+    } catch (err) {
+      logger.error('Failed verifying storage keys after delete-all', err);
+      failed.push('storage:verify');
     }
-  } catch (err) {
-    logger.error('Failed verifying storage keys after delete-all', err);
-    failed.push('storage:verify');
   }
 
   return {

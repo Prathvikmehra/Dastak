@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Alert } from 'react-native';
 import { render, waitFor, fireEvent, screen } from '@testing-library/react-native';
 import { deleteAllUserData } from './delete-all';
 import { PersistentCaseStore, CASES_STORAGE_KEY, KeyValueStorage } from '../cases/storage';
@@ -10,6 +10,9 @@ import { CasesProvider, useCases } from '../cases/store';
 import { MoneyProvider, useMoney } from '../money/store';
 import { MedicinesProvider, useMedicines } from '../medicine/store';
 import { Button } from '../../components/Button';
+import { PrivacySection } from './components/PrivacySection';
+import { LanguageProvider } from '../../copy/context';
+import { ThemeProvider } from '../../theme/ThemeContext';
 
 class FakeKeyValueStorage implements KeyValueStorage {
   public data: Map<string, string> = new Map();
@@ -188,5 +191,71 @@ describe('Delete all user data (fail-closed, complete purge)', () => {
       expect(screen.getByTestId('meds-count').props.children).toBe(0);
       expect(screen.getByTestId('people-count').props.children).toBe(1); // Reset to default 'me'
     });
+  });
+
+  it('fails closed when storage lacks getAllKeys and UI displays failure alert', async () => {
+    const storageWithoutGetAllKeys: KeyValueStorage = {
+      getItem: jest.fn().mockResolvedValue(null),
+      setItem: jest.fn().mockResolvedValue(undefined),
+      removeItem: jest.fn().mockResolvedValue(undefined),
+    };
+
+    const caseStore = new PersistentCaseStore(storageWithoutGetAllKeys);
+    const moneyStore = new PersistentMoneyStore(storageWithoutGetAllKeys);
+    const medicineStore = new PersistentMedicineStore(storageWithoutGetAllKeys);
+    const preferencesStore = new PersistentPreferencesStore(storageWithoutGetAllKeys);
+    const reminders = { cancelAll: jest.fn().mockResolvedValue(undefined) };
+
+    const services = {
+      caseStore,
+      moneyStore,
+      medicineStore,
+      preferencesStore,
+      reminders,
+      storage: storageWithoutGetAllKeys,
+    };
+
+    const result = await deleteAllUserData(services);
+    expect(result.ok).toBe(false);
+    expect(result.failed).toContain('storage:getAllKeysMissing');
+
+    const alertSpy = jest.spyOn(Alert, 'alert');
+
+    await render(
+      <LanguageProvider>
+        <ThemeProvider>
+          <CasesProvider store={caseStore}>
+            <MoneyProvider store={moneyStore}>
+              <MedicinesProvider initialStore={medicineStore}>
+                <PrivacySection services={services} />
+              </MedicinesProvider>
+            </MoneyProvider>
+          </CasesProvider>
+        </ThemeProvider>
+      </LanguageProvider>
+    );
+
+    fireEvent.press(screen.getByText('Delete everything'));
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Delete all data?',
+      'This cannot be undone. All your saved complaints, notes, and records will be permanently removed.',
+      expect.any(Array)
+    );
+
+    const alertButtons = alertSpy.mock.calls[0][2] as {
+      text: string;
+      style?: string;
+      onPress?: () => Promise<void> | void;
+    }[];
+    const confirmButton = alertButtons.find((b) => b.style === 'destructive');
+    expect(confirmButton).toBeDefined();
+
+    await confirmButton?.onPress?.();
+
+    expect(alertSpy).toHaveBeenLastCalledWith(
+      'OK',
+      'We could not delete everything. Please try again.'
+    );
   });
 });

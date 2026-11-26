@@ -41,7 +41,41 @@ The following administrative and infrastructure setup must be performed directly
 
 ---
 
-## 3. Google Play Data Safety Form Answers
+## 3. Android Permissions Honesty & Verification Guide
+
+### Current Manifest State
+
+- **Permissions in the prebuild manifest**: `INTERNET`, `VIBRATE` (blocked: `SYSTEM_ALERT_WINDOW`, `READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE`).
+- **Expected from libraries but UNVERIFIED until a built APK is inspected**: `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED` (and anything else injected during Gradle manifest merge).
+- **Integrity Rule**: Do NOT claim any merged-manifest permission as verified until inspected directly in the compiled APK binary.
+
+### How to Inspect Permissions of a Built APK on Windows
+
+#### Method 1: Using `aapt2` (Android SDK Build Tools)
+
+1. Locate `aapt2.exe` in your local Android SDK installation:
+   ```powershell
+   & "$env:LOCALAPPDATA\Android\Sdk\build-tools\35.0.0\aapt2.exe" dump permissions path\to\dastak.apk
+   ```
+2. Confirm that only intended permissions appear, and verify neither `SCHEDULE_EXACT_ALARM` nor `USE_EXACT_ALARM` is present.
+
+#### Method 2: Using `apkanalyzer`
+
+1. Run `apkanalyzer.bat` from Android SDK cmdline-tools:
+   ```powershell
+   & "$env:LOCALAPPDATA\Android\Sdk\cmdline-tools\latest\bin\apkanalyzer.bat" manifest permissions path\to\dastak.apk
+   ```
+
+#### Method 3: Checking on a Physical Phone
+
+1. Install the standalone preview APK on an Android phone.
+2. Open phone **Settings > Apps > Dastak > Permissions** (or **App info > Permissions**).
+3. Tap the three-dot overflow menu in the top right and select **All permissions**.
+4. Confirm no unexpected permissions (contacts, storage, camera, exact alarms) are declared.
+
+---
+
+## 4. Google Play Data Safety Form Answers
 
 Derived strictly from the Dastak codebase:
 
@@ -55,7 +89,7 @@ Derived strictly from the Dastak codebase:
 
 ---
 
-## 4. Google Play Content Rating Notes
+## 5. Google Play Content Rating Notes
 
 - **App Category**: Tools / Productivity / Utilities (Consumer Rights & Personal Finance Organizer)
 - **Violence, Blood, or Gore**: None
@@ -66,7 +100,7 @@ Derived strictly from the Dastak codebase:
 
 ---
 
-## 5. Draft Store Listing
+## 6. Draft Store Listing
 
 > **Notice**: All translations below are marked: **needs native-speaker review**.
 
@@ -138,7 +172,7 @@ Derived strictly from the Dastak codebase:
 
 ---
 
-## 6. Known Limits of Version 1
+## 7. Known Limits of Version 1
 
 Before releasing version 1.0.0, the team and testers must acknowledge the current functional boundaries:
 

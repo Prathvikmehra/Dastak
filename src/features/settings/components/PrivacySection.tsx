@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Card, Text, Button } from '../../../components';
+import { Card } from '../../../components/Card';
+import { Text } from '../../../components/Text';
+import { Button } from '../../../components/Button';
 import { useTheme } from '../../../theme/ThemeContext';
 import { useCopy } from '../../../copy/context';
 import { useCases } from '../../cases/store';
 import { useMoney } from '../../money/store';
 import { useMedicines } from '../../medicine/store';
-import { deleteAllUserData } from '../delete-all';
+import { deleteAllUserData, DeleteAllServices } from '../delete-all';
 
-export const PrivacySection: React.FC = () => {
+export interface PrivacySectionProps {
+  services?: DeleteAllServices;
+}
+
+export const PrivacySection: React.FC<PrivacySectionProps> = ({ services }) => {
   const { colors } = useTheme();
   const copy = useCopy();
   const { clearCases } = useCases();
@@ -29,7 +35,7 @@ export const PrivacySection: React.FC = () => {
             await clearCases();
             await clearMoney();
             await clearMedicines();
-            const result = await deleteAllUserData();
+            const result = await deleteAllUserData(services);
             if (result.ok) {
               Alert.alert(copy.common.done, copy.settings.deleteAllSuccessMessage);
             } else {
