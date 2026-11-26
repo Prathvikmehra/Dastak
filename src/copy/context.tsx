@@ -19,12 +19,14 @@ export interface LanguageContextValue {
   language: AppLanguage;
   setLanguage: (lang: AppLanguage) => Promise<void>;
   copy: Copy;
+  isLoaded: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<AppLanguage>('en');
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -39,9 +41,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
           const detected = detectDeviceLanguage();
           setLanguageState(detected);
         }
+        setIsLoaded(true);
       })
       .catch((err) => {
         logger.warn('Failed loading language preference', err);
+        if (isMounted) {
+          setIsLoaded(true);
+        }
       });
 
     return () => {
@@ -61,7 +67,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   const copy = COPY_MAP[language] || en;
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, copy }}>
+    <LanguageContext.Provider value={{ language, setLanguage, copy, isLoaded }}>
       {children}
     </LanguageContext.Provider>
   );
@@ -74,6 +80,7 @@ export function useLanguage(): LanguageContextValue {
       language: 'en',
       setLanguage: async () => {},
       copy: en,
+      isLoaded: true,
     };
   }
   return ctx;

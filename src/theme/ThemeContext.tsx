@@ -18,6 +18,7 @@ export interface Theme {
   minTouchTarget: number;
   mode: ColorSchemeMode;
   setMode: (mode: ColorSchemeMode) => void;
+  isLoaded: boolean;
 }
 
 const ThemeContext = createContext<Theme | null>(null);
@@ -28,6 +29,7 @@ export const ThemeProvider: React.FC<{
   initialMode?: ColorSchemeMode;
 }> = ({ children, preferencesStore = defaultPreferencesStore, initialMode }) => {
   const [mode, setModeState] = useState<ColorSchemeMode>(initialMode || 'light');
+  const [isLoaded, setIsLoaded] = useState<boolean>(Boolean(initialMode));
   const deviceScheme = useDeviceColorScheme();
 
   useEffect(() => {
@@ -40,9 +42,13 @@ export const ThemeProvider: React.FC<{
         if (prefs.theme) {
           setModeState(prefs.theme);
         }
+        setIsLoaded(true);
       })
       .catch((err) => {
         logger.warn('Failed loading theme preference', err);
+        if (isMounted) {
+          setIsLoaded(true);
+        }
       });
 
     return () => {
@@ -79,8 +85,9 @@ export const ThemeProvider: React.FC<{
       minTouchTarget,
       mode,
       setMode,
+      isLoaded,
     }),
-    [colors, isDark, mode, setMode]
+    [colors, isDark, mode, setMode, isLoaded]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
@@ -99,6 +106,7 @@ export const useTheme = (): Theme => {
       minTouchTarget,
       mode: 'light',
       setMode: () => {},
+      isLoaded: true,
     };
   }
   return context;
