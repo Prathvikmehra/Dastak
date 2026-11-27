@@ -40,7 +40,8 @@ export interface CallScriptCopy {
   nchLanguagePreference: string;
   rbi: {
     complaintAgainst: (company: string) => string;
-    complaintDetails: (date?: string, reference?: string) => string;
+    incidentDate: (date: string) => string;
+    complaintStatus: (reference?: string) => string;
     guideOmbudsman: string;
   };
 }

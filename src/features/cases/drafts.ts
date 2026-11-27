@@ -173,7 +173,10 @@ export function buildCallScript(
     if (company) {
       lines.push(callScriptCopy.rbi.complaintAgainst(company));
     }
-    lines.push(callScriptCopy.rbi.complaintDetails(date || undefined, ref || undefined));
+    if (date) {
+      lines.push(callScriptCopy.rbi.incidentDate(date));
+    }
+    lines.push(callScriptCopy.rbi.complaintStatus(ref || undefined));
     lines.push(callScriptCopy.rbi.guideOmbudsman);
   }
 

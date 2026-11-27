@@ -134,18 +134,11 @@ export const guCallScript: CallScriptCopy = {
   nchLanguagePreference: 'હું ગુજરાતીમાં વાત કરવા માંગુ છું.',
   rbi: {
     complaintAgainst: (company: string) => `નમસ્તે, મારી ${company} સામે એક ફરિયાદ છે.`,
-    complaintDetails: (date?: string, reference?: string) => {
-      if (date && reference) {
-        return `મેં તેમને ${date} ના રોજ ફરિયાદ કરી હતી (સંદર્ભ ${reference}) અને મને 30 દિવસમાં કોઈ જવાબ મળ્યો નથી, અથવા હું તેમના જવાબથી સંતુષ્ટ નથી.`;
-      }
-      if (date) {
-        return `મેં તેમને ${date} ના રોજ ફરિયાદ કરી હતી અને મને 30 દિવસમાં કોઈ જવાબ મળ્યો નથી, અથવા હું તેમના જવાબથી સંતુષ્ટ નથી.`;
-      }
-      if (reference) {
-        return `મેં તેમને ફરિયાદ કરી હતી (સંદર્ભ ${reference}) અને મને 30 દિવસમાં કોઈ જવાબ મળ્યો નથી, અથવા હું તેમના જવાબથી સંતુષ્ટ નથી.`;
-      }
-      return 'મેં તેમને ફરિયાદ કરી હતી અને મને 30 દિવસમાં કોઈ જવાબ મળ્યો નથી, અથવા હું તેમના જવાબથી સંતુષ્ટ નથી.';
-    },
+    incidentDate: (date: string) => `આ સમસ્યા ${date} ના રોજ બની હતી.`,
+    complaintStatus: (reference?: string) =>
+      reference
+        ? `મેં તેમને ફરિયાદ કરી હતી (સંદર્ભ ${reference}) અને મને સંતોષકારક જવાબ મળ્યો નથી.`
+        : 'મેં તેમને ફરિયાદ કરી હતી અને મને સંતોષકારક જવાબ મળ્યો નથી.',
     guideOmbudsman: 'કૃપા કરીને મને માર્ગદર્શન આપો કે RBI Ombudsman ને ફરિયાદ કેવી રીતે કરવી.',
   },
 };

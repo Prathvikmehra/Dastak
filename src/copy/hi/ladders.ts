@@ -134,18 +134,11 @@ export const hiCallScript: CallScriptCopy = {
   nchLanguagePreference: 'मैं हिंदी में बात करना चाहता हूं।',
   rbi: {
     complaintAgainst: (company: string) => `नमस्ते, मेरी ${company} के खिलाफ एक शिकायत है।`,
-    complaintDetails: (date?: string, reference?: string) => {
-      if (date && reference) {
-        return `मैंने उन्हें ${date} को शिकायत की थी (संदर्भ ${reference}) और मुझे 30 दिनों में कोई जवाब नहीं मिला है, या मैं उनके जवाब से संतुष्ट नहीं हूं।`;
-      }
-      if (date) {
-        return `मैंने उन्हें ${date} को शिकायत की थी और मुझे 30 दिनों में कोई जवाब नहीं मिला है, या मैं उनके जवाब से संतुष्ट नहीं हूं।`;
-      }
-      if (reference) {
-        return `मैंने उन्हें शिकायत की थी (संदर्भ ${reference}) और मुझे 30 दिनों में कोई जवाब नहीं मिला है, या मैं उनके जवाब से संतुष्ट नहीं हूं।`;
-      }
-      return 'मैंने उन्हें शिकायत की थी और मुझे 30 दिनों में कोई जवाब नहीं मिला है, या मैं उनके जवाब से संतुष्ट नहीं हूं।';
-    },
+    incidentDate: (date: string) => `यह समस्या ${date} को हुई थी।`,
+    complaintStatus: (reference?: string) =>
+      reference
+        ? `मैंने उन्हें शिकायत की थी (संदर्भ ${reference}) और मुझे संतोषजनक जवाब नहीं मिला है।`
+        : 'मैंने उन्हें शिकायत की थी और मुझे संतोषजनक जवाब नहीं मिला है।',
     guideOmbudsman: 'कृपया मुझे मार्गदर्शन दें कि RBI Ombudsman से शिकायत कैसे करें।',
   },
 };

@@ -136,18 +136,11 @@ export const enCallScript: CallScriptCopy = {
   nchLanguagePreference: 'I would like to speak in Hindi or Gujarati.',
   rbi: {
     complaintAgainst: (company: string) => `Hello, I have a complaint against ${company}.`,
-    complaintDetails: (date?: string, reference?: string) => {
-      if (date && reference) {
-        return `I complained to them on ${date} (reference ${reference}) and I have not had a reply in 30 days, or I am not satisfied with their reply.`;
-      }
-      if (date) {
-        return `I complained to them on ${date} and I have not had a reply in 30 days, or I am not satisfied with their reply.`;
-      }
-      if (reference) {
-        return `I complained to them (reference ${reference}) and I have not had a reply in 30 days, or I am not satisfied with their reply.`;
-      }
-      return 'I complained to them and I have not had a reply in 30 days, or I am not satisfied with their reply.';
-    },
+    incidentDate: (date: string) => `The problem happened on ${date}.`,
+    complaintStatus: (reference?: string) =>
+      reference
+        ? `I complained to them (reference ${reference}) and I have not received a satisfactory reply.`
+        : 'I complained to them and I have not received a satisfactory reply.',
     guideOmbudsman: 'Please guide me on how to complain to the RBI Ombudsman.',
   },
 };
