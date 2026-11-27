@@ -1,6 +1,9 @@
 import { buildDraft, buildCallScript } from './drafts';
-import { LADDERS } from './ladders';
+import { LADDERS, getLocalizedLadder } from './ladders';
 import { Case } from './types';
+import { en } from '../../copy/en';
+import { hi } from '../../copy/hi';
+import { gu } from '../../copy/gu';
 
 function createMockCase(overrides: Partial<Case> = {}): Case {
   return {
@@ -45,6 +48,7 @@ describe('Complaint Drafts and Call Scripts', () => {
       });
       const draft = buildDraft(c, step);
 
+      expect(draft).toContain('To: National Cyber Crime Reporting Portal (cybercrime.gov.in)');
       expect(draft).toContain('Subject: Formal complaint regarding online payment fraud');
       expect(draft).toContain('an online payment fraud');
       expect(draft).toContain('₹1,00,000');
@@ -159,6 +163,80 @@ describe('Complaint Drafts and Call Scripts', () => {
       expect(script).toContain('Hello, I want to report an unreturned refund from a seller.');
       expect(script).toContain('National Consumer Helpline');
       expect(script).not.toContain('undefined');
+    });
+
+    it('uses draftRecipient for fraud steps and falls back to who for other drafts across all languages', () => {
+      const fraudStep0 = LADDERS.fraud.steps[0];
+      const fraudStep1 = LADDERS.fraud.steps[1];
+      const fraudStep30 = LADDERS.fraud.steps[2];
+      const refundStep0 = LADDERS.refund.steps[0];
+      const bankStep0 = LADDERS.bank.steps[0];
+      const insuranceStep0 = LADDERS.insurance.steps[0];
+
+      const c = createMockCase({ issueType: 'fraud' });
+
+      // English
+      expect(buildDraft(c, fraudStep0, en.drafts)).toContain(
+        'To: National Cyber Crime Reporting Portal (cybercrime.gov.in)'
+      );
+      expect(buildDraft(c, fraudStep1, en.drafts)).toContain(
+        'To: National Cyber Crime Reporting Portal (cybercrime.gov.in)'
+      );
+      expect(buildDraft(c, fraudStep30, en.drafts)).toContain('To: RBI Ombudsman');
+      expect(buildDraft(c, refundStep0, en.drafts)).toContain('To: ' + refundStep0.who);
+      expect(buildDraft(c, bankStep0, en.drafts)).toContain('To: ' + bankStep0.who);
+      expect(buildDraft(c, insuranceStep0, en.drafts)).toContain('To: ' + insuranceStep0.who);
+
+      // Hindi
+      const hiFraud = getLocalizedLadder('fraud', hi);
+      const hiRefund = getLocalizedLadder('refund', hi);
+      expect(buildDraft(c, hiFraud.steps[0], hi.drafts)).toContain(
+        hi.drafts.to('National Cyber Crime Reporting Portal (cybercrime.gov.in)')
+      );
+      expect(buildDraft(c, hiRefund.steps[0], hi.drafts)).toContain(
+        hi.drafts.to(hiRefund.steps[0].who)
+      );
+
+      // Gujarati
+      const guFraud = getLocalizedLadder('fraud', gu);
+      const guRefund = getLocalizedLadder('refund', gu);
+      expect(buildDraft(c, guFraud.steps[0], gu.drafts)).toContain(
+        gu.drafts.to('National Cyber Crime Reporting Portal (cybercrime.gov.in)')
+      );
+      expect(buildDraft(c, guRefund.steps[0], gu.drafts)).toContain(
+        gu.drafts.to(guRefund.steps[0].who)
+      );
+    });
+
+    it('omits date line from drafts and call scripts when incident date is a legacy string', () => {
+      const legacyCases = [
+        createMockCase({ issueType: 'fraud', incidentDate: 'yesterday' }),
+        createMockCase({ issueType: 'fraud', incidentDate: '', legacyIncidentDate: 'yesterday' }),
+        createMockCase({ issueType: 'bank', incidentDate: 'last Tuesday' }),
+        createMockCase({ issueType: 'bank', company: 'ABC Bank', incidentDate: 'Today morning' }),
+      ];
+
+      for (const lc of legacyCases) {
+        // Draft check
+        const draft = buildDraft(lc, LADDERS.bank.steps[0]);
+        expect(draft).not.toContain('yesterday');
+        expect(draft).not.toContain('last Tuesday');
+        expect(draft).not.toContain('Today morning');
+        expect(draft).not.toContain('The incident occurred on');
+
+        // RBI script check
+        const rbiStep = LADDERS.bank.steps[1]; // rbi14448
+        const rbiScript = buildCallScript(lc, rbiStep);
+        expect(rbiScript).not.toContain('yesterday');
+        expect(rbiScript).not.toContain('last Tuesday');
+        expect(rbiScript).not.toContain('Today morning');
+        expect(rbiScript).not.toContain('The problem happened on');
+
+        // Cyber1930 script check
+        const cyberScript = buildCallScript(lc, LADDERS.fraud.steps[0]);
+        expect(cyberScript).not.toContain('yesterday');
+        expect(cyberScript).not.toContain('The incident occurred on');
+      }
     });
   });
 });

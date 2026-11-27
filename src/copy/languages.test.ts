@@ -25,6 +25,7 @@ const ALLOWED_IDENTICAL_STRINGS = new Set([
   'EPFO Member Portal',
   'Department of Posts',
   'National Consumer Helpline',
+  'National Cyber Crime Reporting Portal (cybercrime.gov.in)',
   'Cybercrime helpline',
   'Cybercrime portal',
   'RBI complaint portal',

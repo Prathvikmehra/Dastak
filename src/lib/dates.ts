@@ -79,6 +79,16 @@ export function formatLocalDate(date: LocalDate): string {
   return date;
 }
 
+export function isLocalDate(val: unknown): val is LocalDate {
+  if (typeof val !== 'string') return false;
+  const match = val.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+  const year = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10);
+  const day = parseInt(match[3], 10);
+  return isValidParts(day, month, year);
+}
+
 export function parseLocalDate(str: string | null | undefined): LocalDate | null {
   if (!str || typeof str !== 'string') return null;
   const trimmed = str.trim();

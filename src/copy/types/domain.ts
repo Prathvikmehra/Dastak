@@ -1,7 +1,7 @@
 export interface LadderCopy {
   title: string;
   evidence: Record<string, string>;
-  steps: Record<string, { who: string; how: string; request: string }>;
+  steps: Record<string, { who: string; how: string; request: string; draftRecipient?: string }>;
 }
 
 export interface PlaceCopy {

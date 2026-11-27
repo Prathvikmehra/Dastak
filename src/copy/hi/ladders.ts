@@ -38,12 +38,14 @@ export const hiLadders: Record<'refund' | 'fraud' | 'bank' | 'insurance', Ladder
     steps: {
       'fraud-step-0': {
         who: 'Cybercrime helpline',
+        draftRecipient: 'National Cyber Crime Reporting Portal (cybercrime.gov.in)',
         how: 'आज ही तुरंत 1930 पर कॉल करें, फिर अपने बैंक को बताएं। 24 घंटे के भीतर रिपोर्ट करने से धोखेबाज़ द्वारा पैसे निकालने से पहले वसूली की संभावना बेहतर होती है। आपको मिलने वाला acknowledgment number लिखकर रख लें। अपने बैंक को भी सूचित करें। 1930 पर शिकायत करने से बैंक को सूचित करने की ज़रूरत खत्म नहीं होती।',
         request:
           'मैं आपसे इस मामले की जांच करने, जहां संभव हो प्राप्तकर्ता खाते को रोकने और कटे पैसे वापस करने का अनुरोध करता हूं।',
       },
       'fraud-step-1': {
         who: 'Cybercrime portal',
+        draftRecipient: 'National Cyber Crime Reporting Portal (cybercrime.gov.in)',
         how: 'लेन-देन ID और कॉल स्क्रीनशॉट के साथ National Cyber Crime पोर्टल पर अपनी औपचारिक वित्तीय धोखाधड़ी शिकायत दर्ज करें।',
         request:
           'मैं आपसे इस मामले की जांच करने, जहां संभव हो प्राप्तकर्ता खाते को रोकने और कटे पैसे वापस करने का अनुरोध करता हूं।',

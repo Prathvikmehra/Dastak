@@ -8,6 +8,7 @@ export interface LadderStepDefinition {
   phone?: string;
   link?: string;
   scriptId?: ScriptId;
+  draftRecipient?: string;
   verifiedOn?: '2026-11-26' | null;
   verifiedAgainst?: string | null;
 }
@@ -51,6 +52,7 @@ export const LADDER_DEFINITIONS: Record<IssueType, IssueLadderDefinition> = {
         dayOffset: 0,
         phone: '1930',
         scriptId: 'cyber1930',
+        draftRecipient: 'National Cyber Crime Reporting Portal (cybercrime.gov.in)',
         verifiedOn: '2026-11-26',
         verifiedAgainst: 'https://cybercrime.gov.in',
       },
@@ -58,6 +60,7 @@ export const LADDER_DEFINITIONS: Record<IssueType, IssueLadderDefinition> = {
         id: 'fraud-step-1',
         dayOffset: 1,
         link: 'https://cybercrime.gov.in',
+        draftRecipient: 'National Cyber Crime Reporting Portal (cybercrime.gov.in)',
         verifiedOn: '2026-11-26',
         verifiedAgainst: 'https://cybercrime.gov.in',
       },
@@ -126,6 +129,7 @@ export function getLocalizedLadder(issueType: IssueType, copy: Copy = en): Issue
         phone: step.phone,
         link: step.link,
         scriptId: step.scriptId,
+        draftRecipient: stepCopy.draftRecipient || step.draftRecipient,
         verifiedOn: step.verifiedOn,
         verifiedAgainst: step.verifiedAgainst,
         who: stepCopy.who,

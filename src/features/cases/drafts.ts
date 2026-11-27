@@ -1,6 +1,6 @@
 import { Case, LadderStep } from './types';
 import { formatRupees, parseAmount } from '../../lib/formatters';
-import { toDisplay } from '../../lib/dates';
+import { isLocalDate, toDisplay } from '../../lib/dates';
 import { CallScriptCopy, DraftsCopy } from '../../copy/types/domain';
 import { en } from '../../copy/en';
 
@@ -22,7 +22,8 @@ export function buildDraft(
 ): string {
   const parts: string[] = [];
 
-  parts.push(draftsCopy.to(step.who));
+  const recipient = step.draftRecipient || step.who;
+  parts.push(draftsCopy.to(recipient));
 
   const company = caseItem.company?.trim() || '';
 
@@ -43,9 +44,10 @@ export function buildDraft(
   const sentences: string[] = [];
   const parsedAmt = parseAmount(caseItem.amount);
   const amountStr = parsedAmt !== null ? formatRupees(parsedAmt) : '';
-  const incidentDate = caseItem.incidentDate
-    ? toDisplay(caseItem.incidentDate)
-    : caseItem.legacyIncidentDate?.trim() || '';
+  const incidentDate =
+    caseItem.incidentDate && isLocalDate(caseItem.incidentDate)
+      ? toDisplay(caseItem.incidentDate)
+      : '';
 
   if (caseItem.issueType === 'refund') {
     sentences.push(draftsCopy.introRefund(company || undefined, amountStr || undefined));
@@ -124,9 +126,10 @@ export function buildCallScript(
   const amountStr = parsedAmt !== null ? formatRupees(parsedAmt) : '';
   const company = caseItem.company?.trim() || '';
   const ref = caseItem.reference?.trim() || '';
-  const date = caseItem.incidentDate
-    ? toDisplay(caseItem.incidentDate)
-    : caseItem.legacyIncidentDate?.trim() || '';
+  const date =
+    caseItem.incidentDate && isLocalDate(caseItem.incidentDate)
+      ? toDisplay(caseItem.incidentDate)
+      : '';
 
   if (step.scriptId === 'cyber1930') {
     lines.push(callScriptCopy.openers.fraud);

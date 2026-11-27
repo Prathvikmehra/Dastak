@@ -3,6 +3,7 @@ import path from 'path';
 import ts from 'typescript';
 import {
   isValidParts,
+  isLocalDate,
   parseLocalDate,
   formatLocalDate,
   toDisplay,
@@ -66,6 +67,31 @@ describe('dates utilities', () => {
       expect(parseLocalDate('recently')).toBeNull();
       expect(parseLocalDate('')).toBeNull();
       expect(parseLocalDate(null)).toBeNull();
+    });
+  });
+
+  describe('isLocalDate validator', () => {
+    it('validates strictly formatted and calendar-valid YYYY-MM-DD strings', () => {
+      expect(isLocalDate('2026-10-28')).toBe(true);
+      expect(isLocalDate('2024-02-29')).toBe(true);
+      expect(isLocalDate('2026-01-05')).toBe(true);
+    });
+
+    it('rejects invalid calendar dates even in YYYY-MM-DD format', () => {
+      expect(isLocalDate('2025-02-29')).toBe(false); // non-leap year
+      expect(isLocalDate('2026-04-31')).toBe(false); // April has 30 days
+      expect(isLocalDate('2026-13-01')).toBe(false); // month 13
+    });
+
+    it('rejects legacy free-text strings, empty values, and non-strings', () => {
+      expect(isLocalDate('yesterday')).toBe(false);
+      expect(isLocalDate('Today morning')).toBe(false);
+      expect(isLocalDate('last Tuesday')).toBe(false);
+      expect(isLocalDate('28 Oct 2026')).toBe(false); // only YYYY-MM-DD is LocalDate
+      expect(isLocalDate('')).toBe(false);
+      expect(isLocalDate(null)).toBe(false);
+      expect(isLocalDate(undefined)).toBe(false);
+      expect(isLocalDate(12345)).toBe(false);
     });
   });
 

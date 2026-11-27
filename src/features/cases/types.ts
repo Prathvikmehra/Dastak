@@ -51,6 +51,7 @@ export interface LadderStep {
   link?: string;
   phone?: string;
   scriptId?: ScriptId;
+  draftRecipient?: string;
   verifiedOn?: '2026-11-26' | null;
   verifiedAgainst?: string | null;
 }

@@ -38,12 +38,14 @@ export const guLadders: Record<'refund' | 'fraud' | 'bank' | 'insurance', Ladder
     steps: {
       'fraud-step-0': {
         who: 'Cybercrime helpline',
+        draftRecipient: 'National Cyber Crime Reporting Portal (cybercrime.gov.in)',
         how: 'આજે જ તરત 1930 પર કૉલ કરો, પછી તમારી બેંકને જણાવો. 24 કલાકમાં રિપોર્ટ કરવાથી છેતરપિંડી કરનાર પૈસા ઉપાડી લે તે પહેલાં રિકવરીની તકો વધે છે. તમને આપવામાં આવેલ acknowledgment number લખી લો. તમારી બેંકને પણ જાણ કરો. 1930 પર ફરિયાદ કરવાથી બેંકને જાણ કરવાનું બદલાતું નથી.',
         request:
           'હું તમને આ બાબતની તપાસ કરવા, જ્યાં શક્ય હોય ત્યાં મેળવનારનું ખાતું ફ્રીઝ કરવા અને કપાયેલા પૈસા પરત કરવા વિનંતી કરું છું.',
       },
       'fraud-step-1': {
         who: 'Cybercrime portal',
+        draftRecipient: 'National Cyber Crime Reporting Portal (cybercrime.gov.in)',
         how: 'ટ્રાન્ઝેક્શન ID અને કૉલ સ્ક્રીનશોટ સાથે National Cyber Crime પોર્ટલ પર તમારી ઔપચારિક નાણાકીય છેતરપિંડીની ફરિયાદ નોંધાવો.',
         request:
           'હું તમને આ બાબતની તપાસ કરવા, જ્યાં શક્ય હોય ત્યાં મેળવનારનું ખાતું ફ્રીઝ કરવા અને કપાયેલા પૈસા પરત કરવા વિનંતી કરું છું.',

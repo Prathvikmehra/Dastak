@@ -38,12 +38,14 @@ export const enLadders: Record<'refund' | 'fraud' | 'bank' | 'insurance', Ladder
     steps: {
       'fraud-step-0': {
         who: 'Cybercrime helpline',
+        draftRecipient: 'National Cyber Crime Reporting Portal (cybercrime.gov.in)',
         how: 'Call 1930 immediately today, then tell your bank. Reporting within 24 hours improves the chance of recovery before the scammer withdraws the money. Write down the acknowledgement number you are given. Also tell your bank. Reporting to 1930 does not replace telling your bank.',
         request:
           'I request you to investigate this matter, freeze the receiving account where possible, and reverse the debit.',
       },
       'fraud-step-1': {
         who: 'Cybercrime portal',
+        draftRecipient: 'National Cyber Crime Reporting Portal (cybercrime.gov.in)',
         how: 'Register your formal financial fraud complaint on the National Cyber Crime portal with transaction IDs and call screenshots.',
         request:
           'I request you to investigate this matter, freeze the receiving account where possible, and reverse the debit.',
