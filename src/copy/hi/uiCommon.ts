@@ -58,4 +58,9 @@ export const hiUiCommon: UiCommonCopy = {
     message: 'कुछ गलत हो गया। आपके सहेजे गए मामले इस फोन पर सुरक्षित हैं।',
     tryAgain: 'पुनः प्रयास करें',
   },
+
+  verification: {
+    checkedOn: (date: string) => `संपर्क विवरण ${date} को जाँचा गया`,
+    notCheckedYet: 'अभी तक जाँचा नहीं गया। कृपया आधिकारिक वेबसाइट पर पुष्टि करें।',
+  },
 };

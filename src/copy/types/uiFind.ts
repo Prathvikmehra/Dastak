@@ -169,6 +169,9 @@ export interface UiFindCopy {
     themeDark: string;
     privacyTitle: string;
     privacySubtitle: string;
+    sourcesTitle: string;
+    sourcesExplanation: string;
+    openSourceButton: string;
     corruptBanner: string;
     storageErrorBanner: string;
     deleteAllTitle: string;

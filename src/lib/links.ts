@@ -54,3 +54,8 @@ export async function openWeb(
     return { success: false, url: webUrl, fallbackMessage };
   }
 }
+
+/**
+ * Opens a web link (alias for openWeb).
+ */
+export const openLink = openWeb;

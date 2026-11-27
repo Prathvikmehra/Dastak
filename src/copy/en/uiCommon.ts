@@ -59,4 +59,9 @@ export const enUiCommon: UiCommonCopy = {
     message: 'Something went wrong. Your saved cases are safe on this phone.',
     tryAgain: 'Try again',
   },
+
+  verification: {
+    checkedOn: (date: string) => `Contact details checked on ${date}`,
+    notCheckedYet: 'Not checked yet. Please confirm on the official site.',
+  },
 };

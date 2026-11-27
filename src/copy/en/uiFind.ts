@@ -196,6 +196,10 @@ export const enUiFind: UiFindCopy = {
     privacyTitle: 'Privacy guarantee',
     privacySubtitle:
       'No data leaves your device unless you choose to share a complaint letter. Your cases stay only on this phone. If you change phones, they will not move automatically.',
+    sourcesTitle: 'Sources and checks',
+    sourcesExplanation:
+      'We check helplines and websites against official sources. Items marked not checked yet may be out of date.',
+    openSourceButton: 'Open source',
     corruptBanner: 'We could not read your saved cases. A backup was kept.',
     storageErrorBanner: 'Could not save changes to your phone. Please check available storage.',
     deleteAllTitle: 'Delete all my data',

@@ -1,4 +1,4 @@
-import { openPhone, openWeb } from './links';
+import { openPhone, openWeb, openLink } from './links';
 
 describe('Linking Helpers (openPhone, openWeb)', () => {
   describe('openPhone', () => {
@@ -50,6 +50,17 @@ describe('Linking Helpers (openPhone, openWeb)', () => {
       expect(result.url).toBe('https://cybercrime.gov.in');
       expect(result.fallbackMessage).toContain('https://cybercrime.gov.in');
       expect(onFail).toHaveBeenCalledWith(result.fallbackMessage);
+    });
+  });
+
+  describe('openLink', () => {
+    it('is an alias for openWeb and opens web URLs with fallback message support', async () => {
+      expect(openLink).toBe(openWeb);
+
+      const mockOpener = jest.fn().mockResolvedValue(true);
+      const res = await openLink('https://official.gov.in', undefined, mockOpener);
+      expect(res.success).toBe(true);
+      expect(res.url).toBe('https://official.gov.in');
     });
   });
 });

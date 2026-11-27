@@ -44,4 +44,8 @@ export interface UiCommonCopy {
     message: string;
     tryAgain: string;
   };
+  verification: {
+    checkedOn: (date: string) => string;
+    notCheckedYet: string;
+  };
 }

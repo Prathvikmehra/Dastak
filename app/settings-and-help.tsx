@@ -7,6 +7,7 @@ import { useCopy } from '../src/copy/context';
 import { RemindersSection } from '../src/features/settings/components/RemindersSection';
 import { LanguageSection } from '../src/features/settings/components/LanguageSection';
 import { ThemeSection } from '../src/features/settings/components/ThemeSection';
+import { SourcesSection } from '../src/features/settings/components/SourcesSection';
 import { PrivacySection } from '../src/features/settings/components/PrivacySection';
 import { CorruptDataBanner } from '../src/features/settings/components/CorruptDataBanner';
 
@@ -21,6 +22,7 @@ export default function SettingsAndHelpScreen() {
       <RemindersSection />
       <LanguageSection />
       <ThemeSection />
+      <SourcesSection />
       <PrivacySection />
 
       <View style={styles.closeContainer}>

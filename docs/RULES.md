@@ -107,6 +107,7 @@ dastak/
 - **No Jargon**: Avoid technical jargon (say "Money cut from bank" instead of "Debit transaction initiated").
 - **No Emoji Icons**: Do not use emojis as user interface icons; use `Ionicons` consistently.
 - **Factual Truth in Copy**: A script or letter may only state facts the person entered. Never reuse a field for a different meaning (for example, the incident date is not the complaint date). If we need a fact we do not hold, either add a field for it or leave the sentence out.
+- **Verified Sources**: Any new contact detail must be added with verifiedOn null until a human has checked it against an official source; the app shows that status to the person.
 
 ---
 

@@ -59,4 +59,9 @@ export const guUiCommon: UiCommonCopy = {
     message: 'કંઈક ખોટું થયું. તમારા સાચવેલા કેસ આ ફોન પર સુરક્ષિત છે.',
     tryAgain: 'ફરી પ્રયાસ કરો',
   },
+
+  verification: {
+    checkedOn: (date: string) => `સંપર્ક વિગતો ${date} ના રોજ ચકાસવામાં આવી`,
+    notCheckedYet: 'હજુ સુધી ચકાસાયેલ નથી. કૃપા કરીને સત્તાવાર સાઇટ પર પુષ્ટિ કરો.',
+  },
 };

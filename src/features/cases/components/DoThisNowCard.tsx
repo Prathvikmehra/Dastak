@@ -6,6 +6,7 @@ import { useTheme } from '../../../theme/ThemeContext';
 import { Case, LadderStep } from '../types';
 import { buildCallScript } from '../engine';
 import { useCopy } from '../../../copy/context';
+import { getVerificationLabel } from '../../../lib/verification';
 
 export interface DoThisNowCardProps {
   caseItem: Case;
@@ -31,6 +32,10 @@ export const DoThisNowCard: React.FC<DoThisNowCardProps> = ({
   const hasScript = Boolean(step.scriptId);
   const callScript = hasScript ? buildCallScript(caseItem, step, copy.callScript) : '';
   const isRbiStep = step.scriptId === 'rbi14448';
+  const hasContact = Boolean(step.phone || step.link);
+  const verificationLabel = hasContact
+    ? getVerificationLabel(step.verifiedOn, step.verifiedAgainst, copy.verification)
+    : null;
 
   return (
     <Card style={styles.card}>
@@ -80,6 +85,12 @@ export const DoThisNowCard: React.FC<DoThisNowCardProps> = ({
             {callScript}
           </Text>
         </View>
+      ) : null}
+
+      {hasContact && verificationLabel ? (
+        <Text size="caption" color="muted" style={styles.verificationText}>
+          {verificationLabel}
+        </Text>
       ) : null}
 
       <View style={styles.actionsContainer}>
@@ -210,6 +221,10 @@ const styles = StyleSheet.create({
   scriptText: {
     lineHeight: 22,
     fontWeight: '500',
+  },
+  verificationText: {
+    marginTop: 8,
+    marginBottom: 8,
   },
   actionsContainer: {
     gap: 10,

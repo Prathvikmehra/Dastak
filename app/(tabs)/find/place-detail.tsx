@@ -13,6 +13,7 @@ import { OtpSafetyTip } from '../../../src/features/money/components/OtpSafetyTi
 import { openWeb } from '../../../src/lib/links';
 import { defaultReminders } from '../../../src/features/cases/reminders';
 import { useCopy } from '../../../src/copy/context';
+import { getVerificationLabel } from '../../../src/lib/verification';
 
 const STATUS_OPTIONS: MoneyPlaceStatus[] = [
   'not_checked',
@@ -33,6 +34,11 @@ export default function PlaceDetailScreen() {
   const placeId = params.placeId || 'udgam';
   const place = places.find((p) => p.id === placeId) || places[0];
   const currentRecord = records[place.id];
+  const verificationLabel = getVerificationLabel(
+    place.verifiedOn,
+    place.verifiedAgainst,
+    copy.verification
+  );
 
   const [status, setStatus] = useState<MoneyPlaceStatus>(currentRecord?.status || 'not_checked');
   const [amount, setAmount] = useState(currentRecord?.amount || '');
@@ -88,6 +94,9 @@ export default function PlaceDetailScreen() {
         </Text>
         <Text size="body" color="muted">
           {copy.placeDetail.trackingRecordsFor(activePerson.name)}
+        </Text>
+        <Text size="caption" color="muted" style={styles.verificationText}>
+          {verificationLabel}
         </Text>
       </View>
 
@@ -238,5 +247,8 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginBottom: 32,
+  },
+  verificationText: {
+    marginTop: 6,
   },
 });

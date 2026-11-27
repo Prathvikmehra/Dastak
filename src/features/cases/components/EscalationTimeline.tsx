@@ -5,6 +5,7 @@ import { Card, Text } from '../../../components';
 import { useTheme } from '../../../theme/ThemeContext';
 import { LadderStep } from '../types';
 import { useCopy } from '../../../copy/context';
+import { getVerificationLabel } from '../../../lib/verification';
 
 export interface EscalationTimelineProps {
   steps: LadderStep[];
@@ -42,6 +43,10 @@ export const EscalationTimeline: React.FC<EscalationTimelineProps> = ({
           const isPast = s.dayOffset < activeDayOffset;
           const isFuture = s.dayOffset > activeDayOffset;
           const daysRemaining = s.dayOffset - elapsedDays;
+          const hasContact = Boolean(s.phone || s.link);
+          const verificationLabel = hasContact
+            ? getVerificationLabel(s.verifiedOn, s.verifiedAgainst, copy.verification)
+            : null;
 
           return (
             <View key={s.id} style={styles.timelineStepRow}>
@@ -119,6 +124,11 @@ export const EscalationTimeline: React.FC<EscalationTimelineProps> = ({
                 <Text size="caption" color={isCurrent ? 'ink' : 'muted'}>
                   {copy.caseDetail.daysCount(s.dayOffset)}
                 </Text>
+                {hasContact && verificationLabel ? (
+                  <Text size="caption" color="muted" style={styles.verificationText}>
+                    {verificationLabel}
+                  </Text>
+                ) : null}
               </View>
             </View>
           );
@@ -177,5 +187,8 @@ const styles = StyleSheet.create({
   activeBadge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
+  },
+  verificationText: {
+    marginTop: 4,
   },
 });
