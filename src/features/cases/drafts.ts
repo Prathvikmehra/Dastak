@@ -106,51 +106,75 @@ export function buildDraft(
 }
 
 /**
- * Builds a short call script (4 to 6 plain lines) for steps that have a phone number.
+ * Builds a short call script for steps that have a scriptId.
  * Uses only facts supplied by the user.
+ * Returns empty string if step has no scriptId.
  */
 export function buildCallScript(
   caseItem: Case,
   step: LadderStep,
   callScriptCopy: CallScriptCopy = en.callScript
 ): string {
+  if (!step.scriptId) {
+    return '';
+  }
+
   const lines: string[] = [];
-
-  lines.push(callScriptCopy.openers[caseItem.issueType]);
-
   const parsedAmt = parseAmount(caseItem.amount);
-  if (parsedAmt !== null) {
-    lines.push(callScriptCopy.amount(formatRupees(parsedAmt)));
-  }
-
-  const company = caseItem.company?.trim();
-  if (company) {
-    lines.push(callScriptCopy.companies[caseItem.issueType](company));
-  }
-
-  const ref = caseItem.reference?.trim();
-  if (ref) {
-    lines.push(callScriptCopy.reference(ref));
-  }
-
+  const amountStr = parsedAmt !== null ? formatRupees(parsedAmt) : '';
+  const company = caseItem.company?.trim() || '';
+  const ref = caseItem.reference?.trim() || '';
   const date = caseItem.incidentDate
     ? toDisplay(caseItem.incidentDate)
     : caseItem.legacyIncidentDate?.trim() || '';
-  if (date) {
-    lines.push(callScriptCopy.incidentDate(date));
-  }
 
-  if (lines.length === 1) {
-    lines.push(callScriptCopy.generalFallback1);
-    lines.push(callScriptCopy.generalFallback2);
-  }
-
-  if (caseItem.issueType === 'fraud') {
+  if (step.scriptId === 'cyber1930') {
+    lines.push(callScriptCopy.openers.fraud);
+    if (amountStr) {
+      lines.push(callScriptCopy.amount(amountStr));
+    }
+    if (company) {
+      lines.push(callScriptCopy.companies.fraud(company));
+    }
+    if (ref) {
+      lines.push(callScriptCopy.reference(ref));
+    }
+    if (date) {
+      lines.push(callScriptCopy.incidentDate(date));
+    }
+    if (lines.length === 1) {
+      lines.push(callScriptCopy.generalFallback1);
+      lines.push(callScriptCopy.generalFallback2);
+    }
     lines.push(callScriptCopy.closers.fraud);
-  } else if (step.phone === '1915') {
+  } else if (step.scriptId === 'nch1915') {
+    lines.push(callScriptCopy.openers.refund);
+    if (amountStr) {
+      lines.push(callScriptCopy.amount(amountStr));
+    }
+    if (company) {
+      lines.push(callScriptCopy.companies.refund(company));
+    }
+    if (ref) {
+      lines.push(callScriptCopy.reference(ref));
+    }
+    if (date) {
+      lines.push(callScriptCopy.incidentDate(date));
+    }
+    if (lines.length === 1) {
+      lines.push(callScriptCopy.generalFallback1);
+      lines.push(callScriptCopy.generalFallback2);
+    }
+    if (callScriptCopy.nchLanguagePreference) {
+      lines.push(callScriptCopy.nchLanguagePreference);
+    }
     lines.push(callScriptCopy.closers.nch);
-  } else {
-    lines.push(callScriptCopy.closers.general);
+  } else if (step.scriptId === 'rbi14448') {
+    if (company) {
+      lines.push(callScriptCopy.rbi.complaintAgainst(company));
+    }
+    lines.push(callScriptCopy.rbi.complaintDetails(date || undefined, ref || undefined));
+    lines.push(callScriptCopy.rbi.guideOmbudsman);
   }
 
   return lines.join('\n');

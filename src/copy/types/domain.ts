@@ -37,6 +37,12 @@ export interface CallScriptCopy {
     nch: string;
     general: string;
   };
+  nchLanguagePreference: string;
+  rbi: {
+    complaintAgainst: (company: string) => string;
+    complaintDetails: (date?: string, reference?: string) => string;
+    guideOmbudsman: string;
+  };
 }
 
 export interface DraftsCopy {

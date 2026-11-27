@@ -155,6 +155,7 @@ export const enUiCases: UiCasesCopy = {
       title: 'Do this now',
       callButton: (phone: string) => `Call ${phone}`,
       websiteButton: 'Open official website',
+      openCmsRbiButton: 'Open cms.rbi.org.in',
       shareDraftButton: 'Share complaint draft',
       draftCopiedNotice: 'Draft ready to share',
     },

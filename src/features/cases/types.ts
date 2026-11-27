@@ -40,6 +40,8 @@ export interface CaseStore {
   clear?(): Promise<void>;
 }
 
+export type ScriptId = 'cyber1930' | 'nch1915' | 'rbi14448';
+
 export interface LadderStep {
   id: string;
   dayOffset: number;
@@ -48,6 +50,7 @@ export interface LadderStep {
   request: string;
   link?: string;
   phone?: string;
+  scriptId?: ScriptId;
   verifiedOn?: '2026-11-26' | null;
   verifiedAgainst?: string | null;
 }

@@ -151,6 +151,7 @@ export const guUiCases: UiCasesCopy = {
       title: 'હમણાં આ કરો',
       callButton: (phone: string) => `${phone} પર કૉલ કરો`,
       websiteButton: 'સત્તાવાર વેબસાઇટ ખોલો',
+      openCmsRbiButton: 'cms.rbi.org.in ખોલો',
       shareDraftButton: 'ફરિયાદ ડ્રાફ્ટ શેર કરો',
       draftCopiedNotice: 'ડ્રાફ્ટ શેર કરવા માટે તૈયાર છે',
     },

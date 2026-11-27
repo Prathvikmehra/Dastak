@@ -137,7 +137,8 @@ describe('Complaint Drafts and Call Scripts', () => {
       const draft = buildDraft(caseWithDate, step);
       expect(draft).toContain('The incident occurred on 28 Oct 2026.');
 
-      const script = buildCallScript(caseWithDate, step);
+      const phoneStep = LADDERS.fraud.steps[0];
+      const script = buildCallScript(caseWithDate, phoneStep);
       expect(script).toContain('The incident occurred on 28 Oct 2026.');
     });
 
@@ -154,7 +155,7 @@ describe('Complaint Drafts and Call Scripts', () => {
       const lines = script.split('\n').filter((l) => l.trim().length > 0);
 
       expect(lines.length).toBeGreaterThanOrEqual(4);
-      expect(lines.length).toBeLessThanOrEqual(6);
+      expect(lines.length).toBeLessThanOrEqual(7);
       expect(script).toContain('Hello, I want to report an unreturned refund from a seller.');
       expect(script).toContain('National Consumer Helpline');
       expect(script).not.toContain('undefined');

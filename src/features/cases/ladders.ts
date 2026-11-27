@@ -1,4 +1,4 @@
-import { IssueLadder, IssueType } from './types';
+import { IssueLadder, IssueType, ScriptId } from './types';
 import { en } from '../../copy/en';
 import { Copy } from '../../copy/types';
 
@@ -7,6 +7,7 @@ export interface LadderStepDefinition {
   dayOffset: number;
   phone?: string;
   link?: string;
+  scriptId?: ScriptId;
   verifiedOn?: '2026-11-26' | null;
   verifiedAgainst?: string | null;
 }
@@ -27,6 +28,7 @@ export const LADDER_DEFINITIONS: Record<IssueType, IssueLadderDefinition> = {
         id: 'refund-step-7',
         dayOffset: 7,
         phone: '1915',
+        scriptId: 'nch1915',
         link: 'https://consumerhelpline.gov.in',
         verifiedOn: '2026-11-26',
         verifiedAgainst: 'https://consumerhelpline.gov.in/public/contact',
@@ -48,6 +50,7 @@ export const LADDER_DEFINITIONS: Record<IssueType, IssueLadderDefinition> = {
         id: 'fraud-step-0',
         dayOffset: 0,
         phone: '1930',
+        scriptId: 'cyber1930',
         verifiedOn: '2026-11-26',
         verifiedAgainst: 'https://cybercrime.gov.in',
       },
@@ -62,6 +65,7 @@ export const LADDER_DEFINITIONS: Record<IssueType, IssueLadderDefinition> = {
         id: 'fraud-step-30',
         dayOffset: 30,
         phone: '14448',
+        scriptId: 'rbi14448',
         link: 'https://cms.rbi.org.in',
         verifiedOn: '2026-11-26',
         verifiedAgainst: 'https://www.rbi.org.in/scripts/FAQDisplay.aspx?Id=153',
@@ -77,6 +81,7 @@ export const LADDER_DEFINITIONS: Record<IssueType, IssueLadderDefinition> = {
         id: 'bank-step-30',
         dayOffset: 30,
         phone: '14448',
+        scriptId: 'rbi14448',
         link: 'https://cms.rbi.org.in',
         verifiedOn: '2026-11-26',
         verifiedAgainst: 'https://www.rbi.org.in/scripts/FAQDisplay.aspx?Id=153',
@@ -120,6 +125,7 @@ export function getLocalizedLadder(issueType: IssueType, copy: Copy = en): Issue
         dayOffset: step.dayOffset,
         phone: step.phone,
         link: step.link,
+        scriptId: step.scriptId,
         verifiedOn: step.verifiedOn,
         verifiedAgainst: step.verifiedAgainst,
         who: stepCopy.who,

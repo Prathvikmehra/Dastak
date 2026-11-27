@@ -133,4 +133,21 @@ export const enCallScript: CallScriptCopy = {
     nch: 'Please help me register this complaint with the National Consumer Helpline.',
     general: 'Please record my grievance and provide a complaint reference number.',
   },
+  nchLanguagePreference: 'I would like to speak in Hindi or Gujarati.',
+  rbi: {
+    complaintAgainst: (company: string) => `Hello, I have a complaint against ${company}.`,
+    complaintDetails: (date?: string, reference?: string) => {
+      if (date && reference) {
+        return `I complained to them on ${date} (reference ${reference}) and I have not had a reply in 30 days, or I am not satisfied with their reply.`;
+      }
+      if (date) {
+        return `I complained to them on ${date} and I have not had a reply in 30 days, or I am not satisfied with their reply.`;
+      }
+      if (reference) {
+        return `I complained to them (reference ${reference}) and I have not had a reply in 30 days, or I am not satisfied with their reply.`;
+      }
+      return 'I complained to them and I have not had a reply in 30 days, or I am not satisfied with their reply.';
+    },
+    guideOmbudsman: 'Please guide me on how to complain to the RBI Ombudsman.',
+  },
 };

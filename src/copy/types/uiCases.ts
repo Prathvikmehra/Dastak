@@ -114,6 +114,7 @@ export interface UiCasesCopy {
       title: string;
       callButton: (phone: string) => string;
       websiteButton: string;
+      openCmsRbiButton: string;
       shareDraftButton: string;
       draftCopiedNotice: string;
     };

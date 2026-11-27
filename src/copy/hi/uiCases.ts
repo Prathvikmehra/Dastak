@@ -151,6 +151,7 @@ export const hiUiCases: UiCasesCopy = {
       title: 'अभी यह करें',
       callButton: (phone: string) => `${phone} पर कॉल करें`,
       websiteButton: 'आधिकारिक वेबसाइट खोलें',
+      openCmsRbiButton: 'cms.rbi.org.in खोलें',
       shareDraftButton: 'शिकायत का मसौदा शेयर करें',
       draftCopiedNotice: 'मसौदा शेयर करने के लिए तैयार है',
     },

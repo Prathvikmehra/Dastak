@@ -28,7 +28,9 @@ export const DoThisNowCard: React.FC<DoThisNowCardProps> = ({
   const copy = useCopy();
 
   const hasPhone = Boolean(step.phone);
-  const callScript = hasPhone ? buildCallScript(caseItem, step, copy.callScript) : '';
+  const hasScript = Boolean(step.scriptId);
+  const callScript = hasScript ? buildCallScript(caseItem, step, copy.callScript) : '';
+  const isRbiStep = step.scriptId === 'rbi14448';
 
   return (
     <Card style={styles.card}>
@@ -56,8 +58,8 @@ export const DoThisNowCard: React.FC<DoThisNowCardProps> = ({
         {step.how}
       </Text>
 
-      {/* If step has phone: show call script card */}
-      {hasPhone ? (
+      {/* If step has script: show call script card */}
+      {hasScript && callScript ? (
         <View
           style={[
             styles.scriptBox,
@@ -81,7 +83,36 @@ export const DoThisNowCard: React.FC<DoThisNowCardProps> = ({
       ) : null}
 
       <View style={styles.actionsContainer}>
-        {hasPhone ? (
+        {isRbiStep && step.link ? (
+          <>
+            <Button
+              label={copy.caseDetail.doThisNow.openCmsRbiButton}
+              variant={isUrgentBannerActive ? 'quiet' : 'primary'}
+              onPress={() => onOpenWebsite(step.link!)}
+              icon={
+                <Ionicons
+                  name="open-outline"
+                  size={18}
+                  color={isUrgentBannerActive ? colors.primary : colors.onAction}
+                />
+              }
+            />
+            {step.phone ? (
+              <Button
+                label={copy.caseDetail.doThisNow.callButton(step.phone)}
+                variant="quiet"
+                onPress={() => onCall(step.phone!)}
+                icon={<Ionicons name="call" size={18} color={colors.primary} />}
+              />
+            ) : null}
+            <Button
+              label={copy.caseDetail.doThisNow.shareDraftButton}
+              variant="quiet"
+              onPress={onShareDraft}
+              icon={<Ionicons name="share-outline" size={18} color={colors.primary} />}
+            />
+          </>
+        ) : hasPhone ? (
           <>
             <Button
               label={copy.caseDetail.doThisNow.callButton(step.phone!)}
@@ -101,6 +132,14 @@ export const DoThisNowCard: React.FC<DoThisNowCardProps> = ({
               onPress={onShareDraft}
               icon={<Ionicons name="share-outline" size={18} color={colors.primary} />}
             />
+            {step.link ? (
+              <Button
+                label={copy.caseDetail.doThisNow.websiteButton}
+                variant="quiet"
+                onPress={() => onOpenWebsite(step.link!)}
+                icon={<Ionicons name="open-outline" size={18} color={colors.primary} />}
+              />
+            ) : null}
           </>
         ) : (
           <>
